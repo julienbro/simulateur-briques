@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulateur de Briques 3D</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; overflow: hidden; }
+    #interface {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    button {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      width: 120px;
+    }
+  </style>
+</head>
+<body>
+  <div id="interface">
+    <strong>Standard</strong>
+    <button onclick="selectBrick('entière')">Entière</button>
+    <button onclick="selectBrick('demi')">Demi</button>
+    <button onclick="selectBrick('trois-quarts')">Trois-quarts</button>
+    <button onclick="rotateBrick()">Rotation</button>
+    <button onclick="clearBricks()">Vider l'espace</button>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
+  <script>
+    let scene = new THREE.Scene();
+    let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    let renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    let controls = new THREE.OrbitControls(camera, renderer.domElement);
+    camera.position.set(5, 8, 10);
+    controls.update();
+
+    // Plaque
+    let baseGeometry = new THREE.PlaneGeometry(4, 4);
+    let baseMaterial = new THREE.MeshBasicMaterial({color: 0xdddddd, side: THREE.DoubleSide});
+    let base = new THREE.Mesh(baseGeometry, baseMaterial);
+    base.rotation.x = -Math.PI / 2;
+    scene.add(base);
+
+    let currentType = 'entière';
+    let currentRotation = 0;
+    let bricks = [];
+
+    function selectBrick(type) {
+      currentType = type;
+    }
+
+    function rotateBrick() {
+      currentRotation += Math.PI / 2;
+    }
+
+    function clearBricks() {
+      bricks.forEach(b => scene.remove(b));
+      bricks = [];
+    }
+
+    function addBrick(x, z) {
+      let dims;
+      if (currentType === 'entière') dims = [0.19, 0.07, 0.09];
+      if (currentType === 'demi') dims = [0.09, 0.07, 0.09];
+      if (currentType === 'trois-quarts') dims = [0.14, 0.07, 0.09];
+
+      let geometry = new THREE.BoxGeometry(...dims);
+      let material = new THREE.MeshStandardMaterial({color: 0xB04A19});
+      let brick = new THREE.Mesh(geometry, material);
+      brick.position.set(x, dims[1]/2, z);
+      brick.rotation.y = currentRotation;
+      bricks.push(brick);
+      scene.add(brick);
+    }
+
+    // Lumière
+    const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+    scene.add(ambient);
+    const directional = new THREE.DirectionalLight(0xffffff, 0.5);
+    directional.position.set(5, 10, 7);
+    scene.add(directional);
+
+    // Clic pour placer une brique
+    window.addEventListener('click', (e) => {
+      if (e.target.tagName === 'BUTTON') return;
+      let mouse = new THREE.Vector2(
+        (e.clientX / window.innerWidth) * 2 - 1,
+        -(e.clientY / window.innerHeight) * 2 + 1
+      );
+      let raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(mouse, camera);
+      let intersects = raycaster.intersectObject(base);
+      if (intersects.length > 0) {
+        let point = intersects[0].point;
+        // Align sur une grille invisible de 1cm (0.01 m) avec joints de 1cm
+        let snap = (val) => Math.round(val / 0.20) * 0.20;
+        addBrick(snap(point.x), snap(point.z));
+      }
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
+</body>
+</html>
