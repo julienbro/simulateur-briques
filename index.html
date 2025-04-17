@@ -38,17 +38,20 @@
     let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
     let renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
     document.body.appendChild(renderer.domElement);
 
     let controls = new THREE.OrbitControls(camera, renderer.domElement);
-    camera.position.set(5, 8, 10);
+    camera.position.set(2, 5, 6);
     controls.update();
 
     // Plaque
     let baseGeometry = new THREE.PlaneGeometry(4, 4);
-    let baseMaterial = new THREE.MeshBasicMaterial({color: 0xdddddd, side: THREE.DoubleSide});
+    let baseMaterial = new THREE.MeshStandardMaterial({color: 0xdddddd, side: THREE.DoubleSide});
     let base = new THREE.Mesh(baseGeometry, baseMaterial);
     base.rotation.x = -Math.PI / 2;
+    base.receiveShadow = true;
+    base.name = "base";
     scene.add(base);
 
     let currentType = 'entière';
@@ -77,6 +80,8 @@
       let geometry = new THREE.BoxGeometry(...dims);
       let material = new THREE.MeshStandardMaterial({color: 0xB04A19});
       let brick = new THREE.Mesh(geometry, material);
+      brick.castShadow = true;
+      brick.receiveShadow = true;
       brick.position.set(x, dims[1]/2, z);
       brick.rotation.y = currentRotation;
       bricks.push(brick);
@@ -84,14 +89,15 @@
     }
 
     // Lumière
-    const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+    const ambient = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambient);
-    const directional = new THREE.DirectionalLight(0xffffff, 0.5);
-    directional.position.set(5, 10, 7);
+    const directional = new THREE.DirectionalLight(0xffffff, 0.8);
+    directional.position.set(2, 6, 3);
+    directional.castShadow = true;
     scene.add(directional);
 
     // Clic pour placer une brique
-    window.addEventListener('click', (e) => {
+    window.addEventListener('pointerdown', (e) => {
       if (e.target.tagName === 'BUTTON') return;
       let mouse = new THREE.Vector2(
         (e.clientX / window.innerWidth) * 2 - 1,
@@ -102,8 +108,7 @@
       let intersects = raycaster.intersectObject(base);
       if (intersects.length > 0) {
         let point = intersects[0].point;
-        // Align sur une grille invisible de 1cm (0.01 m) avec joints de 1cm
-        let snap = (val) => Math.round(val / 0.20) * 0.20;
+        let snap = (val) => Math.round(val / 0.10) * 0.10;
         addBrick(snap(point.x), snap(point.z));
       }
     });
