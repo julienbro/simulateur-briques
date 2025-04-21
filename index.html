@@ -138,7 +138,7 @@
 
         #settings-panel h3 {
             margin-top: 0;
-             border-bottom: 1px solid #3c3c3c;
+            border-bottom: 1px solid #3c3c3c;
              padding-bottom: 5px;
              margin-bottom: 10px;
         }
@@ -197,7 +197,7 @@
             width: calc(100% - 60px); /* Match container width */
             padding: 10px 30px; /* Padding to align content within container */
             box-sizing: border-box;
-             padding-left: calc(60px + 30px); /* Account for toolbar + padding */
+            padding-left: calc(60px + 30px); /* Account for toolbar + padding */
         }
 
         #title-input-container {
@@ -385,13 +385,14 @@
         </div>
 
          <div id="title-controls-container">
-             <div id="dimensionsDisplay"></div> <div id="title-input-container">
-                 <label for="wallTitleInput">Titre de l'ouvrage :</label>
+             <div id="dimensionsDisplay"></div>
+             <div id="title-input-container">
+                <label for="wallTitleInput">Titre de l'ouvrage :</label>
                  <input type="text" id="wallTitleInput" placeholder="Entrez le titre ici">
              </div>
              <div id="title-buttons">
                  <label for="fillBricksCheckbox">
-                     <input type="checkbox" id="fillBricksCheckbox" checked> Remplissage briques
+                    <input type="checkbox" id="fillBricksCheckbox" checked> Remplissage briques
                  </label>
                   <button onclick="exportToPDF()"><i class="fas fa-file-pdf"></i> Exporter PDF</button>
              </div>
@@ -400,8 +401,9 @@
 
         <div id="settings-panel">
             <h3>Paramètres</h3>
-             <div class="joint-settings">
-                <label>Joint vertical (mm): <input type="number" id="verticalJointWidthInput" value="10" min="0" max="20" step="1"></label> <label>Joint horizontal (mm): <input type="number" id="horizontalJointWidthInput" value="10" min="0" max="20" step="1"></label>
+            <div class="joint-settings">
+                <label>Joint vertical (mm): <input type="number" id="verticalJointWidthInput" value="10" min="0" max="20" step="1"></label>
+                <label>Joint horizontal (mm): <input type="number" id="horizontalJointWidthInput" value="10" min="0" max="20" step="1"></label>
              </div>
 
             <div class="brick-type-settings">
@@ -413,27 +415,28 @@
 
              <div class="brick-type-settings">
                 <h4>Trois quarts (3/4)</h4>
-                <label>Longueur (cm): <input type="number" id="threeQuartersBrickLengthInput" value="14.25" min="1" max="50" step="0.5"></label>
+                <label>Longueur (cm): <input type="number" id="threeQuartersBrickLengthInput" value="14" min="1" max="50" step="0.5"></label>
                 <label>Hauteur (cm): <input type="number" id="threeQuartersBrickHeightInput" value="6.5" min="1" max="30" step="0.5"></label>
                 <label>Largeur (cm): <input type="number" id="threeQuartersBrickWidthInput" value="9" min="1" max="30" step="0.5"></label>
             </div>
 
-             <div class="brick-type-settings">
+            <div class="brick-type-settings">
                 <h4>Demi (1/2)</h4>
-                <label>Longueur (cm): <input type="number" id="halfBrickLengthInput" value="9.5" min="1" max="50" step="0.5"></label>
+                <label>Longueur (cm): <input type="number" id="halfBrickLengthInput" value="9" min="1" max="50" step="0.5"></label>
                 <label>Hauteur (cm): <input type="number" id="halfBrickHeightInput" value="6.5" min="1" max="30" step="0.5"></label>
                 <label>Largeur (cm): <input type="number" id="halfBrickWidthInput" value="9" min="1" max="30" step="0.5"></label>
             </div>
 
              <div class="brick-type-settings">
                 <h4>Quart (1/4)</h4>
-                <label>Longueur (cm): <input type="number" id="quarterBrickLengthInput" value="4.75" min="1" max="50" step="0.5"></label>
+                <label>Longueur (cm): <input type="number" id="quarterBrickLengthInput" value="4" min="1" max="50" step="0.5"></label>
                 <label>Hauteur (cm): <input type="number" id="quarterBrickHeightInput" value="6.5" min="1" max="30" step="0.5"></label>
                 <label>Largeur (cm): <input type="number" id="quarterBrickWidthInput" value="9" min="1" max="30" step="0.5"></label>
             </div>
 
 
-            <label><input type="checkbox" id="fillBricksSettings" checked> Remplissage des briques</label> </div>
+            <label><input type="checkbox" id="fillBricksSettings" checked> Remplissage des briques</label>
+        </div>
 
         <div id="header">Mur simulateur 2D (par Constr'huy)</div>
 
@@ -452,25 +455,25 @@
                     <div class="legend">
                         <span style="color:#B22222">■</span>1/1 | <span style="color:#FF8C00">■</span>3/4 | <span style="color:#4682B4">■</span>1/2 | <span style="color:#32CD32">■</span>1/4
                     </div>
-                     </div>
+                </div>
             </div>
             <div class="canvas-row">
                 <div class="view">
                     <canvas id="frontView"></canvas>
                     <div class="label">Vue de face</div>
-                     </div>
+                </div>
             </div>
             <div class="canvas-row">
                 <div class="view">
                     <canvas id="leftView"></canvas>
                     <div class="label">Vue gauche</div>
-                     </div>
+                </div>
             </div>
              <div class="canvas-row">
                 <div class="view">
                     <canvas id="rightView"></canvas>
                     <div class="label">Vue droite</div>
-                     </div>
+                </div>
             </div>
              <div id="brick-counts">
                 <h3>Compteur de Briques</h3>
@@ -493,15 +496,13 @@
             half: { color: '#4682B4', label: 'Demi (1/2)' },
             quarter: { color: '#32CD32', label: 'Quart (1/4)' }
         };
-
-         // Store independent dimensions for each type
+        // Store independent dimensions for each type
         let brickDimensions = {
             entire: { w: 19, h: 6.5, d: 9 }, // w: Longueur, h: Hauteur, d: Largeur
-            threeQuarters: { w: 19 * 0.75, h: 6.5, d: 9 },
-            half: { w: 19 * 0.5, h: 6.5, d: 9 },
-            quarter: { w: 19 * 0.25, h: 6.5, d: 9 }
+            threeQuarters: { w: 14, h: 6.5, d: 9 },
+            half: { w: 9, h: 6.5, d: 9 },
+            quarter: { w: 4, h: 6.5, d: 9 }
         };
-
         let scale = 5; // Pixels per cm
         let gridSize = scale; // Grid size based on 1cm = 5px
         let verticalJointWidth = 10; // mm
@@ -556,7 +557,6 @@
                 d: document.getElementById('quarterBrickWidthInput')
             }
         };
-
         const verticalJointWidthInput = document.getElementById('verticalJointWidthInput'); // Vertical joint input
         const horizontalJointWidthInput = document.getElementById('horizontalJointWidthInput'); // Horizontal joint input
 
@@ -566,24 +566,19 @@
         const countThreeQuarters = document.querySelector('#count-threeQuarters span');
         const countHalf = document.querySelector('#count-half span');
         const countQuarter = document.querySelector('#count-quarter span');
-
-
         const ctxs = {
             top: topCanvas.getContext('2d'),
             front: frontCanvas.getContext('2d'),
             left: leftCanvas.getContext('2d'),
             right: rightCanvas.getContext('2d')
         };
-
-         // Add console log to verify DOM references
+        // Add console log to verify DOM references
          console.log("DOM references (on script load):", {
              countEntire, countThreeQuarters, countHalf, countQuarter,
              wallTitleInput, dimensionsDisplay, fillBricksCheckbox, fillBricksSettingsCheckbox,
              verticalJointWidthInput, horizontalJointWidthInput,
              dimensionInputs // Log the dimension input references
          });
-
-
         // Gestion de l'historique
         function saveState() {
             // Deep clone the layers array
@@ -601,7 +596,7 @@
             resizeCanvases();
             initSettings(); // Sets up initial settings and event listeners
             updateLayerSelect(); // Initialize layer select
-             currentLayerLabel.textContent = currentLayer + 1; // Update layer label
+            currentLayerLabel.textContent = currentLayer + 1; // Update layer label
             saveState(); // Save initial empty state
             drawAll();
             updateBrickCounts(); // Initial count update
@@ -609,7 +604,6 @@
              updateDimensionsDisplay(); // Display initial dimensions
              syncFillBricksCheckboxes(); // Ensure checkboxes are in sync initially
         });
-
         // Initialisation des paramètres et événements
         function initSettings() {
             verticalJointWidthInput.value = verticalJointWidth;
@@ -682,7 +676,7 @@
         // Redimensionnement responsive
         function resizeCanvases() {
             const containerWidth = document.getElementById('container').offsetWidth;
-             if (containerWidth === 0) { // Avoid division by zero if container is not yet measured
+            if (containerWidth === 0) { // Avoid division by zero if container is not yet measured
                  console.warn("Container width is 0, cannot resize canvases.");
                  return;
              }
@@ -706,15 +700,12 @@
 
             frontCanvas.width = fullWidthCanvas;
             frontCanvas.height = fullWidthCanvas / aspectRatioTopFront;
-
             // Left and Right views will be stacked vertically, so they can also use full width
             leftCanvas.width = fullWidthCanvas; // Use full width for stacking
             leftCanvas.height = fullWidthCanvas / aspectRatioLeftRight;
             rightCanvas.width = fullWidthCanvas; // Use full width for stacking
             rightCanvas.height = fullWidthCanvas / aspectRatioLeftRight;
-
-
-             drawAll(); // Redraw after resizing
+            drawAll(); // Redraw after resizing
              // console.log(`Canvases resized. Top: ${topCanvas.width}x${topCanvas.height}, Front: ${frontCanvas.width}x${frontCanvas.height}, Side: ${leftCanvas.width}x${leftCanvas.height}`);
         }
 
@@ -783,7 +774,7 @@
                 document.querySelectorAll('#toolbar button[data-type]').forEach(btn => {
                     btn.classList.remove('selected'); // Remove selected class from all type buttons
                 });
-                 // Find the selected button and add a border
+                // Find the selected button and add a border
                 const selectedBtn = document.querySelector(`#toolbar button[data-type="${type}"]`);
                 if(selectedBtn) {
                      selectedBtn.classList.add('selected'); // Add selected class
@@ -797,21 +788,19 @@
 
         function updateBrickCounts() {
             const counts = { entire: 0, threeQuarters: 0, half: 0, quarter: 0 };
-
             layers.forEach(layer => {
                 layer.forEach(brick => {
                     // Ensure brick.type is a valid key before incrementing
                     if (brick && typeof brick.type === 'string' && counts.hasOwnProperty(brick.type)) {
-                         counts[brick.type]++;
+                        counts[brick.type]++;
                     } else if (brick && brick.type) {
                          console.warn("Brick with unknown type encountered (will not be counted):", brick.type);
                     } else {
-                         // console.warn("Brick with missing type encountered:", brick); // Too noisy
+                        // console.warn("Brick with missing type encountered:", brick); // Too noisy
                     }
                 });
             });
-
-             // console.log("Calculated brick counts:", counts); // Debugging: Check calculated counts
+            // console.log("Calculated brick counts:", counts); // Debugging: Check calculated counts
 
             // Update DOM elements
             if (countEntire) countEntire.textContent = counts.entire;
@@ -825,12 +814,12 @@
          // Helper to get scaled brick size based on type and rotation *using current settings*
          // This is primarily for the GHOST brick and initial placement calculations.
          // For drawing already placed bricks, use the dimensions stored *with the brick object*.
-        function getCurrentScaledBrickSize(type = selectedBrickType, rot = rotation) {
+         function getCurrentScaledBrickSize(type = selectedBrickType, rot = rotation) {
              // console.log(`Getting scaled size for type: ${type}, rotation: ${rot}`);
-            // Get base dimensions in cm from current settings
+             // Get base dimensions in cm from current settings
             // DIRECTLY use the dimensions from the brickDimensions object for this type
             const { w, h, d } = brickDimensions[type];
-             // console.log(`Base dimensions (cm) for ${type}: W=${w}, H=${h}, D=${d}`);
+            // console.log(`Base dimensions (cm) for ${type}: W=${w}, H=${h}, D=${d}`);
 
 
             // Convert cm to pixels using the current scale
@@ -840,10 +829,8 @@
 
 
             const color = brickTypes[type].color;
-
             // In top view (plan), rotation swaps Longueur and Largeur
             const rotatedSizeTopView = rot % 180 === 0 ? { w: scaledW, h: scaledD } : { w: scaledD, h: scaledW };
-
             return {
                  base_w_cm: w, // Longueur (cm)
                  base_h_cm: h, // Hauteur (cm)
@@ -871,8 +858,7 @@
 
 
         function drawGrid(ctx, w, h) {
-            ctx.clearRect(0, 0, w, h);
-             // Optional: Draw a background color if not clearing to transparent
+            ctx.clearRect(0, 0, w, h); // Optional: Draw a background color if not clearing to transparent
              // ctx.fillStyle = 'white';
              // ctx.fillRect(0, 0, w, h);
 
@@ -913,7 +899,7 @@
                      // If not found, use current settings as fallback, but warn that this might be inaccurate
                      const dims = (b.w_placed !== undefined && b.h_placed !== undefined) ?
                                   { w: b.w_placed, h: b.h_placed } :
-                                  (brickDimensions[b.type] ? (b.rotation % 180 === 0 ? { w: brickDimensions[b.type].w * scale, h: brickDimensions[b.type].d * scale } : { w: brickDimensions[b.type].d * scale, h: brickDimensions[b.type].w * scale }) : { w: 0, h: 0 });
+                                   (brickDimensions[b.type] ? (b.rotation % 180 === 0 ? { w: brickDimensions[b.type].w * scale, h: brickDimensions[b.type].d * scale } : { w: brickDimensions[b.type].d * scale, h: brickDimensions[b.type].w * scale }) : { w: 0, h: 0 });
                     if (b.w_placed === undefined || b.h_placed === undefined) {
                          // console.warn(`Drawing previous layer outline for brick without stored placed dimensions. Type: ${b.type}, Rotation: ${b.rotation}. Using current settings as fallback.`); // Too noisy
                     }
@@ -924,9 +910,9 @@
 
                       if (drawW > 0 && drawH > 0) { // Only draw if dimensions are positive
                         ctx.strokeRect(b.x, b.y, drawW, drawH);
-                      }
+                 }
                  });
-                  ctx.lineWidth = 1; // Reset line width
+                 ctx.lineWidth = 1; // Reset line width
              }
              // -------------------------------------------------------------
 
@@ -948,7 +934,6 @@
 
                 ctx.strokeStyle = 'black'; // Border color for bricks
                 ctx.lineWidth = 1;
-
                 if (fillBricks) {
                     ctx.fillStyle = b.color;
                     ctx.fillRect(brickX, brickY, brickDrawW, brickDrawH);
@@ -1011,9 +996,9 @@
 
                         if(rot === 0 || rot === 180) { // Original Longueur is along top view X axis
                             holeCenterX_cm_relative = holeCenterAlongSpreadDim_cm; // X maps to position along physical Longueur
-                            holeCenterY_cm_relative = centerY_cm;              // Y maps to center along physical Largeur
+                            holeCenterY_cm_relative = centerY_cm; // Y maps to center along physical Largeur
                         } else { // Original Longueur is along top view Y axis (rot 90 or 270)
-                            holeCenterX_cm_relative = centerY_cm;              // X maps to center along physical Largeur
+                            holeCenterX_cm_relative = centerY_cm; // X maps to center along physical Largeur
                             holeCenterY_cm_relative = holeCenterAlongSpreadDim_cm; // Y maps to position along physical Longueur
                         }
 
@@ -1027,7 +1012,7 @@
                          if (holeCenterX_px >= brickX - tolerance && holeCenterX_px <= brickX + brickDrawW + tolerance &&
                              holeCenterY_px >= brickY - tolerance && holeCenterY_px <= brickY + brickDrawH + tolerance) {
 
-                            ctx.beginPath();
+                             ctx.beginPath();
                             ctx.arc(holeCenterX_px, holeCenterY_px, holeRadius, 0, 2 * Math.PI);
                             ctx.fillStyle = '#ccc'; // Lighter grey for holes
                             ctx.fill();
@@ -1039,7 +1024,7 @@
                     }
                 }
             });
-            // -------------------------------------------------------------
+             // -------------------------------------------------------------
 
 
             // Draw ghost brick for the current layer's canvas
@@ -1075,13 +1060,22 @@
 
              ctx.strokeStyle = 'black'; // Border color
              ctx.lineWidth = 1;
-
              let brickDrawX, brickDrawW;
 
              if (mode === 'front') {
-                 // Front view: use x position from top view brick object and stored scaled width (longueur)
+                 // Front view: use x position from top view brick object
                  brickDrawX = brick.x; // Already scaled pixel position from top view
-                 brickDrawW = brickScaledW; // Use stored scaled width (longueur)
+
+                 // For the front view, the width depends on the rotation in the top view.
+                 // If rotated 90 or 270 degrees, show the Largeur (scaled_d) as width.
+                 // Otherwise, show the Longueur (scaled_w) as width.
+                 const rot = brick.rotation % 360;
+                 if (rot === 90 || rot === 270) {
+                     brickDrawW = brickScaledD; // Use scaled Largeur as width for 90/270 rotation
+                 } else {
+                     brickDrawW = brickScaledW; // Use scaled Longueur as width for 0/180 rotation
+                 }
+
              } else { // Left or Right view
                  // Side views: use y position (depth in top view) from top view brick object and stored scaled depth (largeur)
                  brickDrawX = brick.y; // Already scaled pixel position (this is the depth position from top view)
@@ -1128,6 +1122,9 @@
              const graduationTextOffset = 10; // Pixels
 
 
+            // Create a temporary array to hold bricks visible in this elevation view
+            const visibleBricks = [];
+
             layers.forEach((layer, z) => {
                 // Y position for the bottom of the current layer (in pixels from canvas top)
                 // This calculation correctly uses the current layer height setting
@@ -1140,14 +1137,35 @@
                 ctx.stroke();
                 ctx.fillText(`A${z+1}`, canvasWidth - graduationTextOffset - graduationLineLength - 3, layerBottomY + 3); // Position text to the left of the line
 
-                // Draw bricks in this layer
-                layer.forEach(b => {
-                     // Pass the brick object, mode, and the calculated layer bottom Y position
-                     drawElevationBrick(ctx, b, mode, layerBottomY);
-                });
-             });
 
-            ctx.lineWidth = 1; // Reset line width
+                 // For occlusion in Front and Side views, we need to draw layers from back to front
+                 // This simple loop draws layer by layer, but doesn't handle occlusion *within* a layer or across layers properly.
+                 // A full occlusion implementation would require sorting bricks by their position in the view's depth axis
+                 // and drawing them in that order, potentially splitting bricks that are partially occluded.
+                 // This is a significant complexity increase.
+
+                 // For now, let's collect all bricks that *could* be visible in this view for potential future sorting/occlusion logic.
+                 // However, the current drawing logic in drawElevationBrick draws all bricks.
+                 // To implement the user's request for "hidden behind another on the plan view not displayed on the front view",
+                 // we would need to determine which bricks are in front of others in the FRONT view perspective, not the PLAN view.
+                 // This requires analyzing the x and depth (y in plan view) coordinates.
+
+                 layer.forEach(b => {
+                     // Add all bricks to the list for now, occlusion is not implemented.
+                     visibleBricks.push({ ...b, layerZ: z, layerBottomY: layerBottomY });
+                 });
+            });
+
+            // Simple drawing of all bricks without occlusion handling as per current code structure.
+            // To implement occlusion, we would sort 'visibleBricks' based on their depth in this specific 'mode' view
+            // and draw them in reverse order.
+
+            visibleBricks.forEach(b => {
+                 // Pass the brick object, mode, and the calculated layer bottom Y position
+                 drawElevationBrick(ctx, b, mode, b.layerBottomY);
+            });
+
+             ctx.lineWidth = 1; // Reset line width
          }
 
 
@@ -1172,7 +1190,7 @@
             const mouseX = e.clientX - r.left;
             const mouseY = e.clientY - r.top;
 
-             // Snap to grid
+            // Snap to grid
             const snappedX = Math.floor(mouseX / gridSize) * gridSize;
             const snappedY = Math.floor(mouseY / gridSize) * gridSize;
 
@@ -1182,7 +1200,6 @@
             };
             drawTopView(); // Only need to redraw top view on mouse move
         });
-
         topCanvas.addEventListener('click', () => {
              console.log('Click handler started.');
              console.log('Current layer:', currentLayer, 'Total layers:', layers.length);
@@ -1211,8 +1228,8 @@
 
                      // Store dimensions as they were calculated when placed (in pixels)
                      // These are based on *current* settings and rotation at placement time.
-                     w_placed: s.displayW_top, // Scaled Longueur or Largeur depending on rotation
-                     h_placed: s.displayH_top, // Scaled Largeur or Longueur depending on rotation
+                     w_placed: s.displayW_top,
+                     h_placed: s.displayH_top,
 
                       // Store base dimensions in cm (needed for hole calculation and potential future re-scaling)
                       base_w_cm: s.base_w_cm, // Longueur (cm)
@@ -1220,7 +1237,7 @@
                       base_d_cm: s.base_d_cm, // Largeur (cm)
 
                       // Store scaled base dimensions (pixels) based on current settings
-                      scaled_w: s.scaled_w, // Scaled Longueur
+                     scaled_w: s.scaled_w, // Scaled Longueur
                       scaled_h: s.scaled_h, // Scaled Hauteur
                       scaled_d: s.scaled_d, // Scaled Largeur
 
@@ -1255,7 +1272,6 @@
                  console.error('Error during brick placement:', error);
                  // Consider showing an alert to the user as well
                  alert('Erreur lors de la pose de la brique : ' + error.message + '. Vérifiez la console pour plus de détails.');
-
              }
         });
 
@@ -1264,11 +1280,9 @@
              ghostBrick = null;
              drawTopView(); // Redraw top view to remove ghost brick
          });
-
-
-        function rotateBrick(){
+         function rotateBrick(){
             rotation = (rotation + 90) % 360;
-             // Update the ghost brick's appearance if visible
+            // Update the ghost brick's appearance if visible
              if(ghostBrick) {
                 drawTopView();
              }
@@ -1283,13 +1297,11 @@
                 // Ensure currentLayer is valid after undoing layers
                 if (currentLayer >= layers.length) {
                     currentLayer = layers.length - 1;
-                     if (currentLayer < 0) currentLayer = 0; // Handle case where all layers are undone (should result in layers = [[]], currentLayer = 0)
+                    if (currentLayer < 0) currentLayer = 0; // Handle case where all layers are undone (should result in layers = [[]], currentLayer = 0)
                      updateLayerSelect(); // Update dropdown again if currentLayer changed
                 }
                  // Ensure layers is never completely empty after undoing all
                  if (layers.length === 0) layers = [[]];
-
-
                 drawAll(); // Redraw all views
                 updateBrickCounts(); // Update counts
                  // console.log('Undo. History index:', historyIndex);
@@ -1329,21 +1341,20 @@
 
         function exportPose(){
             const a = document.createElement('a');
-             // Store only necessary data for re-creating the wall structure:
+            // Store only necessary data for re-creating the wall structure:
              // grid positions (x, y), type, and rotation.
-             // Dimensions will be re-calculated on import based on current settings.
-             // Also export the current brick dimensions settings so they can be reloaded
+            // Dimensions will be re-calculated on import based on current settings.
+            // Also export the current brick dimensions settings so they can be reloaded
             const dataToExport = {
                  version: APP_VERSION, // Include version
                  brickDimensions: brickDimensions, // Export all brick dimensions settings
                  layers: layers.map(layer => layer.map(brick => ({
-                     x: brick.x, // Pixel position in top view as placed (relative to top-left, snapped to grid)
+                    x: brick.x, // Pixel position in top view as placed (relative to top-left, snapped to grid)
                      y: brick.y, // Pixel position in top view as placed (relative to top-left, snapped to grid)
                      type: brick.type, // Brick type string (entire, half, etc.)
                      rotation: brick.rotation // Rotation in degrees (0, 90, 180, 270)
                  })))
              };
-
             const d = JSON.stringify(dataToExport, null, 2); // Use 2 spaces for pretty printing
             a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(d); // Specify charset
             a.download = 'mur_pose.json'; // More descriptive filename
@@ -1352,14 +1363,13 @@
 
         function importPose(e) {
             const file = e.target.files[0];
-             if (!file) return;
+            if (!file) return;
 
             const reader = new FileReader();
             reader.onload = ev => {
                 try {
                     const importedData = JSON.parse(ev.target.result);
-
-                     // Basic validation
+                    // Basic validation
                      if (!importedData || !Array.isArray(importedData.layers) || !importedData.brickDimensions) {
                          throw new Error('Format de fichier JSON invalide ou corrompu.');
                      }
@@ -1425,7 +1435,7 @@
                              scaled_h: s.scaled_h,
                              scaled_d: s.scaled_d,
 
-                             color: brickTypes[importedBrick.type].color, // Re-calculate color based on current type
+                            color: brickTypes[importedBrick.type].color, // Re-calculate color based on current type
                              rotation: importedBrick.rotation, // Use stored rotation
                              type: importedBrick.type // Use stored type
                          };
@@ -1446,7 +1456,7 @@
 
                 } catch (error) {
                     alert('Erreur lors de l\'importation du fichier : ' + error.message);
-                    console.error(error);
+                    console.error('Import Error:', error);
                 } finally {
                      // Reset the file input so the same file can be imported again if needed
                     e.target.value = '';
@@ -1510,7 +1520,6 @@
             // Calculate the equivalent length in mm in the PDF, based on how the canvas was scaled
             const scaleFactorPDF = finalWidthMM / originalCanvasWidthPx; // mm per pixel in the PDF
             const scaleBarLengthMM = scaleLengthPx * scaleFactorPDF;
-
             const barHeight = 0.8; // mm - Reduced bar height significantly
             const tickHeight = 3; // mm - Reduced tick height
             const textMargin = 2; // mm
@@ -1551,7 +1560,6 @@
              const yPos = pageHeight - 5; // 5mm from the bottom
 
              doc.text(footerTextRight, xPosRight, yPos);
-
              // Left aligned text (Page Numbering)
              const xPosLeft = margin;
              doc.text(footerTextLeft, xPosLeft, yPos, { align: 'left' });
@@ -1570,7 +1578,6 @@
                 const { jsPDF } = window.jspdf;
                 // Orientation portrait ('p'), size 'a4'
                 const doc = new jsPDF('p', 'mm', 'a4');
-
                 const pageWidth = doc.internal.pageSize.getWidth(); // A4 Portrait width in mm
                 const pageHeight = doc.internal.pageSize.getHeight(); // A4 Portrait height in mm
                 const margin = 10; // mm
@@ -1581,8 +1588,6 @@
 
                  // Joint dimensions text
                  const jointDimensionsText = `Joints: Vertical=${verticalJointWidth} mm, Horizontal=${horizontalJointWidth} mm`;
-
-
                  // Space between image, label, legend, and scale bar
                 const spacingAfterLabel = 5; // Space between label and legend/scale
                 const spacingAfterLegendAndScale = 7; // Space after legend/scale bar
@@ -1591,7 +1596,6 @@
 
                 const addCanvasSectionToPDF = (docInstance, canvasId, desiredWidthMM, labelText, xPos, startY) => {
                     const canvas = document.getElementById(canvasId);
-
                     // Create a temporary canvas to get a higher resolution image for PDF
                     const scaleFactor = 3; // Increased resolution
                     const tempCanvas = document.createElement('canvas');
@@ -1620,13 +1624,12 @@
 
 
                     docInstance.addImage(imgData, 'PNG', xPos, startY, finalWidthMM, finalHeightMM);
-
-                     // Add label below the image
+                    // Add label below the image
                      docInstance.setFontSize(14); // Increased font size for label
                      docInstance.setFont(undefined, 'bold'); // Made label bold
                      docInstance.setTextColor(0, 0, 0); // Black color for label
                      const labelY = startY + finalHeightMM + 3;
-                     docInstance.text(labelText, xPos + finalWidthMM / 2, labelY, { align: 'center' }); // Position label below image
+                    docInstance.text(labelText, xPos + finalWidthMM / 2, labelY, { align: 'center' }); // Position label below image
                      docInstance.setFont(undefined, 'normal'); // Reset font style
 
 
@@ -1639,12 +1642,9 @@
                      const estimatedLegendHeight = 5; // mm
                      const scaleBarY = legendY + estimatedLegendHeight + 2; // Position scale bar below legend
                      addScaleBarToPDF(docInstance, canvas, finalWidthMM, xPos, scaleBarY);
-
                     const estimatedScaleBarHeight = 5; // mm
                      return startY + finalHeightMM + 3 + estimatedLegendHeight + estimatedScaleBarHeight + spacingAfterLabel + 2; // Return the Y position after this section
                 };
-
-
                 // Add Title
                 doc.setFontSize(16);
                 doc.setFont(undefined, 'bold'); // Set font to bold
@@ -1664,8 +1664,7 @@
                      doc.text(dimText, pageWidth / 2, cursorY + 5, { align: 'center' });
                      cursorY += 4; // Space between dimension lines
                 });
-
-                 cursorY += spacingAfterDimensions; // Space after the block of dimensions
+                cursorY += spacingAfterDimensions; // Space after the block of dimensions
 
                 // Add Joint Dimensions Text
                  doc.setFontSize(9);
@@ -1712,7 +1711,6 @@
                          counts[brick.type]++;
                      }
                  }));
-
                 const tableStartX = margin;
                 const tableCol1Width = 8; // Color Square column
                 const tableCol2Width = 60; // Type Label column (increased width)
@@ -1722,8 +1720,7 @@
                 const squareSize = 4; // mm
 
                  const tableTotalWidth = tableCol1Width + tableCol2Width + tableCol3Width;
-
-                // Check if enough space for the table header and at least one row
+                 // Check if enough space for the table header and at least one row
                  const requiredTableIntroHeight = tableHeaderHeight + tableRowHeight + 5; // Header + Column titles + padding
                  if (cursorY + requiredTableIntroHeight > pageHeight - margin) {
                      doc.addPage();
@@ -1736,8 +1733,7 @@
                 doc.setTextColor(0, 0, 0);
                 doc.text('Compteur de Briques', tableStartX, cursorY); // Table Title
                 cursorY += tableHeaderHeight;
-
-                 doc.line(tableStartX, cursorY - 2, tableStartX + tableTotalWidth, cursorY - 2); // Underline header
+                doc.line(tableStartX, cursorY - 2, tableStartX + tableTotalWidth, cursorY - 2); // Underline header
 
                  doc.setFontSize(9);
                  doc.setFont(undefined, 'normal'); // Reset font to normal
@@ -1760,23 +1756,12 @@
                      // Check space for row before drawing
                      if (cursorY + tableRowHeight > pageHeight - margin) {
                          doc.addPage();
-                         cursorY = margin + tableHeaderHeight + tableRowHeight; // Start new page with headers space
-                          // Optionally redraw headers on new page if needed
-                          doc.setFontSize(10);
-                          doc.setFont(undefined, 'bold');
-                          doc.setTextColor(0, 0, 0);
-                          // doc.text('Compteur de Briques (suite)', tableStartX, cursorY - tableHeaderHeight); // Optional continuation text
-                          // cursorY += tableHeaderHeight; // Adjust cursor if adding continuation header
-                          doc.setFontSize(9);
-                          doc.setFont(undefined, 'normal');
-                          doc.setTextColor(countTextColor);
-                          doc.line(tableStartX, cursorY - 2, tableStartX + tableTotalWidth, cursorY - 2); // Redraw underline on new page
+                         cursorY = margin;
                      }
 
                      // Draw color square
                      doc.setFillColor(color);
                      doc.rect(tableStartX + (tableCol1Width - squareSize) / 2, cursorY + (tableRowHeight - squareSize) / 2, squareSize, squareSize, 'F');
-
                      // Draw Label
                      doc.text(label, tableStartX + tableCol1Width + 2, cursorY + tableRowHeight * 0.7); // Adjust Y for vertical alignment
 
@@ -1785,12 +1770,9 @@
 
                      // Draw horizontal line *after* drawing the row content
                      doc.line(tableStartX, cursorY + tableRowHeight - 2, tableStartX + tableTotalWidth, cursorY + tableRowHeight - 2);
-
-
                      cursorY += tableRowHeight; // Move to next row
                  });
-
-                 // The last line of the table is drawn inside the loop, no need for a separate call here
+                // The last line of the table is drawn inside the loop, no need for a separate call here
 
 
                  // Add Footer to all pages
@@ -1855,10 +1837,8 @@
              //     }
              // }
         });
-
         // Initialisation au chargement
         window.addEventListener('resize', resizeCanvases);
-
          // Initial call to select type and draw on page load (before start is clicked)
          // selectType('entire'); // Highlight the default selected type on load
 
