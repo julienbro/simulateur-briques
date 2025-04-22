@@ -8,24 +8,28 @@
   <style>
     body { margin: 0; overflow: hidden; background: #ffffff; color: #000000; font-family: Arial, sans-serif; }
     canvas { width: 100%; height: 100vh; }
-    .toolbox, .layerbox, .actions, .brick-counter, .title, .version { position: absolute; background: #e2e8f0; padding: 8px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); z-index: 10; }
+    .toolbox, .layerbox, .actions, .brick-counter, .title, .version, .title-input { position: absolute; background: #e2e8f0; padding: 8px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); z-index: 10; }
     .toolbox { top: 10px; left: 10px; width: 256px; }
-    .layerbox { top: 100px; left: 50%; transform: translateX(-50%); cursor: move; width: auto; max-width: 600px; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
+    .layerbox { top: 160px; left: 50%; transform: translateX(-50%); cursor: move; width: auto; max-width: 600px; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
     .layerbox * { pointer-events: auto; }
     .actions { top: 10px; right: 10px; width: 256px; }
     .brick-counter { bottom: 10px; right: 10px; width: 200px; }
     .title { top: 10px; left: 50%; transform: translateX(-50%); text-align: center; pointer-events: none; }
     .title h1 { font-size: 24px; margin: 0; }
     .title p { font-size: 14px; margin: 4px 0 0; }
+    .title-input { top: 80px; left: 50%; transform: translateX(-50%); width: 300px; cursor: move; pointer-events: none; }
+    .title-input * { pointer-events: auto; }
     .version { bottom: 10px; left: 10px; font-size: 12px; padding: 8px; }
-    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     button { padding: 4px; border-radius: 4px; border: none; cursor: pointer; font-size: 12px; font-weight: bold; color: #000000; }
     button:hover { opacity: 0.8; }
     .delete-active { background-color: #b7791f !important; }
-    input, select { background: #edf2f7; color: #000000; border: none; padding: 4px; border-radius: 4px; }
-    label { font-size: 14px; margin-right: 8px; }
+    input, select { background: #edf2f7; color: #000000; border: none; padding: 4px; border-radius: 4px; width: 100%; }
+    label { font-size: 14px; margin-bottom: 4px; display: block; }
     h2 { font-size: 18px; margin-bottom: 8px; color: #000000; }
-    .brick-count, .brick-type-count { font-size: 14px; }
+    .brick-type-count { font-size: 14px; }
+    .checkbox-container { margin-top: 8px; }
+    .checkbox-container input[type="checkbox"] { margin-right: 8px; vertical-align: middle; }
+    .checkbox-container span { font-size: 14px; vertical-align: middle; }
     #homepage { display: flex; }
     #app { display: none; }
     #notification { display: none; }
@@ -44,32 +48,44 @@
       <h1>Wall Simulateur 3d</h1>
       <p>Créé par Julien BROHEZ</p>
     </div>
+    <div id="title-input" class="title-input">
+      <label for="project-title">Titre du projet</label>
+      <input type="text" id="project-title" maxlength="100" placeholder="Entrez le titre du projet">
+    </div>
     <div id="toolbox" class="toolbox">
       <h2>🧱 Outils de pose</h2>
-      <label>Type de brique</label>
-      <div class="grid">
-        <button id="brick-entire" style="background-color: #e07b39;" title="Entière - 19x9x5">1/1</button>
-        <button id="brick-three_quarter" style="background-color: #3498db;" title="Trois quarts - 14x9x5">3/4</button>
-        <button id="brick-half" style="background-color: #2ecc71;" title="Demi - 9x9x5">1/2</button>
-        <button id="brick-quarter" style="background-color: #9b59b6;" title="Quart - 4x9x5">1/4</button>
-      </div>
+      <label for="brick-type">Type de brique/bloc</label>
+      <select id="brick-type">
+        <option value="M50">Brique M50</option>
+        <option value="M57">Brique M57</option>
+        <option value="M65">Brique M65</option>
+        <option value="M90">Brique M90</option>
+        <option value="WF">Brique WF</option>
+        <option value="WFD">Brique WFD</option>
+        <option value="Bloc9">Bloc de 9</option>
+        <option value="Bloc14">Bloc de 14</option>
+        <option value="Bloc19">Bloc de 19</option>
+        <option value="Bloc29">Bloc de 29</option>
+      </select>
+      <label for="brick-size">Taille</label>
+      <select id="brick-size">
+        <option value="entire">Entière</option>
+        <option value="three_quarter">Trois quarts</option>
+        <option value="half">Demi</option>
+        <option value="quarter">Quart</option>
+      </select>
       <label>Rotation Y (°)</label>
       <input type="range" id="rotation-y" min="0" max="355" step="15" value="0">
       <div id="rotation-value" style="text-align: center; font-size: 12px;">0°</div>
       <label>Épaisseur du joint (cm)</label>
       <input type="number" id="joint-thickness" min="0" step="0.1" value="1">
-      <label>Couleur des briques</label>
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <input type="checkbox" id="show-colors" checked>
-        <span style="font-size: 14px;">Afficher les couleurs</span>
-      </div>
-      <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+      <div class="checkbox-container">
         <input type="checkbox" id="white-bricks">
-        <span style="font-size: 14px;">Afficher en blanc</span>
+        <span>Afficher en blanc</span>
       </div>
-      <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+      <div class="checkbox-container">
         <input type="checkbox" id="show-grid">
-        <span style="font-size: 14px;">Afficher la grille</span>
+        <span>Afficher la grille</span>
       </div>
       <button id="delete-mode" style="background-color: #d69e2e; margin-top: 8px;">🗑️ Effacer</button>
     </div>
@@ -79,7 +95,6 @@
         <select id="layer-select"></select>
         <button id="add-layer" style="background-color: #3182ce;">➕</button>
       </div>
-      <div id="brick-count" class="brick-count" style="margin-top: 8px; text-align: center;">Assise active: 0 | Total: 0</div>
     </div>
     <div class="actions">
       <h2>📄 Actions</h2>
@@ -92,13 +107,8 @@
       <button id="export-png" style="background-color: #3182ce; margin-top: 8px;">🖼️ Exporter PNG</button>
     </div>
     <div id="brick-counter" class="brick-counter">
-      <h2>🧮 Compteur de briques</h2>
-      <div id="brick-type-counts" class="brick-type-count">
-        <div>Entière: 0</div>
-        <div>Trois quarts: 0</div>
-        <div>Demi: 0</div>
-        <div>Quart: 0</div>
-      </div>
+      <h2>🧮 Compteur d'éléments</h2>
+      <div id="brick-type-counts" class="brick-type-count"></div>
     </div>
     <div id="version" class="version">Version 1.0.0</div>
   </div>
@@ -110,30 +120,77 @@
 
     // Constants
     const BRICK_SIZES = {
-      entire: [0.19, 0.05, 0.09],
-      three_quarter: [0.14, 0.05, 0.09],
-      half: [0.09, 0.05, 0.09],
-      quarter: [0.04, 0.05, 0.09],
+      M50_entire: [0.19, 0.05, 0.09],
+      M50_three_quarter: [0.14, 0.05, 0.09],
+      M50_half: [0.09, 0.05, 0.09],
+      M50_quarter: [0.04, 0.05, 0.09],
+      M57_entire: [0.19, 0.057, 0.09],
+      M57_three_quarter: [0.14, 0.057, 0.09],
+      M57_half: [0.09, 0.057, 0.09],
+      M57_quarter: [0.04, 0.057, 0.09],
+      M65_entire: [0.19, 0.065, 0.09],
+      M65_three_quarter: [0.14, 0.065, 0.09],
+      M65_half: [0.09, 0.065, 0.09],
+      M65_quarter: [0.04, 0.065, 0.09],
+      M90_entire: [0.19, 0.09, 0.09],
+      M90_three_quarter: [0.14, 0.09, 0.09],
+      M90_half: [0.09, 0.09, 0.09],
+      M90_quarter: [0.04, 0.09, 0.09],
+      WF_entire: [0.21, 0.09, 0.09],
+      WF_three_quarter: [0.15, 0.05, 0.09],
+      WF_half: [0.10, 0.05, 0.09],
+      WF_quarter: [0.05, 0.05, 0.09],
+      WFD_entire: [0.21, 0.09, 0.09],
+      WFD_three_quarter: [0.15, 0.05, 0.09],
+      WFD_half: [0.10, 0.05, 0.09],
+      WFD_quarter: [0.05, 0.05, 0.09],
+      Bloc9_entire: [0.39, 0.19, 0.09],
+      Bloc9_three_quarter: [0.29, 0.19, 0.09],
+      Bloc9_half: [0.19, 0.19, 0.09],
+      Bloc9_quarter: [0.14, 0.19, 0.09],
+      Bloc14_entire: [0.39, 0.19, 0.14],
+      Bloc14_three_quarter: [0.29, 0.19, 0.14],
+      Bloc14_half: [0.19, 0.19, 0.14],
+      Bloc14_quarter: [0.14, 0.19, 0.14],
+      Bloc19_entire: [0.39, 0.19, 0.19],
+      Bloc19_three_quarter: [0.29, 0.19, 0.19],
+      Bloc19_half: [0.19, 0.19, 0.19],
+      Bloc19_quarter: [0.14, 0.19, 0.19],
+      Bloc29_entire: [0.39, 0.19, 0.29],
+      Bloc29_three_quarter: [0.29, 0.19, 0.29],
+      Bloc29_half: [0.19, 0.19, 0.29],
+      Bloc29_quarter: [0.14, 0.19, 0.29],
     };
+
     const COLOR_MAP = {
-      entire: '#e07b39',
-      three_quarter: '#3498db',
-      half: '#2ecc71',
-      quarter: '#9b59b6',
+      M50: '#e07b39',
+      M57: '#c0392b',
+      M65: '#8e44ad',
+      M90: '#2980b9',
+      WF: '#27ae60',
+      WFD: '#16a085',
+      Bloc9: '#d35400',
+      Bloc14: '#7f8c8d',
+      Bloc19: '#2c3e50',
+      Bloc29: '#f1c40f',
     };
+
+    const BRICK_TYPES = ['M50', 'M57', 'M65', 'M90', 'WF', 'WFD', 'Bloc9', 'Bloc14', 'Bloc19', 'Bloc29'];
+    const SIZE_VARIANTS = ['entire', 'three_quarter', 'half', 'quarter'];
 
     // State
     let layers = [[/* assise 0 */]];
     let currentLayer = 0;
-    let selectedSize = 'entire';
+    let selectedSize = 'M50_entire';
     let hoverPoint = null;
     let jointThickness = 0.01;
     let rotationY = 0;
-    let showColors = true;
     let whiteBricks = false;
     let deleteMode = false;
-    let layerboxPos = { x: window.innerWidth / 2 - 150, y: 100 };
-    let history = [{ layers: JSON.parse(JSON.stringify(layers)) }];
+    let projectTitle = '';
+    let layerboxPos = { x: window.innerWidth / 2 - 150, y: 160 };
+    let titleInputPos = { x: window.innerWidth / 2 - 150, y: 80 };
+    let history = [{ layers: JSON.parse(JSON.stringify(layers)), projectTitle: '' }];
     let historyIndex = 0;
 
     // Three.js Setup
@@ -211,7 +268,8 @@
     // Create Brick
     function createBrick(position, size, type, transparent = false, highlight = false, rotation = [0, 0, 0], isColliding = false) {
       const geometry = new THREE.BoxGeometry(...size);
-      const color = transparent ? (isColliding ? '#ff0000' : '#00ff00') : (whiteBricks ? '#ffffff' : (highlight ? '#00ffff' : (showColors ? (COLOR_MAP[type] || 'orange') : '#999')));
+      const brickType = type.split('_')[0];
+      const color = transparent ? (isColliding ? '#ff0000' : '#00ff00') : (whiteBricks ? '#ffffff' : (highlight ? '#00ffff' : (COLOR_MAP[brickType] || 'orange')));
       const material = new THREE.MeshStandardMaterial({
         color,
         transparent,
@@ -262,7 +320,6 @@
           if (Math.abs(snapX - x) <= threshold) snapX = x;
           if (Math.abs(snapZ - z) <= threshold) snapZ = z;
         }
-        console.log('Hover brick position:', { snapX, snapZ });
         const y = getBrickY(BRICK_SIZES[selectedSize]);
         let isColliding = false;
         const newBox = new THREE.Box3().setFromCenterAndSize(
@@ -284,8 +341,6 @@
         }
         const hoverBrick = createBrick([snapX, y, snapZ], BRICK_SIZES[selectedSize], selectedSize, true, false, [0, rotationY, 0], isColliding);
         scene.add(hoverBrick);
-      } else {
-        console.log('Hover point invalid:', hoverPoint);
       }
       updateBrickCount();
       renderer.shadowMap.needsUpdate = true;
@@ -293,22 +348,30 @@
 
     // Update Brick Count
     function updateBrickCount() {
-      const currentCount = layers[currentLayer].length;
-      const totalCount = layers.reduce((sum, layer) => sum + layer.length, 0);
-      document.getElementById('brick-count').textContent = `Assise active: ${currentCount} | Total: ${totalCount}`;
+      const counts = {};
+      BRICK_TYPES.forEach(type => {
+        counts[type] = {
+          entire: layers.flat().filter(b => b[3] === `${type}_entire`).length,
+          three_quarter: layers.flat().filter(b => b[3] === `${type}_three_quarter`).length,
+          half: layers.flat().filter(b => b[3] === `${type}_half`).length,
+          quarter: layers.flat().filter(b => b[3] === `${type}_quarter`).length,
+        };
+      });
 
-      const counts = {
-        entire: layers.flat().filter(b => b[3] === 'entire').length,
-        three_quarter: layers.flat().filter(b => b[3] === 'three_quarter').length,
-        half: layers.flat().filter(b => b[3] === 'half').length,
-        quarter: layers.flat().filter(b => b[3] === 'quarter').length,
-      };
-      document.getElementById('brick-type-counts').innerHTML = `
-        <div>Entière: ${counts.entire}</div>
-        <div>Trois quarts: ${counts.three_quarter}</div>
-        <div>Demi: ${counts.half}</div>
-        <div>Quart: ${counts.quarter}</div>
-      `;
+      let html = '';
+      BRICK_TYPES.forEach(type => {
+        const typeCounts = counts[type];
+        const hasNonZero = Object.values(typeCounts).some(count => count > 0);
+        if (hasNonZero) {
+          html += `<div>${type}:<br>`;
+          if (typeCounts.entire > 0) html += `  Entière: ${typeCounts.entire}<br>`;
+          if (typeCounts.three_quarter > 0) html += `  Trois quarts: ${typeCounts.three_quarter}<br>`;
+          if (typeCounts.half > 0) html += `  Demi: ${typeCounts.half}<br>`;
+          if (typeCounts.quarter > 0) html += `  Quart: ${typeCounts.quarter}<br>`;
+          html += `</div>`;
+        }
+      });
+      document.getElementById('brick-type-counts').innerHTML = html || 'Aucun élément placé';
     }
 
     // Get Brick Y Position
@@ -319,17 +382,13 @@
     // Save History State
     function saveState() {
       history = history.slice(0, historyIndex + 1);
-      history.push({ layers: JSON.parse(JSON.stringify(layers)) });
+      history.push({ layers: JSON.parse(JSON.stringify(layers)), projectTitle });
       historyIndex++;
-      console.log('State saved:', { historyIndex, historyLength: history.length });
     }
 
     // Add Brick with Collision Detection
     function addBrick(point) {
-      if (!point || point.x === undefined || point.z === undefined) {
-        console.error('Invalid point for addBrick:', point);
-        return;
-      }
+      if (!point || point.x === undefined || point.z === undefined) return;
       const allPositions = layers.flat();
       const threshold = jointThickness + 0.001;
       const size = BRICK_SIZES[selectedSize];
@@ -344,9 +403,6 @@
       }
 
       const y = getBrickY(size);
-      console.log('Adding brick at:', { snappedX, y, snappedZ });
-
-      // Collision detection
       const newBox = new THREE.Box3().setFromCenterAndSize(
         new THREE.Vector3(snappedX, y, snappedZ),
         new THREE.Vector3(size[0], size[1], size[2])
@@ -355,7 +411,7 @@
       newBox.applyMatrix4(rotationMatrix);
 
       for (const [x, y2, z, type, rotY] of layers[currentLayer]) {
-        if (y !== y2) continue; // Same layer only
+        if (y !== y2) continue;
         const existingBox = new THREE.Box3().setFromCenterAndSize(
           new THREE.Vector3(x, y2, z),
           new THREE.Vector3(BRICK_SIZES[type][0], BRICK_SIZES[type][1], BRICK_SIZES[type][2])
@@ -369,7 +425,6 @@
           notification.style.top = `${-mouse.y * window.innerHeight / 2 + window.innerHeight / 2 + 10}px`;
           notification.style.display = 'block';
           setTimeout(() => notification.style.display = 'none', 2000);
-          console.warn('Collision detected, brick not added:', { snappedX, y, snappedZ });
           return;
         }
       }
@@ -409,28 +464,24 @@
 
     // Undo
     function undo() {
-      if (!history || historyIndex <= 0) {
-        console.warn('Cannot undo: history is undefined or at start');
-        return;
-      }
+      if (historyIndex <= 0) return;
       historyIndex--;
       layers = JSON.parse(JSON.stringify(history[historyIndex].layers));
+      projectTitle = history[historyIndex].projectTitle;
+      document.getElementById('project-title').value = projectTitle;
       updateLayerSelect();
       updateScene();
-      console.log('Undo:', { historyIndex, historyLength: history.length });
     }
 
     // Redo
     function redo() {
-      if (!history || historyIndex >= (history.length - 1)) {
-        console.warn('Cannot redo: history is undefined or at end');
-        return;
-      }
+      if (historyIndex >= history.length - 1) return;
       historyIndex++;
       layers = JSON.parse(JSON.stringify(history[historyIndex].layers));
+      projectTitle = history[historyIndex].projectTitle;
+      document.getElementById('project-title').value = projectTitle;
       updateLayerSelect();
       updateScene();
-      console.log('Redo:', { historyIndex, historyLength: history.length });
     }
 
     // Export PDF
@@ -450,10 +501,10 @@
       // Page 1: Top view
       let minX = 0, maxX = 0, minZ = 0, maxZ = 0;
       layers.flat().forEach(([x, , z]) => {
-        minX = Math.min(minX, x - 0.19 / 2);
-        maxX = Math.max(maxX, x + 0.19 / 2);
-        minZ = Math.min(minZ, z - 0.19 / 2);
-        maxZ = Math.max(maxZ, z + 0.19 / 2);
+        minX = Math.min(minX, x - 0.39 / 2);
+        maxX = Math.max(maxX, x + 0.39 / 2);
+        minZ = Math.min(minZ, z - 0.39 / 2);
+        maxZ = Math.max(maxZ, z + 0.39 / 2);
       });
       const padding = 0.1;
       const topWidth = Math.max(2, maxX - minX + padding);
@@ -472,6 +523,11 @@
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(12);
       pdf.text('Vue de dessus', width / 2, height - 1, { align: 'center' });
+      if (projectTitle) {
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        pdf.text(projectTitle, width / 2, height - 1.5, { align: 'center' });
+      }
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(8);
       pdf.text('Wall Simulateur 3d', width - 3, height - 1.5, { align: 'right' });
@@ -499,6 +555,11 @@
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(12);
       pdf.text('Vue de face', width / 2, height - 1, { align: 'center' });
+      if (projectTitle) {
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        pdf.text(projectTitle, width / 2, height - 1.5, { align: 'center' });
+      }
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(8);
       pdf.text('Wall Simulateur 3d', width - 3, height - 1.5, { align: 'right' });
@@ -527,6 +588,11 @@
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(12);
       pdf.text('Vue de côté', width / 2, height - 1, { align: 'center' });
+      if (projectTitle) {
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        pdf.text(projectTitle, width / 2, height - 1.5, { align: 'center' });
+      }
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(8);
       pdf.text('Wall Simulateur 3d', width - 3, height - 1.5, { align: 'right' });
@@ -549,23 +615,37 @@
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(12);
       pdf.text('Vue 3D', width / 2, height - 1, { align: 'center' });
+      if (projectTitle) {
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        pdf.text(projectTitle, width / 2, height - 1.5, { align: 'center' });
+      }
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(8);
       pdf.text('Wall Simulateur 3d', width - 3, height - 1.5, { align: 'right' });
       pdf.text('Made by Julien BROHEZ', width - 3, height - 1, { align: 'right' });
 
-      // Page 5: Brick inventory
+      // Page 5: Element inventory
       pdf.addPage();
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(12);
-      pdf.text('Inventaire des briques', width / 2, 1, { align: 'center' });
+      pdf.text('Inventaire des éléments', width / 2, 1, { align: 'center' });
+      if (projectTitle) {
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        pdf.text(projectTitle, width / 2, 1.5, { align: 'center' });
+      }
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(10);
-      let y = 2;
-      Object.keys(BRICK_SIZES).forEach(type => {
-        const count = layers.flat().filter(b => b[3] === type).length;
-        pdf.text(`${type}: ${count} briques`, 1, y);
-        y += 1;
+      let y = projectTitle ? 2.5 : 2;
+      BRICK_TYPES.forEach(type => {
+        SIZE_VARIANTS.forEach(variant => {
+          const count = layers.flat().filter(b => b[3] === `${type}_${variant}`).length;
+          if (count > 0) {
+            pdf.text(`${type} (${variant}): ${count} éléments`, 1, y);
+            y += 1;
+          }
+        });
       });
 
       renderer.setSize(originalWidth, originalHeight);
@@ -575,18 +655,34 @@
       scene.background = skyTexture;
       renderer.setClearColor(0x000000, 0);
 
-      pdf.save('vue-briques.pdf');
+      pdf.save('vue-elements.pdf');
     }
 
     // Export PNG
     function exportPNG() {
-      renderer.render(scene, camera);
-      setTimeout(() => {
+      if (projectTitle) {
+        const canvas = document.createElement('canvas');
+        canvas.width = renderer.domElement.width;
+        canvas.height = renderer.domElement.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(renderer.domElement, 0, 0);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, 50);
+        ctx.fillStyle = '#000000';
+        ctx.font = 'bold 30px Helvetica';
+        ctx.textAlign = 'center';
+        ctx.fillText(projectTitle, canvas.width / 2, 40);
         const link = document.createElement('a');
-        link.download = 'vue-briques.png';
+        link.download = 'vue-elements.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } else {
+        renderer.render(scene, camera);
+        const link = document.createElement('a');
+        link.download = 'vue-elements.png';
         link.href = renderer.domElement.toDataURL('image/png');
         link.click();
-      }, 100);
+      }
     }
 
     // Update Layer Select
@@ -608,7 +704,7 @@
       let startX, startY;
 
       element.addEventListener('mousedown', (e) => {
-        if (e.target.tagName === 'LABEL' || e.target.classList.contains('brick-count')) return;
+        if (e.target.tagName === 'LABEL' || e.target.tagName === 'INPUT') return;
         isDragging = true;
         startX = e.clientX - pos.x;
         startY = e.clientY - pos.y;
@@ -620,7 +716,10 @@
         let y = e.clientY - startY;
 
         if (element.id === 'layerbox') {
-          y = Math.max(100, Math.min(y, 150));
+          y = Math.max(160, Math.min(y, 210));
+          x = Math.max(0, Math.min(x, window.innerWidth - element.offsetWidth));
+        } else if (element.id === 'title-input') {
+          y = Math.max(80, Math.min(y, 130));
           x = Math.max(0, Math.min(x, window.innerWidth - element.offsetWidth));
         }
 
@@ -637,7 +736,7 @@
 
     // Save File
     function saveFile() {
-      const data = JSON.stringify(layers);
+      const data = JSON.stringify({ layers, projectTitle });
       const blob = new Blob([data], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -653,28 +752,34 @@
     }
 
     function validateLayers(data) {
-      return Array.isArray(data) && data.every(layer => Array.isArray(layer) && layer.every(([x, y, z, type, rotY]) => 
-        typeof x === 'number' && typeof y === 'number' && typeof z === 'number' && 
-        BRICK_SIZES[type] && (rotY === undefined || typeof rotY === 'number')
-      ));
+      if (!data || typeof data !== 'object') return false;
+      const { layers, projectTitle } = data;
+      return (
+        Array.isArray(layers) &&
+        layers.every(layer => Array.isArray(layer) && layer.every(([x, y, z, type, rotY]) => 
+          typeof x === 'number' && typeof y === 'number' && typeof z === 'number' && 
+          BRICK_SIZES[type] && (rotY === undefined || typeof rotY === 'number')
+        )) &&
+        (typeof projectTitle === 'string' || projectTitle === undefined)
+      );
     }
 
     // Event Listeners
     function setupEventListeners() {
-      document.getElementById('brick-entire').addEventListener('click', () => {
-        selectedSize = 'entire';
+      document.getElementById('project-title').addEventListener('input', (e) => {
+        projectTitle = e.target.value.slice(0, 100);
+        saveState();
+      });
+      document.getElementById('brick-type').addEventListener('change', (e) => {
+        const brickType = e.target.value;
+        const sizeVariant = document.getElementById('brick-size').value;
+        selectedSize = `${brickType}_${sizeVariant}`;
         updateScene();
       });
-      document.getElementById('brick-three_quarter').addEventListener('click', () => {
-        selectedSize = 'three_quarter';
-        updateScene();
-      });
-      document.getElementById('brick-half').addEventListener('click', () => {
-        selectedSize = 'half';
-        updateScene();
-      });
-      document.getElementById('brick-quarter').addEventListener('click', () => {
-        selectedSize = 'quarter';
+      document.getElementById('brick-size').addEventListener('change', (e) => {
+        const sizeVariant = e.target.value;
+        const brickType = document.getElementById('brick-type').value;
+        selectedSize = `${brickType}_${sizeVariant}`;
         updateScene();
       });
       document.getElementById('rotation-y').addEventListener('input', (e) => {
@@ -684,10 +789,6 @@
       });
       document.getElementById('joint-thickness').addEventListener('input', (e) => {
         jointThickness = parseFloat(e.target.value) / 100;
-        updateScene();
-      });
-      document.getElementById('show-colors').addEventListener('change', (e) => {
-        showColors = e.target.checked;
         updateScene();
       });
       document.getElementById('white-bricks').addEventListener('change', (e) => {
@@ -718,17 +819,17 @@
         const reader = new FileReader();
         reader.onload = (event) => {
           try {
-            const loadedLayers = JSON.parse(event.target.result);
-            if (validateLayers(loadedLayers)) {
-              layers = loadedLayers;
+            const data = JSON.parse(event.target.result);
+            if (validateLayers(data)) {
+              layers = data.layers;
+              projectTitle = data.projectTitle || '';
+              document.getElementById('project-title').value = projectTitle;
               currentLayer = Math.min(currentLayer, layers.length - 1);
-              history = [{ layers: JSON.parse(JSON.stringify(layers)) }];
+              history = [{ layers: JSON.parse(JSON.stringify(layers)), projectTitle }];
               historyIndex = 0;
-              console.log('History reset after file load:', history);
               updateLayerSelect();
               updateScene();
             } else {
-              console.error('Invalid file format');
               const notification = document.getElementById('notification');
               notification.textContent = 'Erreur : Format de fichier invalide';
               notification.style.left = `${window.innerWidth / 2}px`;
@@ -737,9 +838,8 @@
               setTimeout(() => notification.style.display = 'none', 2000);
             }
           } catch (err) {
-            console.error('Error parsing file:', err);
             const notification = document.getElementById('notification');
-            notification.textContent = 'Erreur : Impossible de lire le fichier';
+            notification.textContent = `Erreur : ${err.message}`;
             notification.style.left = `${window.innerWidth / 2}px`;
             notification.style.top = `${window.innerHeight / 2}px`;
             notification.style.display = 'block';
@@ -747,7 +847,7 @@
           }
         };
         reader.readAsText(file);
-        e.target.value = ''; // Reset file input
+        e.target.value = '';
       });
       document.getElementById('export-pdf').addEventListener('click', exportPDF);
       document.getElementById('export-png').addEventListener('click', exportPNG);
@@ -759,30 +859,24 @@
         const intersects = raycaster.intersectObject(plane);
         if (intersects.length > 0 && !deleteMode) {
           hoverPoint = intersects[0].point;
-          console.log('Mouse hover point:', hoverPoint);
         } else {
           hoverPoint = null;
         }
         updateScene();
       });
 
-      renderer.domElement.addEventListener('click', (e) => {
+      document.addEventListener('click', (e) => {
         if (deleteMode) {
-          console.log('Click detected in delete mode');
           deleteBrick();
         }
       });
 
-      renderer.domElement.addEventListener('dblclick', (e) => {
+      document.addEventListener('dblclick', (e) => {
         if (!deleteMode) {
-          console.log('Double-click detected');
           raycaster.setFromCamera(mouse, camera);
           const intersects = raycaster.intersectObject(plane);
           if (intersects.length > 0) {
-            console.log('Plane intersected at:', intersects[0].point);
             addBrick(intersects[0].point);
-          } else {
-            console.log('No intersection with plane');
           }
         }
       });
@@ -792,10 +886,13 @@
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
         layerboxPos.x = window.innerWidth / 2 - document.getElementById('layerbox').offsetWidth / 2;
+        titleInputPos.x = window.innerWidth / 2 - document.getElementById('title-input').offsetWidth / 2;
         document.getElementById('layerbox').style.left = `${layerboxPos.x}px`;
+        document.getElementById('title-input').style.left = `${titleInputPos.x}px`;
       });
 
       makeDraggable(document.getElementById('layerbox'), layerboxPos);
+      makeDraggable(document.getElementById('title-input'), titleInputPos);
     }
 
     // Homepage Button
