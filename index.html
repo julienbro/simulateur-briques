@@ -1,1847 +1,641 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Mur simulateur 2D (par Constr'huy)</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <style>
-        /* Styles CSS optimisés */
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 0;
-            background: #1e1e1e;
-            color: #d4d4d4;
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        #welcome-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #2d2d30;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        #welcome-title {
-            font-size: 48px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #fff;
-        }
-
-        #welcome-version {
-            font-size: 18px;
-            margin-bottom: 5px; /* Adjusted margin */
-            color: #aaa;
-        }
-
-        #welcome-author {
-             font-size: 14px; /* Smaller font size */
-             color: #bbb;
-             margin-top: 5px; /* Space above author text */
-             margin-bottom: 5px; /* Space below author text */
-        }
-
-        #welcome-website {
-             font-size: 16px; /* Slightly larger than author */
-             color: #bbb;
-             margin-top: 0; /* Adjust spacing */
-             margin-bottom: 30px; /* Space above the button */
-        }
-
-
-        #start-btn {
-            padding: 12px 24px;
-            background: #B22222;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        #start-btn:hover {
-            background: #C23535;
-        }
-
-        #main-interface {
-            display: none;
-            width: 100%;
-        }
-
-        #toolbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 60px;
-            background: #2d2d30;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px;
-            height: 100vh;
-            box-sizing: border-box;
-            border-right: 1px solid #3c3c3c;
-            gap: 10px;
-            z-index: 100;
-        }
-
-        #toolbar button, #toolbar label {
-            background: #3c3c3c;
-            color: #d4d4d4;
-            border: none;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        #toolbar button:hover, #toolbar label:hover {
-            background: #505050;
-        }
-
-         /* Style for the selected toolbar button */
-        #toolbar button.selected {
-            border: 2px solid #ffffff80; /* Semi-transparent white border for highlighting */
-        }
-
-
-        #settings-panel {
-            position: fixed;
-            top: 80px;
-            left: 80px;
-            background: #2d2d30;
-            padding: 15px;
-            border-radius: 5px;
-            border: 1px solid #3c3c3c;
-            z-index: 90;
-            display: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-             max-height: 80vh; /* Limit height to prevent overflow */
-             overflow-y: auto; /* Add scrollbar if content exceeds max height */
-        }
-
-        #settings-panel h3 {
-            margin-top: 0;
-            border-bottom: 1px solid #3c3c3c;
-             padding-bottom: 5px;
-             margin-bottom: 10px;
-        }
-
-        .brick-type-settings {
-             margin-bottom: 15px;
-             padding: 10px;
-             border: 1px solid #3c3c3c;
-             border-radius: 4px;
-        }
-
-        .brick-type-settings h4 {
-             margin-top: 0;
-             margin-bottom: 5px;
-             color: #f0f0f0;
-             font-size: 14px;
-        }
-
-
-        #settings-panel label {
-            display: block;
-            margin: 5px 0;
-            font-size: 14px;
-        }
-
-        #settings-panel input {
-            width: 60px;
-            margin-left: 5px;
-            padding: 3px;
-            background: #3c3c3c;
-            border: 1px solid #505050;
-            color: white;
-        }
-
-        #settings-panel .joint-settings label {
-            display: inline-block; /* Allow joints on the same line */
-            margin-right: 15px; /* Space between joint settings */
-        }
-
-
-        #header {
-            margin-top: 0;
-            padding: 20px 0 10px;
-            text-align: center;
-            width: 100%;
-            font-size: 32px;
-            font-weight: bold;
-            border-bottom: 1px solid #3c3c3c;
-             position: relative; /* Needed for absolute positioning of dimensions */
-        }
-
-        #title-controls-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: calc(100% - 60px); /* Match container width */
-            padding: 10px 30px; /* Padding to align content within container */
-            box-sizing: border-box;
-            padding-left: calc(60px + 30px); /* Account for toolbar + padding */
-        }
-
-        #title-input-container {
-             flex-grow: 1; /* Allow title input to take available space */
-             text-align: center;
-             margin: 0 20px; /* Space between dimensions and controls */
-        }
-
-         #title-input-container label {
-             font-size: 16px;
-             margin-right: 10px;
-             color: #d4d4d4;
-         }
-
-        #title-input-container input {
-            padding: 5px;
-            background: #3c3c3c;
-            border: 1px solid #505050;
-            color: white;
-            font-size: 16px;
-            width: 300px; /* Adjust width as needed */
-             max-width: 80%; /* Prevent overflow on small screens */
-        }
-
-         #dimensionsDisplay {
-             font-size: 14px;
-             color: #aaa;
-             text-align: left;
-             min-width: 200px; /* Reserve space */
-         }
-
-        #title-buttons {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-             min-width: 200px; /* Reserve space */
-             justify-content: flex-end;
-        }
-
-        #title-buttons button, #title-buttons label {
-            background: #3c3c3c;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-             display: flex;
-             align-items: center;
-             gap: 5px;
-            transition: background 0.3s;
-        }
-         #title-buttons button:hover, #title-buttons label:hover {
-            background: #505050;
-        }
-        #title-buttons input[type="checkbox"] {
-            margin-right: 5px;
-        }
-
-
-        #container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: calc(100% - 60px);
-            padding-left: 60px;
-            box-sizing: border-box;
-        }
-
-        .canvas-row {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 20px 0;
-            width: 100%;
-            max-width: 1200px;
-        }
-
-        .view {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            background: #2d2d30;
-            padding: 10px;
-            border-radius: 5px;
-        }
-
-        canvas {
-            background: white;
-            border: 1px solid #444;
-            max-width: 100%;
-        }
-
-        .label {
-            margin-top: 4px;
-            text-align: center;
-            font-size: 16px;
-            color: #f0f0f0;
-        }
-
-        .legend {
-            font-size: 12px;
-            color: #aaa;
-            margin-top: 2px;
-        }
-
-        .layer-controls {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin: 5px 0;
-        }
-
-        .layer-selector {
-            padding: 5px;
-            border-radius: 4px;
-            background: #3c3c3c;
-            color: white;
-            border: 1px solid #505050;
-        }
-
-        .export-image-btn, .settings-btn, .add-layer-btn {
-            background: #3c3c3c;
-            color: white;
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.3s;
-        }
-
-        .export-image-btn:hover, .settings-btn:hover, .add-layer-btn:hover {
-            background: #505050;
-        }
-
-        #brick-counts {
-            margin-top: 20px;
-            padding: 15px;
-            background: #2d2d30;
-            border-radius: 5px;
-            border: 1px solid #3c3c3c;
-            color: #d4d4d4;
-            font-size: 14px;
-            width: calc(100% - 80px); /* Adjust to fit within container */
-            max-width: 1180px; /* Match max-width of canvas-row */
-            box-sizing: border-box;
-        }
-
-        #brick-counts div {
-            margin-bottom: 5px;
-        }
-
-        #brick-counts span {
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wall Simulateur 3d</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: #ffffff; color: #000000; font-family: Arial, sans-serif; }
+    canvas { width: 100%; height: 100vh; }
+    .toolbox, .layerbox, .actions, .brick-counter, .title, .version { position: absolute; background: #e2e8f0; padding: 8px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); z-index: 10; }
+    .toolbox { top: 10px; left: 10px; width: 256px; }
+    .layerbox { top: 100px; left: 50%; transform: translateX(-50%); cursor: move; width: auto; max-width: 600px; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
+    .layerbox * { pointer-events: auto; }
+    .actions { top: 10px; right: 10px; width: 256px; }
+    .brick-counter { bottom: 10px; right: 10px; width: 200px; }
+    .title { top: 10px; left: 50%; transform: translateX(-50%); text-align: center; pointer-events: none; }
+    .title h1 { font-size: 24px; margin: 0; }
+    .title p { font-size: 14px; margin: 4px 0 0; }
+    .version { bottom: 10px; left: 10px; font-size: 12px; padding: 8px; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    button { padding: 4px; border-radius: 4px; border: none; cursor: pointer; font-size: 12px; font-weight: bold; color: #000000; }
+    button:hover { opacity: 0.8; }
+    .delete-active { background-color: #b7791f !important; }
+    .selected { ring: 2px solid #000000; }
+    input, select { background: #edf2f7; color: #000000; border: none; padding: 4px; border-radius: 4px; }
+    label { font-size: 14px; margin-right: 8px; }
+    h2 { font-size: 18px; margin-bottom: 8px; color: #000000; }
+    .brick-count, .brick-type-count { font-size: 14px; }
+  </style>
 </head>
 <body>
-    <div id="welcome-screen">
-        <div id="welcome-title">Mur simulateur 2D</div>
-        <div id="welcome-version">Version 2.5</div>
-         <p id="welcome-author">Réalisé par Julien Brohez</p>
-         <p id="welcome-website">www.constrhuy.be</p>
-        <button id="start-btn">Commencer</button>
+  <div id="title" class="title">
+    <h1>Wall Simulateur 3d</h1>
+    <p>Créé par Julien BROHEZ</p>
+  </div>
+  <div id="toolbox" class="toolbox">
+    <h2>🧱 Outils de pose</h2>
+    <label>Type de brique</label>
+    <div class="grid">
+      <button id="brick-entire" style="background-color: #e07b39;" title="Entière - 19x9x5">1/1</button>
+      <button id="brick-three_quarter" style="background-color: #3498db;" title="Trois quarts - 14x9x5">3/4</button>
+      <button id="brick-half" style="background-color: #2ecc71;" title="Demi - 9x9x5">1/2</button>
+      <button id="brick-quarter" style="background-color: #9b59b6;" title="Quart - 4x9x5">1/4</button>
     </div>
-
-    <div id="main-interface">
-        <div id="toolbar">
-            <button title="Brique entière" onclick="selectType('entire')" data-type="entire" style="background:#B22222">1/1</button>
-            <button title="Trois quarts" onclick="selectType('threeQuarters')" data-type="threeQuarters" style="background:#FF8C00">3/4</button>
-            <button title="Demi" onclick="selectType('half')" data-type="half" style="background:#4682B4">1/2</button>
-            <button title="Quart" onclick="selectType('quarter')" data-type="quarter" style="background:#32CD32">1/4</button>
-            <button title="Rotation 90°" onclick="rotateBrick()"><i class="fas fa-sync-alt"></i></button>
-            <button title="Annuler (Ctrl+Z)" onclick="undo()"><i class="fas fa-undo"></i></button>
-            <button title="Nouvelle assise" onclick="addLayer()"><i class="fas fa-layer-group"></i></button>
-            <button title="Exporter JSON" onclick="exportPose()"><i class="fas fa-file-export"></i></button>
-            <input type="file" id="importPose" style="display:none" onchange="importPose(event)">
-            <label for="importPose" title="Importer JSON"><i class="fas fa-folder-open"></i></label>
-            <button title="Paramètres" id="settings-btn" onclick="toggleSettings()"><i class="fas fa-cog"></i></button>
-        </div>
-
-         <div id="title-controls-container">
-             <div id="dimensionsDisplay"></div>
-             <div id="title-input-container">
-                <label for="wallTitleInput">Titre de l'ouvrage :</label>
-                 <input type="text" id="wallTitleInput" placeholder="Entrez le titre ici">
-             </div>
-             <div id="title-buttons">
-                 <label for="fillBricksCheckbox">
-                    <input type="checkbox" id="fillBricksCheckbox" checked> Remplissage briques
-                 </label>
-                  <button onclick="exportToPDF()"><i class="fas fa-file-pdf"></i> Exporter PDF</button>
-             </div>
-         </div>
-
-
-        <div id="settings-panel">
-            <h3>Paramètres</h3>
-            <div class="joint-settings">
-                <label>Joint vertical (mm): <input type="number" id="verticalJointWidthInput" value="10" min="0" max="20" step="1"></label>
-                <label>Joint horizontal (mm): <input type="number" id="horizontalJointWidthInput" value="10" min="0" max="20" step="1"></label>
-             </div>
-
-            <div class="brick-type-settings">
-                <h4>Brique entière (1/1)</h4>
-                <label>Longueur (cm): <input type="number" id="entireBrickLengthInput" value="19" min="1" max="50" step="0.5"></label>
-                <label>Hauteur (cm): <input type="number" id="entireBrickHeightInput" value="6.5" min="1" max="30" step="0.5"></label>
-                <label>Largeur (cm): <input type="number" id="entireBrickWidthInput" value="9" min="1" max="30" step="0.5"></label>
-            </div>
-
-             <div class="brick-type-settings">
-                <h4>Trois quarts (3/4)</h4>
-                <label>Longueur (cm): <input type="number" id="threeQuartersBrickLengthInput" value="14" min="1" max="50" step="0.5"></label>
-                <label>Hauteur (cm): <input type="number" id="threeQuartersBrickHeightInput" value="6.5" min="1" max="30" step="0.5"></label>
-                <label>Largeur (cm): <input type="number" id="threeQuartersBrickWidthInput" value="9" min="1" max="30" step="0.5"></label>
-            </div>
-
-            <div class="brick-type-settings">
-                <h4>Demi (1/2)</h4>
-                <label>Longueur (cm): <input type="number" id="halfBrickLengthInput" value="9" min="1" max="50" step="0.5"></label>
-                <label>Hauteur (cm): <input type="number" id="halfBrickHeightInput" value="6.5" min="1" max="30" step="0.5"></label>
-                <label>Largeur (cm): <input type="number" id="halfBrickWidthInput" value="9" min="1" max="30" step="0.5"></label>
-            </div>
-
-             <div class="brick-type-settings">
-                <h4>Quart (1/4)</h4>
-                <label>Longueur (cm): <input type="number" id="quarterBrickLengthInput" value="4" min="1" max="50" step="0.5"></label>
-                <label>Hauteur (cm): <input type="number" id="quarterBrickHeightInput" value="6.5" min="1" max="30" step="0.5"></label>
-                <label>Largeur (cm): <input type="number" id="quarterBrickWidthInput" value="9" min="1" max="30" step="0.5"></label>
-            </div>
-
-
-            <label><input type="checkbox" id="fillBricksSettings" checked> Remplissage des briques</label>
-        </div>
-
-        <div id="header">Mur simulateur 2D (par Constr'huy)</div>
-
-
-        <div id="container">
-            <div class="canvas-row">
-                <div class="view">
-                    <canvas id="topView"></canvas>
-                    <div class="label">Vue en plan (Assise <span id="currentLayerLabel">1</span>)</div>
-                    <div class="layer-controls">
-                        <select id="layerSelect" class="layer-selector" onchange="changeLayer(this.value)"></select>
-                        <button class="add-layer-btn" onclick="addLayer()" title="Ajouter une assise">
-                            <i class="fas fa-layer-group"></i>
-                        </button>
-                    </div>
-                    <div class="legend">
-                        <span style="color:#B22222">■</span>1/1 | <span style="color:#FF8C00">■</span>3/4 | <span style="color:#4682B4">■</span>1/2 | <span style="color:#32CD32">■</span>1/4
-                    </div>
-                </div>
-            </div>
-            <div class="canvas-row">
-                <div class="view">
-                    <canvas id="frontView"></canvas>
-                    <div class="label">Vue de face</div>
-                </div>
-            </div>
-            <div class="canvas-row">
-                <div class="view">
-                    <canvas id="leftView"></canvas>
-                    <div class="label">Vue gauche</div>
-                </div>
-            </div>
-             <div class="canvas-row">
-                <div class="view">
-                    <canvas id="rightView"></canvas>
-                    <div class="label">Vue droite</div>
-                </div>
-            </div>
-             <div id="brick-counts">
-                <h3>Compteur de Briques</h3>
-                <div id="count-entire"><span style="color:#B22222">■</span> Brique entière (1/1) : <span>0</span></div>
-                <div id="count-threeQuarters"><span style="color:#FF8C00">■</span> Trois quarts (3/4) : <span>0</span></div>
-                <div id="count-half"><span style="color:#4682B4">■</span> Demi (1/2) : <span>0</span></div>
-                <div id="count-quarter"><span style="color:#32CD32">■</span> Quart (1/4) : <span>0</span></div>
-             </div>
-        </div>
+    <label>Rotation Y (°)</label>
+    <input type="range" id="rotation-y" min="0" max="355" step="15" value="0">
+    <div id="rotation-value" style="text-align: center; font-size: 12px;">0°</div>
+    <label>Épaisseur du joint (cm)</label>
+    <input type="number" id="joint-thickness" min="0" step="0.1" value="1">
+    <label>Couleur des briques</label>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <input type="checkbox" id="show-colors" checked>
+      <span style="font-size: 14px;">Afficher les couleurs</span>
     </div>
+    <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+      <input type="checkbox" id="white-bricks">
+      <span style="font-size: 14px;">Afficher en blanc</span>
+    </div>
+    <button id="delete-mode" style="background-color: #d69e2e; margin-top: 8px;">🗑️ Effacer</button>
+  </div>
+  <div id="layerbox" class="layerbox">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <label>Assise active</label>
+      <select id="layer-select"></select>
+      <button id="add-layer" style="background-color: #3182ce;">➕</button>
+    </div>
+    <div id="brick-count" class="brick-count" style="margin-top: 8px; text-align: center;">Current Layer: 0 | Total: 0</div>
+  </div>
+  <div class="actions">
+    <h2>📄 Actions</h2>
+    <button id="undo" style="background-color: #e53e3e;">↩️ Annuler</button>
+    <button id="export-pdf" style="background-color: #38a169; margin-top: 8px;">📄 Exporter PDF</button>
+    <button id="export-png" style="background-color: #3182ce; margin-top: 8px;">🖼️ Exporter PNG</button>
+  </div>
+  <div id="brick-counter" class="brick-counter">
+    <h2>🧮 Compteur de briques</h2>
+    <div id="brick-type-counts" class="brick-type-count">
+      <div>Entière: 0</div>
+      <div>Trois quarts: 0</div>
+      <div>Demi: 0</div>
+      <div>Quart: 0</div>
+    </div>
+  </div>
+  <div id="version" class="version">Version 1.0.0</div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    const { jsPDF } = window.jspdf;
 
-    <script>
-        // Application Version
-        const APP_VERSION = "2.6"; // Updated version number
+    // Constants
+    const BRICK_SIZES = {
+      entire: [0.19, 0.05, 0.09],
+      three_quarter: [0.14, 0.05, 0.09],
+      half: [0.09, 0.05, 0.09],
+      quarter: [0.04, 0.05, 0.09],
+    };
+    const COLOR_MAP = {
+      entire: '#e07b39',
+      three_quarter: '#3498db',
+      half: '#2ecc71',
+      quarter: '#9b59b6',
+    };
 
-        // Configuration initiale
-        const brickTypes = {
-            entire: { color: '#B22222', label: 'Brique entière (1/1)' },
-            threeQuarters: { color: '#FF8C00', label: 'Trois quarts (3/4)' },
-            half: { color: '#4682B4', label: 'Demi (1/2)' },
-            quarter: { color: '#32CD32', label: 'Quart (1/4)' }
-        };
-        // Store independent dimensions for each type
-        let brickDimensions = {
-            entire: { w: 19, h: 6.5, d: 9 }, // w: Longueur, h: Hauteur, d: Largeur
-            threeQuarters: { w: 14, h: 6.5, d: 9 },
-            half: { w: 9, h: 6.5, d: 9 },
-            quarter: { w: 4, h: 6.5, d: 9 }
-        };
-        let scale = 5; // Pixels per cm
-        let gridSize = scale; // Grid size based on 1cm = 5px
-        let verticalJointWidth = 10; // mm
-        let horizontalJointWidth = 10; // mm
-        let layers = [[]];
-        let currentLayer = 0;
-        let ghostBrick = null;
-        let selectedBrickType = 'entire';
-        let rotation = 0; // 0, 90, 180, 270 degrees
-        let fillBricks = true; // Default state
-        let history = [[]];
-        let historyIndex = 0;
-        const groundOffset = 15 * scale; // Ground offset in pixels from the bottom of elevation views
+    // State
+    let layers = [[/* assise 0 */]];
+    let currentLayer = 0;
+    let selectedSize = 'entire';
+    let hoverPoint = null;
+    let jointThickness = 0.01;
+    let rotationY = 0;
+    let showColors = true;
+    let whiteBricks = false;
+    let deleteMode = false;
+    let layerboxPos = { x: window.innerWidth / 2 - 150, y: 100 };
 
-        // Références DOM
-        const welcomeScreen = document.getElementById('welcome-screen');
-        const mainInterface = document.getElementById('main-interface');
-        const startBtn = document.getElementById('start-btn');
-        const topCanvas = document.getElementById('topView');
-        const frontCanvas = document.getElementById('frontView');
-        const leftCanvas = document.getElementById('leftView');
-        const rightCanvas = document.getElementById('rightView');
-        const layerSelect = document.getElementById('layerSelect');
-        const settingsPanel = document.getElementById('settings-panel');
-        const settingsBtn = document.getElementById('settings-btn'); // Reference to the settings button
-        const currentLayerLabel = document.getElementById('currentLayerLabel');
-        const wallTitleInput = document.getElementById('wallTitleInput'); // Reference to the title input
-        const dimensionsDisplay = document.getElementById('dimensionsDisplay'); // Reference to the dimensions display div
-        const fillBricksCheckbox = document.getElementById('fillBricksCheckbox'); // Reference to the new fill bricks checkbox
-        const fillBricksSettingsCheckbox = document.getElementById('fillBricksSettings'); // Reference to the settings panel fill bricks checkbox
+    // Three.js Setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0.5, 0.5, 1);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.autoUpdate = false;
+    document.body.appendChild(renderer.domElement);
 
-        // References to all dimension inputs (12 in total)
-        const dimensionInputs = {
-            entire: {
-                w: document.getElementById('entireBrickLengthInput'),
-                h: document.getElementById('entireBrickHeightInput'),
-                d: document.getElementById('entireBrickWidthInput')
-            },
-            threeQuarters: {
-                w: document.getElementById('threeQuartersBrickLengthInput'),
-                h: document.getElementById('threeQuartersBrickHeightInput'),
-                d: document.getElementById('threeQuartersBrickWidthInput')
-            },
-            half: {
-                w: document.getElementById('halfBrickLengthInput'),
-                h: document.getElementById('halfBrickHeightInput'),
-                d: document.getElementById('halfBrickWidthInput')
-            },
-            quarter: {
-                w: document.getElementById('quarterBrickLengthInput'),
-                h: document.getElementById('quarterBrickHeightInput'),
-                d: document.getElementById('quarterBrickWidthInput')
-            }
-        };
-        const verticalJointWidthInput = document.getElementById('verticalJointWidthInput'); // Vertical joint input
-        const horizontalJointWidthInput = document.getElementById('horizontalJointWidthInput'); // Horizontal joint input
+    // Gradient Sky
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 512;
+    const context = canvas.getContext('2d');
+    const gradient = context.createLinearGradient(0, 0, 0, 512);
+    gradient.addColorStop(0, '#87CEEB');
+    gradient.addColorStop(1, '#FFFFFF');
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, 512, 512);
+    const skyTexture = new THREE.CanvasTexture(canvas);
+    scene.background = skyTexture;
 
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+    directionalLight.position.set(1, 2, 2);
+    directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.width = 2048;
+    directionalLight.shadow.mapSize.height = 2048;
+    directionalLight.shadow.camera.left = -2;
+    directionalLight.shadow.camera.right = 2;
+    directionalLight.shadow.camera.top = 2;
+    directionalLight.shadow.camera.bottom = -2;
+    directionalLight.shadow.camera.near = 0.1;
+    directionalLight.shadow.camera.far = 10;
+    scene.add(directionalLight);
 
-        // Brick Count Elements
-        const countEntire = document.querySelector('#count-entire span');
-        const countThreeQuarters = document.querySelector('#count-threeQuarters span');
-        const countHalf = document.querySelector('#count-half span');
-        const countQuarter = document.querySelector('#count-quarter span');
-        const ctxs = {
-            top: topCanvas.getContext('2d'),
-            front: frontCanvas.getContext('2d'),
-            left: leftCanvas.getContext('2d'),
-            right: rightCanvas.getContext('2d')
-        };
-        // Add console log to verify DOM references
-         console.log("DOM references (on script load):", {
-             countEntire, countThreeQuarters, countHalf, countQuarter,
-             wallTitleInput, dimensionsDisplay, fillBricksCheckbox, fillBricksSettingsCheckbox,
-             verticalJointWidthInput, horizontalJointWidthInput,
-             dimensionInputs // Log the dimension input references
-         });
-        // Gestion de l'historique
-        function saveState() {
-            // Deep clone the layers array
-            const currentState = layers.map(layer => layer.map(brick => ({ ...brick })));
-            history = history.slice(0, historyIndex + 1);
-            history.push(currentState);
-            historyIndex++;
-            // console.log('State saved. History length:', history.length, 'Index:', historyIndex);
+    // Controls
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enablePan = true;
+    controls.enableZoom = true;
+    controls.enableRotate = true;
+
+    // Ground Plane (Visible Floor)
+    const planeGeometry = new THREE.PlaneGeometry(4, 4);
+    const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xf0f0f0, visible: true });
+    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    plane.rotation.x = -Math.PI / 2;
+    scene.add(plane);
+
+    // Shadow Plane
+    const shadowMaterial = new THREE.ShadowMaterial({ opacity: 0.5 });
+    const shadowPlane = new THREE.Mesh(planeGeometry, shadowMaterial);
+    shadowPlane.rotation.x = -Math.PI / 2;
+    shadowPlane.receiveShadow = true;
+    scene.add(shadowPlane);
+
+    // Raycaster for mouse interaction
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    // Create Brick
+    function createBrick(position, size, type, transparent = false, highlight = false, rotation = [0, 0, 0]) {
+      const geometry = new THREE.BoxGeometry(...size);
+      const color = whiteBricks ? '#ffffff' : (highlight ? '#00ffff' : (showColors ? (COLOR_MAP[type] || 'orange') : '#999'));
+      const material = new THREE.MeshStandardMaterial({
+        color,
+        transparent,
+        opacity: transparent ? 0.3 : 1,
+        wireframe: transparent,
+      });
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.set(...position);
+      mesh.rotation.set(...rotation);
+      mesh.castShadow = !transparent;
+      mesh.receiveShadow = true;
+
+      // Add edges for placed bricks
+      if (!transparent) {
+        const edges = new THREE.EdgesGeometry(geometry);
+        const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 1 });
+        const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
+        edgeLines.position.set(...position);
+        edgeLines.rotation.set(...rotation);
+        mesh.userData.edges = edgeLines;
+      }
+
+      return mesh;
+    }
+
+    // Update Scene Bricks
+    function updateScene() {
+      scene.children = scene.children.filter(child => !child.isMesh && !child.isLineSegments || child === plane || child === shadowPlane);
+      let hoveredBrick = null;
+      if (deleteMode) {
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(scene.children.filter(child => child.isMesh && child !== plane && child !== shadowPlane));
+        if (intersects.length > 0) {
+          hoveredBrick = intersects[0].object;
+        }
+      }
+      layers.flat().forEach(([x, y, z, type, rotY]) => {
+        const isHovered = deleteMode && hoveredBrick && Math.abs(hoveredBrick.position.x - x) < 0.001 && Math.abs(hoveredBrick.position.y - y) < 0.001 && Math.abs(hoveredBrick.position.z - z) < 0.001;
+        const brick = createBrick([x, y, z], BRICK_SIZES[type], type, false, isHovered, [0, rotY || 0, 0]);
+        scene.add(brick);
+        if (brick.userData.edges) scene.add(brick.userData.edges);
+      });
+      if (hoverPoint && !deleteMode && hoverPoint.x !== undefined && hoverPoint.z !== undefined) {
+        let snapX = Math.round(hoverPoint.x * 100) / 100;
+        let snapZ = Math.round(hoverPoint.z * 100) / 100;
+        const threshold = jointThickness + 0.001;
+        const allPositions = layers.flat();
+        for (const [x, , z] of allPositions) {
+          if (Math.abs(snapX - x) <= threshold) snapX = x;
+          if (Math.abs(snapZ - z) <= threshold) snapZ = z;
+        }
+        console.log('Hover brick position:', { snapX, snapZ });
+        const y = getBrickY(BRICK_SIZES[selectedSize]);
+        const hoverBrick = createBrick([snapX, y, snapZ], BRICK_SIZES[selectedSize], selectedSize, true, false, [0, rotationY, 0]);
+        scene.add(hoverBrick);
+      } else {
+        console.log('Hover point invalid:', hoverPoint);
+      }
+      updateBrickCount();
+      renderer.shadowMap.needsUpdate = true;
+    }
+
+    // Update Brick Count
+    function updateBrickCount() {
+      const currentCount = layers[currentLayer].length;
+      const totalCount = layers.reduce((sum, layer) => sum + layer.length, 0);
+      document.getElementById('brick-count').textContent = `Current Layer: ${currentCount} | Total: ${totalCount}`;
+
+      // Update brick type counts
+      const counts = {
+        entire: layers.flat().filter(b => b[3] === 'entire').length,
+        three_quarter: layers.flat().filter(b => b[3] === 'three_quarter').length,
+        half: layers.flat().filter(b => b[3] === 'half').length,
+        quarter: layers.flat().filter(b => b[3] === 'quarter').length,
+      };
+      document.getElementById('brick-type-counts').innerHTML = `
+        <div>Entière: ${counts.entire}</div>
+        <div>Trois quarts: ${counts.three_quarter}</div>
+        <div>Demi: ${counts.half}</div>
+        <div>Quart: ${counts.quarter}</div>
+      `;
+    }
+
+    // Get Brick Y Position
+    function getBrickY(size) {
+      return size[1] / 2 + jointThickness + currentLayer * (size[1] + jointThickness);
+    }
+
+    // Add Brick
+    function addBrick(point) {
+      if (!point || point.x === undefined || point.z === undefined) {
+        console.error('Invalid point for addBrick:', point);
+        return;
+      }
+      const allPositions = layers.flat();
+      const threshold = jointThickness + 0.001;
+      const size = BRICK_SIZES[selectedSize];
+      let snappedX = Math.round(point.x * 100) / 100;
+      let snappedZ = Math.round(point.z * 100) / 100;
+
+      for (const [x, , z] of allPositions) {
+        if (Math.abs(snappedX - x) <= threshold) snappedX = x;
+        if (Math.abs(snappedZ - z) <= threshold) snappedZ = z;
+      }
+
+      const y = getBrickY(size);
+      console.log('Adding brick at:', { snappedX, y, snappedZ });
+      layers[currentLayer].push([snappedX, y, snappedZ, selectedSize, rotationY]);
+      updateScene();
+    }
+
+    // Delete Brick
+    function deleteBrick() {
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(scene.children.filter(child => child.isMesh && child !== plane && child !== shadowPlane));
+      if (intersects.length > 0) {
+        const clickedMesh = intersects[0].object;
+        const position = clickedMesh.position;
+        for (let i = 0; i < layers.length; i++) {
+          layers[i] = layers[i].filter(([x, y, z]) => {
+            return !(Math.abs(x - position.x) < 0.001 && Math.abs(y - position.y) < 0.001 && Math.abs(z - position.z) < 0.001);
+          });
+        }
+        deleteMode = false;
+        document.getElementById('delete-mode').classList.remove('delete-active');
+        updateScene();
+      }
+    }
+
+    // Add Layer
+    function addLayer() {
+      layers.push([]);
+      currentLayer = layers.length - 1;
+      updateLayerSelect();
+      updateScene();
+    }
+
+    // Undo
+    function undo() {
+      layers[currentLayer] = layers[currentLayer].slice(0, -1);
+      updateScene();
+    }
+
+    // Export PDF
+    function exportPDF() {
+      const originalWidth = window.innerWidth;
+      const originalHeight = window.innerHeight;
+      const exportWidth = 1920;
+      const exportHeight = exportWidth * (originalHeight / originalWidth);
+
+      const pdf = new jsPDF({ orientation: 'landscape', unit: 'cm', format: [21, 29.7] });
+      const width = pdf.internal.pageSize.getWidth();
+      const height = pdf.internal.pageSize.getHeight();
+
+      renderer.setSize(exportWidth, exportHeight);
+      renderer.setClearColor(0xffffff, 1);
+
+      // Page 1: Top view (Orthographic, dynamic scale)
+      let minX = 0, maxX = 0, minZ = 0, maxZ = 0;
+      layers.flat().forEach(([x, , z]) => {
+        minX = Math.min(minX, x - 0.19 / 2);
+        maxX = Math.max(maxX, x + 0.19 / 2);
+        minZ = Math.min(minZ, z - 0.19 / 2);
+        maxZ = Math.max(maxZ, z + 0.19 / 2);
+      });
+      const padding = 0.1;
+      const topWidth = Math.max(2, maxX - minX + padding);
+      const topHeight = Math.max(2, maxZ - minZ + padding);
+      renderer.shadowMap.enabled = false;
+      scene.background = null;
+      const topCamera = new THREE.OrthographicCamera(-topWidth / 2, topWidth / 2, topHeight / 2, -topHeight / 2, 0.1, 100);
+      topCamera.position.set(0, 1, 0);
+      topCamera.lookAt(0, 0, 0);
+      renderer.render(scene, topCamera);
+      pdf.addImage(renderer.domElement.toDataURL('image/png'), 'PNG', 0, 0, width, height);
+      pdf.setLineWidth(0.05);
+      pdf.line(1, height - 2, 1 + 1, height - 2);
+      pdf.setFontSize(8);
+      pdf.text('100 cm', 1, height - 1.5);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(12);
+      pdf.text('Vue de dessus', width / 2, height - 1, { align: 'center' });
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(8);
+      pdf.text('Wall Simulateur 3d', width - 3, height - 1.5, { align: 'right' });
+      pdf.text('Made by Julien BROHEZ', width - 3, height - 1, { align: 'right' });
+
+      // Page 2: Front view (Orthographic, 2x scale, with ground line)
+      pdf.addPage();
+      const frontLineGeometry = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(-2, 0, 0),
+        new THREE.Vector3(2, 0, 0)
+      ]);
+      const frontLineMaterial = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 5 });
+      const frontLine = new THREE.Line(frontLineGeometry, frontLineMaterial);
+      scene.add(frontLine);
+      scene.background = null;
+      const frontCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
+      frontCamera.position.set(0, 0.5, 1);
+      frontCamera.lookAt(0, 0.5, 0);
+      renderer.render(scene, frontCamera);
+      pdf.addImage(renderer.domElement.toDataURL('image/png'), 'PNG', 0, 0, width, height);
+      pdf.setLineWidth(0.05);
+      pdf.line(1, height - 2, 1 + 1, height - 2);
+      pdf.setFontSize(8);
+      pdf.text('100 cm', 1, height - 1.5);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(12);
+      pdf.text('Vue de face', width / 2, height - 1, { align: 'center' });
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(8);
+      pdf.text('Wall Simulateur 3d', width - 3, height - 1.5, { align: 'right' });
+      pdf.text('Made by Julien BROHEZ', width - 3, height - 1, { align: 'right' });
+      scene.remove(frontLine);
+
+      // Page 3: Side view (Orthographic, 2x scale, with ground line)
+      pdf.addPage();
+      const sideLineGeometry = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, 0, -2),
+        new THREE.Vector3(0, 0, 2)
+      ]);
+      const sideLineMaterial = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 5 });
+      const sideLine = new THREE.Line(sideLineGeometry, sideLineMaterial);
+      scene.add(sideLine);
+      scene.background = null;
+      const sideCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
+      sideCamera.position.set(1, 0.5, 0);
+      sideCamera.lookAt(0, 0.5, 0);
+      renderer.render(scene, sideCamera);
+      pdf.addImage(renderer.domElement.toDataURL('image/png'), 'PNG', 0, 0, width, height);
+      pdf.setLineWidth(0.05);
+      pdf.line(1, height - 2, 1 + 1, height - 2);
+      pdf.setFontSize(8);
+      pdf.text('100 cm', 1, height - 1.5);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(12);
+      pdf.text('Vue de côté', width / 2, height - 1, { align: 'center' });
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(8);
+      pdf.text('Wall Simulateur 3d', width - 3, height - 1.5, { align: 'right' });
+      pdf.text('Made by Julien BROHEZ', width - 3, height - 1, { align: 'right' });
+      scene.remove(sideLine);
+
+      // Page 4: 3D view (Perspective, current viewpoint)
+      pdf.addPage();
+      renderer.shadowMap.enabled = true;
+      scene.background = skyTexture;
+      camera.aspect = exportWidth / exportHeight;
+      camera.updateProjectionMatrix();
+      camera.lookAt(controls.target);
+      renderer.render(scene, camera);
+      pdf.addImage(renderer.domElement.toDataURL('image/png'), 'PNG', 0, 0, width, height);
+      pdf.setLineWidth(0.05);
+      pdf.line(1, height - 2, 1 + 1, height - 2);
+      pdf.setFontSize(8);
+      pdf.text('100 cm', 1, height - 1.5);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(12);
+      pdf.text('Vue 3D', width / 2, height - 1, { align: 'center' });
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(8);
+      pdf.text('Wall Simulateur 3d', width - 3, height - 1.5, { align: 'right' });
+      pdf.text('Made by Julien BROHEZ', width - 3, height - 1, { align: 'right' });
+
+      // Page 5: Brick inventory
+      pdf.addPage();
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(12);
+      pdf.text('Inventaire des briques', width / 2, 1, { align: 'center' });
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10);
+      let y = 2;
+      Object.keys(BRICK_SIZES).forEach(type => {
+        const count = layers.flat().filter(b => b[3] === type).length;
+        pdf.text(`${type}: ${count} briques`, 1, y);
+        y += 1;
+      });
+
+      renderer.setSize(originalWidth, originalHeight);
+      camera.aspect = originalWidth / originalHeight;
+      camera.updateProjectionMatrix();
+      renderer.shadowMap.enabled = true;
+      scene.background = skyTexture;
+      renderer.setClearColor(0x000000, 0);
+
+      pdf.save('vue-briques.pdf');
+    }
+
+    // Export PNG
+    function exportPNG() {
+      renderer.render(scene, camera);
+      setTimeout(() => {
+        const link = document.createElement('a');
+        link.download = 'vue-briques.png';
+        link.href = renderer.domElement.toDataURL('image/png');
+        link.click();
+      }, 100);
+    }
+
+    // Update Layer Select
+    function updateLayerSelect() {
+      const select = document.getElementById('layer-select');
+      select.innerHTML = '';
+      layers.forEach((_, i) => {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `Assise ${i + 1}`;
+        if (i === currentLayer) option.selected = true;
+        select.appendChild(option);
+      });
+    }
+
+    // Drag Handling
+    function makeDraggable(element, pos) {
+      let isDragging = false;
+      let startX, startY;
+
+      element.addEventListener('mousedown', (e) => {
+        if (e.target.tagName === 'LABEL' || e.target.classList.contains('brick-count')) return;
+        isDragging = true;
+        startX = e.clientX - pos.x;
+        startY = e.clientY - pos.y;
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        let x = e.clientX - startX;
+        let y = e.clientY - startY;
+
+        if (element.id === 'layerbox') {
+          y = Math.max(100, Math.min(y, 150));
+          x = Math.max(0, Math.min(x, window.innerWidth - element.offsetWidth));
         }
 
-        // Événements
-        startBtn.addEventListener('click', () => {
-            welcomeScreen.style.display = 'none';
-            mainInterface.style.display = 'block';
-            resizeCanvases();
-            initSettings(); // Sets up initial settings and event listeners
-            updateLayerSelect(); // Initialize layer select
-            currentLayerLabel.textContent = currentLayer + 1; // Update layer label
-            saveState(); // Save initial empty state
-            drawAll();
-            updateBrickCounts(); // Initial count update
-             selectType('entire'); // Highlight the default selected type
-             updateDimensionsDisplay(); // Display initial dimensions
-             syncFillBricksCheckboxes(); // Ensure checkboxes are in sync initially
-        });
-        // Initialisation des paramètres et événements
-        function initSettings() {
-            verticalJointWidthInput.value = verticalJointWidth;
-            horizontalJointWidthInput.value = horizontalJointWidth;
+        pos.x = x;
+        pos.y = y;
+        element.style.left = `${x}px`;
+        element.style.top = `${y}px`;
+      });
 
-            // Set initial values for all dimension inputs from brickDimensions
-            for (const type in dimensionInputs) {
-                if (dimensionInputs.hasOwnProperty(type)) {
-                    dimensionInputs[type].w.value = brickDimensions[type].w;
-                    dimensionInputs[type].h.value = brickDimensions[type].h;
-                    dimensionInputs[type].d.value = brickDimensions[type].d;
-                }
-            }
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+      });
+    }
 
-            // Ensure fillBricks state is consistent with the checkbox on startup
-            fillBricks = fillBricksCheckbox.checked;
-            fillBricksSettingsCheckbox.checked = fillBricks; // Sync settings checkbox
+    // Event Listeners
+    document.getElementById('brick-entire').addEventListener('click', () => {
+      selectedSize = 'entire';
+      updateScene();
+    });
+    document.getElementById('brick-three_quarter').addEventListener('click', () => {
+      selectedSize = 'three_quarter';
+      updateScene();
+    });
+    document.getElementById('brick-half').addEventListener('click', () => {
+      selectedSize = 'half';
+      updateScene();
+    });
+    document.getElementById('brick-quarter').addEventListener('click', () => {
+      selectedSize = 'quarter';
+      updateScene();
+    });
+    document.getElementById('rotation-y').addEventListener('input', (e) => {
+      rotationY = (e.target.value * Math.PI) / 180;
+      document.getElementById('rotation-value').textContent = `${e.target.value}°`;
+      updateScene();
+    });
+    document.getElementById('joint-thickness').addEventListener('input', (e) => {
+      jointThickness = parseFloat(e.target.value) / 100;
+      updateScene();
+    });
+    document.getElementById('show-colors').addEventListener('change', (e) => {
+      showColors = e.target.checked;
+      updateScene();
+    });
+    document.getElementById('white-bricks').addEventListener('change', (e) => {
+      whiteBricks = e.target.checked;
+      updateScene();
+    });
+    document.getElementById('layer-select').addEventListener('change', (e) => {
+      currentLayer = parseInt(e.target.value);
+      updateScene();
+    });
+    document.getElementById('add-layer').addEventListener('click', addLayer);
+    document.getElementById('undo').addEventListener('click', undo);
+    document.getElementById('delete-mode').addEventListener('click', () => {
+      deleteMode = !deleteMode;
+      document.getElementById('delete-mode').classList.toggle('delete-active', deleteMode);
+      updateScene();
+    });
+    document.getElementById('export-pdf').addEventListener('click', exportPDF);
+    document.getElementById('export-png').addEventListener('click', exportPNG);
 
-            // Event Listeners for Settings
-            verticalJointWidthInput.addEventListener('change', updateVerticalJointWidth);
-            horizontalJointWidthInput.addEventListener('change', updateHorizontalJointWidth);
+    // Mouse Move for Hover
+    document.addEventListener('mousemove', (e) => {
+      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObject(plane);
+      if (intersects.length > 0 && !deleteMode) {
+        hoverPoint = intersects[0].point;
+        console.log('Mouse hover point:', hoverPoint);
+      } else {
+        hoverPoint = null;
+      }
+      updateScene();
+    });
 
-            // Add event listeners for all dimension inputs
-             for (const type in dimensionInputs) {
-                 if (dimensionInputs.hasOwnProperty(type)) {
-                     dimensionInputs[type].w.addEventListener('change', updateBrickDimensions);
-                     dimensionInputs[type].h.addEventListener('change', updateBrickDimensions);
-                     dimensionInputs[type].d.addEventListener('change', updateBrickDimensions);
-                 }
-             }
+    // Click to Add or Delete Brick
+    renderer.domElement.addEventListener('click', (e) => {
+      if (deleteMode) {
+        console.log('Click detected in delete mode');
+        deleteBrick();
+      }
+    });
 
-
-            // Event Listeners for Fill Bricks Checkboxes
-            fillBricksCheckbox.addEventListener('change', updateFillBricks);
-            fillBricksSettingsCheckbox.addEventListener('change', updateFillBricks); // Link settings checkbox
+    // Double Click to Add Brick
+    renderer.domElement.addEventListener('dblclick', (e) => {
+      if (!deleteMode) {
+        console.log('Double-click detected');
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObject(plane);
+        if (intersects.length > 0) {
+          console.log('Plane intersected at:', intersects[0].point);
+          addBrick(intersects[0].point);
+        } else {
+          console.log('No intersection with plane');
         }
-
-        function syncFillBricksCheckboxes() {
-             fillBricksCheckbox.checked = fillBricks;
-             fillBricksSettingsCheckbox.checked = fillBricks;
-        }
-
-        function updateFillBricks(event) {
-            // Determine the new fillBricks state from the checkbox that triggered the event
-            fillBricks = event.target.checked;
-            // Sync the other checkbox
-            if (event.target === fillBricksCheckbox) {
-                 fillBricksSettingsCheckbox.checked = fillBricks;
-            } else if (event.target === fillBricksSettingsCheckbox) {
-                 fillBricksCheckbox.checked = fillBricks;
-            }
-            drawAll(); // Redraw canvases with the new fill state
-        }
-
-        function updateVerticalJointWidth() {
-             verticalJointWidth = parseInt(verticalJointWidthInput.value) || 0; // Default to 0 if invalid
-             // Vertical joint primarily affects layer height visually, which is handled in drawView
-             drawAll(); // Redraw all views to reflect potential layer height change
-        }
-
-        function updateHorizontalJointWidth() {
-             horizontalJointWidth = parseInt(horizontalJointWidthInput.value) || 0; // Default to 0 if invalid
-             // Horizontal joint affects spacing between bricks *within* a layer in elevation views.
-             // In the current top-view placement, the grid is 1cm, not tied to brick length + joint.
-             // So changing this value doesn't automatically adjust placement grid, but it's stored.
-             drawAll(); // Redraw views (although visual effect might be minimal without smarter placement)
-        }
-
-
-        // Redimensionnement responsive
-        function resizeCanvases() {
-            const containerWidth = document.getElementById('container').offsetWidth;
-            if (containerWidth === 0) { // Avoid division by zero if container is not yet measured
-                 console.warn("Container width is 0, cannot resize canvases.");
-                 return;
-             }
-
-             // Use a reasonable default ratio if element isn't visible yet
-            const aspectRatioTopFront = topCanvas.height > 0 && topCanvas.width > 0 ? topCanvas.width / topCanvas.height : 800 / 400;
-            const aspectRatioLeftRight = leftCanvas.height > 0 && leftCanvas.width > 0 ? leftCanvas.width / leftCanvas.height : 1;
-
-            const canvasPadding = 20; // padding inside .view + border
-            const gap = 20; // gap between canvases
-
-             // Top and Front views take roughly full width
-            const fullWidthCanvas = containerWidth - 60 - (2 * canvasPadding); // Container width - toolbar width - view padding/borders
-            if (fullWidthCanvas <= 0) {
-                 console.warn("Calculated canvas width is non-positive, cannot resize.");
-                 return;
-            }
-
-            topCanvas.width = fullWidthCanvas;
-            topCanvas.height = fullWidthCanvas / aspectRatioTopFront;
-
-            frontCanvas.width = fullWidthCanvas;
-            frontCanvas.height = fullWidthCanvas / aspectRatioTopFront;
-            // Left and Right views will be stacked vertically, so they can also use full width
-            leftCanvas.width = fullWidthCanvas; // Use full width for stacking
-            leftCanvas.height = fullWidthCanvas / aspectRatioLeftRight;
-            rightCanvas.width = fullWidthCanvas; // Use full width for stacking
-            rightCanvas.height = fullWidthCanvas / aspectRatioLeftRight;
-            drawAll(); // Redraw after resizing
-             // console.log(`Canvases resized. Top: ${topCanvas.width}x${topCanvas.height}, Front: ${frontCanvas.width}x${frontCanvas.height}, Side: ${leftCanvas.width}x${leftCanvas.height}`);
-        }
-
-        // Fonctions de base
-        function toggleSettings() {
-            if (settingsPanel.style.display === 'block') {
-                settingsPanel.style.display = 'none';
-                settingsBtn.classList.remove('selected'); // Remove highlight
-            } else {
-                settingsPanel.style.display = 'block';
-                settingsBtn.classList.add('selected'); // Add highlight
-            }
-        }
-
-
-        function updateBrickDimensions() {
-             // Read values from all dimension input fields
-             for (const type in dimensionInputs) {
-                 if (dimensionInputs.hasOwnProperty(type)) {
-                     brickDimensions[type].w = parseFloat(dimensionInputs[type].w.value) || 0; // Longueur
-                     brickDimensions[type].h = parseFloat(dimensionInputs[type].h.value) || 0; // Hauteur
-                     brickDimensions[type].d = parseFloat(dimensionInputs[type].d.value) || 0; // Largeur
-                 }
-             }
-
-
-             // Note: Changing dimensions *after* placing bricks will likely misalign them
-             // visually if they were placed based on grid position. A real application might
-             // need to re-calculate all brick positions based on the new dimensions, or
-             // enforce setting dimensions before starting. For this simulator, we just redraw.
-             // The stored brick objects still hold the dimensions used at placement.
-            drawAll();
-            updateDimensionsDisplay(); // Update displayed dimensions
-        }
-
-         function updateDimensionsDisplay() {
-             if (dimensionsDisplay) {
-                 const { w, h, d } = brickDimensions.entire;
-                 dimensionsDisplay.textContent = `Dimensions brique standard: L=${w} cm, H=${h} cm, l=${d} cm`; // Updated label
-             }
-         }
-
-
-        function updateLayerSelect() {
-            layerSelect.innerHTML = '';
-            layers.forEach((layer, index) => {
-                const option = document.createElement('option');
-                option.value = index;
-                option.textContent = `Assise ${index + 1}`;
-                option.selected = index === currentLayer;
-                layerSelect.appendChild(option);
-            });
-             currentLayerLabel.textContent = currentLayer + 1; // Update label below top view canvas
-        }
-
-        function changeLayer(index) {
-            currentLayer = parseInt(index);
-            updateLayerSelect(); // Update select box and label
-            drawAll();
-        }
-
-        function selectType(type) {
-            if (brickTypes.hasOwnProperty(type)) { // Check if type exists in brickTypes
-                selectedBrickType = type;
-                // Optionally update the button styles to show which is selected
-                document.querySelectorAll('#toolbar button[data-type]').forEach(btn => {
-                    btn.classList.remove('selected'); // Remove selected class from all type buttons
-                });
-                // Find the selected button and add a border
-                const selectedBtn = document.querySelector(`#toolbar button[data-type="${type}"]`);
-                if(selectedBtn) {
-                     selectedBtn.classList.add('selected'); // Add selected class
-                }
-
-                drawTopView(); // Only need to redraw top view to show ghost brick change
-            } else {
-                console.error('Unknown brick type:', type);
-            }
-        }
-
-        function updateBrickCounts() {
-            const counts = { entire: 0, threeQuarters: 0, half: 0, quarter: 0 };
-            layers.forEach(layer => {
-                layer.forEach(brick => {
-                    // Ensure brick.type is a valid key before incrementing
-                    if (brick && typeof brick.type === 'string' && counts.hasOwnProperty(brick.type)) {
-                        counts[brick.type]++;
-                    } else if (brick && brick.type) {
-                         console.warn("Brick with unknown type encountered (will not be counted):", brick.type);
-                    } else {
-                        // console.warn("Brick with missing type encountered:", brick); // Too noisy
-                    }
-                });
-            });
-            // console.log("Calculated brick counts:", counts); // Debugging: Check calculated counts
-
-            // Update DOM elements
-            if (countEntire) countEntire.textContent = counts.entire;
-            if (countThreeQuarters) countThreeQuarters.textContent = counts.threeQuarters;
-            if (countHalf) countHalf.textContent = counts.half;
-            if (countQuarter) countQuarter.textContent = counts.quarter;
-        }
-
-
-        // Dessin
-         // Helper to get scaled brick size based on type and rotation *using current settings*
-         // This is primarily for the GHOST brick and initial placement calculations.
-         // For drawing already placed bricks, use the dimensions stored *with the brick object*.
-         function getCurrentScaledBrickSize(type = selectedBrickType, rot = rotation) {
-             // console.log(`Getting scaled size for type: ${type}, rotation: ${rot}`);
-             // Get base dimensions in cm from current settings
-            // DIRECTLY use the dimensions from the brickDimensions object for this type
-            const { w, h, d } = brickDimensions[type];
-            // console.log(`Base dimensions (cm) for ${type}: W=${w}, H=${h}, D=${d}`);
-
-
-            // Convert cm to pixels using the current scale
-            const scaledW = w * scale; // Scaled Longueur
-            const scaledH = h * scale; // Scaled Hauteur
-            const scaledD = d * scale; // Scaled Largeur
-
-
-            const color = brickTypes[type].color;
-            // In top view (plan), rotation swaps Longueur and Largeur
-            const rotatedSizeTopView = rot % 180 === 0 ? { w: scaledW, h: scaledD } : { w: scaledD, h: scaledW };
-            return {
-                 base_w_cm: w, // Longueur (cm)
-                 base_h_cm: h, // Hauteur (cm)
-                 base_d_cm: d, // Largeur (cm)
-
-                scaled_w: scaledW, // Scaled Longueur (pixels, current settings)
-                scaled_h: scaledH, // Scaled Hauteur (pixels, current settings)
-                scaled_d: scaledD, // Scaled Largeur (pixels, current settings)
-
-                color: color,
-
-                 // Dimensions as they appear in the TOP view (pixels, current settings)
-                 displayW_top: rotatedSizeTopView.w, // This will be scaled Longueur or scaled Largeur
-                 displayH_top: rotatedSizeTopView.h, // This will be scaled Largeur or scaled Longueur
-
-                 // Dimensions as they appear in the FRONT view (pixels, current settings)
-                 displayW_front: scaledW, // Front view always shows scaled Longueur
-                 displayH_front: scaledH, // Front view always shows scaled Hauteur
-
-                 // Dimensions as they appear in the SIDE views (pixels, current settings)
-                 displayW_side: scaledD, // Side views always show scaled Largeur
-                 displayH_side: scaledH // Side views always shows scaled Hauteur
-            };
-        }
-
-
-        function drawGrid(ctx, w, h) {
-            ctx.clearRect(0, 0, w, h); // Optional: Draw a background color if not clearing to transparent
-             // ctx.fillStyle = 'white';
-             // ctx.fillRect(0, 0, w, h);
-
-            ctx.beginPath();
-            ctx.strokeStyle = '#eee'; // Lighter grid lines
-             ctx.lineWidth = 0.5; // Thin grid lines
-            for (let x = 0; x <= w; x += gridSize) { ctx.moveTo(x, 0); ctx.lineTo(x, h); }
-            for (let y = 0; y<= h; y += gridSize) { ctx.moveTo(0, y); ctx.lineTo(w, y); }
-            ctx.stroke();
-             ctx.lineWidth = 1; // Reset linewidth
-        }
-
-        function drawGround(ctx, w) {
-            ctx.beginPath();
-            const groundY = ctx.canvas.height - groundOffset;
-            ctx.moveTo(0, groundY);
-            ctx.lineTo(w, groundY);
-            ctx.lineWidth = 2; // Slightly thicker ground line
-            ctx.strokeStyle = '#333'; // Darker ground line color
-            ctx.stroke();
-            ctx.lineWidth = 1; // Reset line width
-        }
-
-        function drawTopView() {
-            const ctx = ctxs.top;
-            const canvasWidth = topCanvas.width;
-            const canvasHeight = topCanvas.height; // Corrected here
-
-            drawGrid(ctx, canvasWidth, canvasHeight); // This clears the canvas
-
-             // --- Draw previous layer outline if not on the first layer ---
-             if (currentLayer > 0 && layers[currentLayer - 1]) {
-                 ctx.strokeStyle = '#aaaaaa'; // Light grey for previous layer
-                 ctx.lineWidth = 0.8; // Thin line
-                 layers[currentLayer - 1].forEach(b => {
-                     // Use the stored placed dimensions which are already scaled pixels
-                     // Ensure placed dimensions exist (for backward compatibility if loading old data)
-                     // If not found, use current settings as fallback, but warn that this might be inaccurate
-                     const dims = (b.w_placed !== undefined && b.h_placed !== undefined) ?
-                                  { w: b.w_placed, h: b.h_placed } :
-                                   (brickDimensions[b.type] ? (b.rotation % 180 === 0 ? { w: brickDimensions[b.type].w * scale, h: brickDimensions[b.type].d * scale } : { w: brickDimensions[b.type].d * scale, h: brickDimensions[b.type].w * scale }) : { w: 0, h: 0 });
-                    if (b.w_placed === undefined || b.h_placed === undefined) {
-                         // console.warn(`Drawing previous layer outline for brick without stored placed dimensions. Type: ${b.type}, Rotation: ${b.rotation}. Using current settings as fallback.`); // Too noisy
-                    }
-
-                     const drawW = dims.w;
-                     const drawH = dims.h;
-
-
-                      if (drawW > 0 && drawH > 0) { // Only draw if dimensions are positive
-                        ctx.strokeRect(b.x, b.y, drawW, drawH);
-                 }
-                 });
-                 ctx.lineWidth = 1; // Reset line width
-             }
-             // -------------------------------------------------------------
-
-
-             // --- Draw bricks for the current layer ---
-            layers[currentLayer].forEach(b => {
-                // Use the stored placed dimensions which are already scaled pixels
-                const brickX = b.x;
-                const brickY = b.y;
-                const brickDrawW = b.w_placed; // Use stored placed dimensions
-                const brickDrawH = b.h_placed; // This is depth in top view
-
-                 // Ensure draw dimensions are positive before drawing
-                  if (brickDrawW <= 0 || brickDrawH <= 0) {
-                      // console.warn("Top view: Calculated draw dimensions are non-positive, skipping drawing:", brickDrawW, brickDrawH); // Too noisy
-                      return; // Skip drawing if dimensions are invalid for drawing
-                  }
-
-
-                ctx.strokeStyle = 'black'; // Border color for bricks
-                ctx.lineWidth = 1;
-                if (fillBricks) {
-                    ctx.fillStyle = b.color;
-                    ctx.fillRect(brickX, brickY, brickDrawW, brickDrawH);
-                    ctx.strokeRect(brickX, brickY, brickDrawW, brickDrawH); // Draw border on top of fill
-                } else {
-                    ctx.strokeStyle = b.color;
-                    ctx.strokeRect(brickX, brickY, brickDrawW, brickDrawH);
-                }
-
-                // Dessin des trous (simplified for 2D top view)
-                 // Hole radius based on the *current* scale, not stored
-                const holeRadius = 2 * scale; // 2cm radius in pixels
-                let holes;
-                switch(b.type) {
-                    case 'entire': holes = 3; break;
-                    case 'threeQuarters': holes = 2; break;
-                    case 'half': holes = 1; break;
-                    case 'quarter': holes = 0; break; // Quarters typically don't have holes in this representation
-                    default: holes = 0;
-                }
-
-                if(holes > 0) {
-                    // Use the base dimensions in cm stored with the brick
-                    const { base_w_cm, base_d_cm } = b; // Get base dimensions in cm (Longueur, Largeur)
-                     if (base_w_cm === undefined || base_d_cm === undefined) {
-                         // Fallback if base dimensions are not stored (e.g., old imported data)
-                         const fallbackDims = brickDimensions[b.type]; // Use current settings as fallback
-                          if (fallbackDims) {
-                            base_w_cm = fallbackDims.w; // Longueur
-                            base_d_cm = fallbackDims.d; // Largeur
-                          } else {
-                              // console.warn("Missing base dimensions and unknown type for hole drawing:", b); // Tooisy
-                             return; // Skip drawing holes
-                          }
-                     }
-
-                    // Physical dimensions relevant to hole placement within the brick itself
-                    const holeSpreadDimension_cm = base_w_cm; // Holes are typically along the Longueur
-                    const holeCenterDimension_cm = base_d_cm; // Holes are typically centered along the Largeur
-
-
-                    const totalHoleDiameter_cm = (holeRadius * 2) / scale * holes; // Total diameter of holes in cm
-                    const spacing_cm = (holeSpreadDimension_cm - totalHoleDiameter_cm) / (holes + 1); // Space between holes in cm
-
-                     if (spacing_cm < -0.1) { // Check for negative spacing (holes are too big/many)
-                         // console.warn(`Holes larger than brick dimension or negative spacing calculated for type ${b.type}. Skipping holes.`); // Too noisy
-                         return; // Skip drawing holes if dimensions are impossible
-                     }
-
-                    const centerY_cm = holeCenterDimension_cm / 2; // Center along the physical Largeur
-
-
-                    for(let i = 0; i < holes; i++) {
-                        // Calculate hole center in cm relative to brick's physical dimensions
-                        const holeCenterAlongSpreadDim_cm = spacing_cm * (i + 1) + (holeRadius / scale) * (2 * i + 1);
-
-                        let holeCenterX_cm_relative, holeCenterY_cm_relative;
-                        // Now map these physical coordinates to the top view canvas coordinates based on rotation
-                        const rot = b.rotation % 360; // Use full rotation for mapping
-
-                        if(rot === 0 || rot === 180) { // Original Longueur is along top view X axis
-                            holeCenterX_cm_relative = holeCenterAlongSpreadDim_cm; // X maps to position along physical Longueur
-                            holeCenterY_cm_relative = centerY_cm; // Y maps to center along physical Largeur
-                        } else { // Original Longueur is along top view Y axis (rot 90 or 270)
-                            holeCenterX_cm_relative = centerY_cm; // X maps to center along physical Largeur
-                            holeCenterY_cm_relative = holeCenterAlongSpreadDim_cm; // Y maps to position along physical Longueur
-                        }
-
-
-                        // Convert relative cm coordinates to absolute pixel coordinates on canvas
-                        const holeCenterX_px = brickX + holeCenterX_cm_relative * scale;
-                        const holeCenterY_px = brickY + holeCenterY_cm_relative * scale;
-
-                         // Ensure hole center is within brick boundaries before drawing
-                         const tolerance = 1; // Pixel tolerance
-                         if (holeCenterX_px >= brickX - tolerance && holeCenterX_px <= brickX + brickDrawW + tolerance &&
-                             holeCenterY_px >= brickY - tolerance && holeCenterY_px <= brickY + brickDrawH + tolerance) {
-
-                             ctx.beginPath();
-                            ctx.arc(holeCenterX_px, holeCenterY_px, holeRadius, 0, 2 * Math.PI);
-                            ctx.fillStyle = '#ccc'; // Lighter grey for holes
-                            ctx.fill();
-                            ctx.strokeStyle = '#333'; // Darker border for holes
-                            ctx.stroke();
-                         } else {
-                              // console.warn("Hole center calculated outside brick bounds, skipping drawing:", holeCenterX_px, holeCenterY_px, brickX, brickY, brickDrawW, brickDrawH); // Too noisy
-                         }
-                    }
-                }
-            });
-             // -------------------------------------------------------------
-
-
-            // Draw ghost brick for the current layer's canvas
-            // Only show ghost brick on the top view and if mouse is over
-            if(ghostBrick && currentLayer === layers.length -1){
-                 // Use current settings for the ghost brick size
-                 const s = getCurrentScaledBrickSize();
-                 // Ensure dimensions are positive before drawing ghost
-                 if (s.displayW_top > 0 && s.displayH_top > 0) {
-                    ctx.fillStyle = '#00000033'; // Semi-transparent black
-                    ctx.fillRect(ghostBrick.x, ghostBrick.y, s.displayW_top, s.displayH_top);
-                 }
-            }
-        }
-
-         // Helper function to draw a single brick in an elevation view
-         function drawElevationBrick(ctx, brick, mode, layerBottomY) {
-             // Use the stored scaled dimensions from the brick object at the time of placement
-             const brickScaledW = brick.scaled_w; // Scaled Longueur
-             const brickScaledH = brick.scaled_h; // Scaled Hauteur
-             const brickScaledD = brick.scaled_d; // Scaled Largeur (profondeur)
-
-
-             // Ensure dimensions are valid numbers
-              if (isNaN(brickScaledW) || isNaN(brickScaledH) || isNaN(brickScaledD)) {
-                  console.warn("Invalid scaled dimensions stored for brick, skipping drawing:", brick);
-                  return; // Skip drawing this brick if dimensions are invalid
-              }
-
-             // Y position for the top of the brick (in pixels from canvas top)
-             const brickTopY = layerBottomY - brickScaledH; // Use the stored scaled height
-
-
-             ctx.strokeStyle = 'black'; // Border color
-             ctx.lineWidth = 1;
-             let brickDrawX, brickDrawW;
-
-             if (mode === 'front') {
-                 // Front view: use x position from top view brick object
-                 brickDrawX = brick.x; // Already scaled pixel position from top view
-
-                 // For the front view, the width depends on the rotation in the top view.
-                 // If rotated 90 or 270 degrees, show the Largeur (scaled_d) as width.
-                 // Otherwise, show the Longueur (scaled_w) as width.
-                 const rot = brick.rotation % 360;
-                 if (rot === 90 || rot === 270) {
-                     brickDrawW = brickScaledD; // Use scaled Largeur as width for 90/270 rotation
-                 } else {
-                     brickDrawW = brickScaledW; // Use scaled Longueur as width for 0/180 rotation
-                 }
-
-             } else { // Left or Right view
-                 // Side views: use y position (depth in top view) from top view brick object and stored scaled depth (largeur)
-                 brickDrawX = brick.y; // Already scaled pixel position (this is the depth position from top view)
-                 brickDrawW = brickScaledD; // Use stored scaled depth (largeur)
-             }
-
-             // Ensure draw dimensions are positive before drawing
-              if (brickDrawW <= 0 || brickScaledH <= 0) {
-                  // console.warn(`Elevation view (${mode}): Calculated draw dimensions are non-positive, skipping drawing: ${brickDrawW}x${brickScaledH}`, brick); // Too noisy
-                  return; // Skip drawing if dimensions are invalid for drawing
-              }
-
-
-             if (fillBricks) {
-                 ctx.fillStyle = brick.color; // Use the color stored with the brick
-                 ctx.fillRect(brickDrawX, brickTopY, brickDrawW, brickScaledH); // Use stored scaled height
-                 ctx.strokeRect(brickDrawX, brickTopY, brickDrawW, brickScaledH); // Draw border on top of fill
-             } else {
-                 ctx.strokeStyle = brick.color;
-                 ctx.strokeRect(brickDrawX, brickTopY, brickDrawW, brickScaledH);
-             }
-         }
-
-
-        function drawView(ctx, mode) {
-            const canvasWidth = ctx.canvas.width;
-            const canvasHeight = ctx.canvas.height; // Corrected here
-            drawGrid(ctx, canvasWidth, canvasHeight);
-            drawGround(ctx, canvasWidth);
-
-             // Calculate layer height including joint (in pixels)
-             const brickH_scaled_entire = brickDimensions.entire.h * scale; // Height of a standard brick (entire) using *current* settings
-             const verticalJointH_scaled = (verticalJointWidth / 10) * scale; // Vertical joint in pixels (verticalJointWidth is in mm, convert to cm first)
-             const layerTotalHeight = brickH_scaled_entire + verticalJointH_scaled; // Assume uniform layer height based on current entire brick height + vertical joint
-
-
-             // Draw layer graduations
-             ctx.font = '10px Arial';
-             ctx.fillStyle = '#333'; // Text color
-             ctx.textAlign = 'right';
-             ctx.strokeStyle = '#555'; // Graduation line color
-             ctx.lineWidth = 1;
-             const graduationLineLength = 5; // Pixels
-             const graduationTextOffset = 10; // Pixels
-
-
-            // Create a temporary array to hold bricks visible in this elevation view
-            const visibleBricks = [];
-
-            layers.forEach((layer, z) => {
-                // Y position for the bottom of the current layer (in pixels from canvas top)
-                // This calculation correctly uses the current layer height setting
-                const layerBottomY = canvasHeight - groundOffset - (z * layerTotalHeight);
-
-                // Graduation
-                ctx.beginPath();
-                ctx.moveTo(canvasWidth - graduationTextOffset, layerBottomY);
-                ctx.lineTo(canvasWidth - graduationTextOffset - graduationLineLength, layerBottomY);
-                ctx.stroke();
-                ctx.fillText(`A${z+1}`, canvasWidth - graduationTextOffset - graduationLineLength - 3, layerBottomY + 3); // Position text to the left of the line
-
-
-                 // For occlusion in Front and Side views, we need to draw layers from back to front
-                 // This simple loop draws layer by layer, but doesn't handle occlusion *within* a layer or across layers properly.
-                 // A full occlusion implementation would require sorting bricks by their position in the view's depth axis
-                 // and drawing them in that order, potentially splitting bricks that are partially occluded.
-                 // This is a significant complexity increase.
-
-                 // For now, let's collect all bricks that *could* be visible in this view for potential future sorting/occlusion logic.
-                 // However, the current drawing logic in drawElevationBrick draws all bricks.
-                 // To implement the user's request for "hidden behind another on the plan view not displayed on the front view",
-                 // we would need to determine which bricks are in front of others in the FRONT view perspective, not the PLAN view.
-                 // This requires analyzing the x and depth (y in plan view) coordinates.
-
-                 layer.forEach(b => {
-                     // Add all bricks to the list for now, occlusion is not implemented.
-                     visibleBricks.push({ ...b, layerZ: z, layerBottomY: layerBottomY });
-                 });
-            });
-
-            // Simple drawing of all bricks without occlusion handling as per current code structure.
-            // To implement occlusion, we would sort 'visibleBricks' based on their depth in this specific 'mode' view
-            // and draw them in reverse order.
-
-            visibleBricks.forEach(b => {
-                 // Pass the brick object, mode, and the calculated layer bottom Y position
-                 drawElevationBrick(ctx, b, mode, b.layerBottomY);
-            });
-
-             ctx.lineWidth = 1; // Reset line width
-         }
-
-
-        function drawAll() {
-            console.log('Drawing all views. Current layer:', currentLayer, 'Total layers:', layers.length);
-            drawTopView();
-            drawView(ctxs.front, 'front');
-            drawView(ctxs.left, 'left');
-            drawView(ctxs.right, 'right');
-        }
-
-        // Interactions
-        topCanvas.addEventListener('mousemove', e => {
-             // Only show ghost brick if on the current (top-most) layer
-             if (currentLayer < layers.length - 1) {
-                 ghostBrick = null; // Hide ghost brick on lower layers
-                 drawTopView(); // Redraw to clear any existing ghost
-                 return;
-             }
-
-            const r = topCanvas.getBoundingClientRect();
-            const mouseX = e.clientX - r.left;
-            const mouseY = e.clientY - r.top;
-
-            // Snap to grid
-            const snappedX = Math.floor(mouseX / gridSize) * gridSize;
-            const snappedY = Math.floor(mouseY / gridSize) * gridSize;
-
-            ghostBrick = {
-                x: snappedX,
-                y: snappedY
-            };
-            drawTopView(); // Only need to redraw top view on mouse move
-        });
-        topCanvas.addEventListener('click', () => {
-             console.log('Click handler started.');
-             console.log('Current layer:', currentLayer, 'Total layers:', layers.length);
-
-
-             // Only allow placing bricks on the current (top-most) layer
-             if (currentLayer < layers.length - 1) {
-                 console.log('Click on lower layer, returning.');
-                 return;
-             }
-             console.log('Click on top layer.');
-
-             if (!ghostBrick) {
-                 console.log('No ghost brick, returning.');
-                 return; // Should not happen if mousemove is working
-             }
-             console.log('Ghost brick found at', ghostBrick.x, ghostBrick.y);
-
-             try {
-                 const s = getCurrentScaledBrickSize();
-                 console.log('Scaled size calculated:', s);
-
-                 const newBrick = {
-                     x: ghostBrick.x, // Pixel position in top view (relative to top-left, snapped to grid)
-                     y: ghostBrick.y, // Pixel position in top view (relative to top-left, snapped to grid)
-
-                     // Store dimensions as they were calculated when placed (in pixels)
-                     // These are based on *current* settings and rotation at placement time.
-                     w_placed: s.displayW_top,
-                     h_placed: s.displayH_top,
-
-                      // Store base dimensions in cm (needed for hole calculation and potential future re-scaling)
-                      base_w_cm: s.base_w_cm, // Longueur (cm)
-                      base_h_cm: s.base_h_cm, // Hauteur (cm)
-                      base_d_cm: s.base_d_cm, // Largeur (cm)
-
-                      // Store scaled base dimensions (pixels) based on current settings
-                     scaled_w: s.scaled_w, // Scaled Longueur
-                      scaled_h: s.scaled_h, // Scaled Hauteur
-                      scaled_d: s.scaled_d, // Scaled Largeur
-
-
-                     color: s.color, // Store color (based on type at placement)
-                     rotation: rotation, // Store rotation
-                     type: selectedBrickType // Store brick type (essential for counts, export, import)
-                 };
-                 console.log('New brick object created:', newBrick);
-
-
-                 saveState();
-                 console.log('State saved.');
-
-
-                  if (!layers[currentLayer]) layers[currentLayer] = []; // Ensure layer exists
-                  console.log('Pushing brick to layer', currentLayer, '...');
-                 layers[currentLayer].push(newBrick);
-                  console.log('... Brick pushed. Current layer now has', layers[currentLayer].length, 'bricks.');
-                  console.log('Layers state after push:', layers);
-
-
-                 drawAll();
-                 console.log('drawAll called.');
-
-
-                 updateBrickCounts();
-                 console.log('updateBrickCounts called. Click handler finished successfully?');
-
-
-             } catch (error) {
-                 console.error('Error during brick placement:', error);
-                 // Consider showing an alert to the user as well
-                 alert('Erreur lors de la pose de la brique : ' + error.message + '. Vérifiez la console pour plus de détails.');
-             }
-        });
-
-         // Handle mouseout to hide ghost brick
-         topCanvas.addEventListener('mouseout', () => {
-             ghostBrick = null;
-             drawTopView(); // Redraw top view to remove ghost brick
-         });
-         function rotateBrick(){
-            rotation = (rotation + 90) % 360;
-            // Update the ghost brick's appearance if visible
-             if(ghostBrick) {
-                drawTopView();
-             }
-        }
-
-        function undo(){
-            if (historyIndex > 0) {
-                historyIndex--;
-                // Deep clone the state from history
-                layers = history[historyIndex].map(layer => layer.map(brick => ({ ...brick })));
-                updateLayerSelect(); // Update layer dropdown and label
-                // Ensure currentLayer is valid after undoing layers
-                if (currentLayer >= layers.length) {
-                    currentLayer = layers.length - 1;
-                    if (currentLayer < 0) currentLayer = 0; // Handle case where all layers are undone (should result in layers = [[]], currentLayer = 0)
-                     updateLayerSelect(); // Update dropdown again if currentLayer changed
-                }
-                 // Ensure layers is never completely empty after undoing all
-                 if (layers.length === 0) layers = [[]];
-                drawAll(); // Redraw all views
-                updateBrickCounts(); // Update counts
-                 // console.log('Undo. History index:', historyIndex);
-            } else {
-                // console.log('Cannot undo further.');
-            }
-        }
-
-         // Redo functionality (optional but good companion to undo)
-        // function redo() {
-        //     if (historyIndex < history.length - 1) {
-        //         historyIndex++;
-        //         layers = history[historyIndex].map(layer => layer.map(brick => ({ ...brick })));
-        //         updateLayerSelect();
-        //         if (currentLayer >= layers.length) { // Should not happen with redo unless state is weird
-        //              currentLayer = layers.length - 1;
-        //              if (currentLayer < 0) currentLayer = 0;
-        //              updateLayerSelect();
-        //         }
-        //         drawAll();
-        //         updateBrickCounts();
-        //          console.log('Redo. History index:', historyIndex);
-        //     } else {
-        //          console.log('Cannot redo further.');
-        //     }
-        // }
-
-
-        function addLayer(){
-             saveState(); // Save state before adding
-            layers.push([]);
-            currentLayer = layers.length - 1;
-            updateLayerSelect(); // Update select box and label
-            drawAll(); // Redraw all views (especially elevation views which show all layers)
-            updateBrickCounts(); // Count doesn't change immediately, but good practice
-        }
-
-        function exportPose(){
-            const a = document.createElement('a');
-            // Store only necessary data for re-creating the wall structure:
-             // grid positions (x, y), type, and rotation.
-            // Dimensions will be re-calculated on import based on current settings.
-            // Also export the current brick dimensions settings so they can be reloaded
-            const dataToExport = {
-                 version: APP_VERSION, // Include version
-                 brickDimensions: brickDimensions, // Export all brick dimensions settings
-                 layers: layers.map(layer => layer.map(brick => ({
-                    x: brick.x, // Pixel position in top view as placed (relative to top-left, snapped to grid)
-                     y: brick.y, // Pixel position in top view as placed (relative to top-left, snapped to grid)
-                     type: brick.type, // Brick type string (entire, half, etc.)
-                     rotation: brick.rotation // Rotation in degrees (0, 90, 180, 270)
-                 })))
-             };
-            const d = JSON.stringify(dataToExport, null, 2); // Use 2 spaces for pretty printing
-            a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(d); // Specify charset
-            a.download = 'mur_pose.json'; // More descriptive filename
-            a.click();
-        }
-
-        function importPose(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = ev => {
-                try {
-                    const importedData = JSON.parse(ev.target.result);
-                    // Basic validation
-                     if (!importedData || !Array.isArray(importedData.layers) || !importedData.brickDimensions) {
-                         throw new Error('Format de fichier JSON invalide ou corrompu.');
-                     }
-
-                     // Optional: Check version compatibility
-                     // if (importedData.version && importedData.version !== APP_VERSION) {
-                     //     console.warn(`Importing data from version ${importedData.version}. Current version is ${APP_VERSION}. Compatibility issues may arise.`);
-                     // }
-
-
-                    // Import brick dimensions settings
-                    // Validate and use imported dimensions, fallback to current settings if invalid
-                     for (const type in importedData.brickDimensions) {
-                         if (brickDimensions.hasOwnProperty(type)) { // Check if the type exists in current settings
-                             const dims = importedData.brickDimensions[type];
-                             if (dims && typeof dims.w === 'number' && typeof dims.h === 'number' && typeof dims.d === 'number') {
-                                 brickDimensions[type] = { ...dims }; // Use imported dimensions
-                             } else {
-                                 console.warn(`Invalid dimensions for type ${type} in imported data. Using current settings.`);
-                             }
-                         } else {
-                             console.warn(`Unknown brick type ${type} in imported data. Skipping.`);
-                         }
-                     }
-
-                     // Update dimension inputs in the settings panel
-                     for (const type in dimensionInputs) {
-                         if (dimensionInputs.hasOwnProperty(type) && brickDimensions.hasOwnProperty(type)) {
-                             dimensionInputs[type].w.value = brickDimensions[type].w;
-                             dimensionInputs[type].h.value = brickDimensions[type].h;
-                             dimensionInputs[type].d.value = brickDimensions[type].d;
-                         }
-                     }
-                     updateDimensionsDisplay(); // Update displayed dimensions near title
-
-
-                    // Reconstruct brick objects for layers
-                    layers = importedData.layers.map(layer => layer.map(importedBrick => {
-                         // Validate imported brick properties
-                         if (typeof importedBrick.x !== 'number' || typeof importedBrick.y !== 'number' ||
-                             !brickTypes.hasOwnProperty(importedBrick.type) || typeof importedBrick.rotation !== 'number') {
-                              console.warn("Skipping invalid brick found in imported data:", importedBrick);
-                              return null; // Skip this invalid brick
-                         }
-
-                         // Use *current* settings (which were just updated from import) to calculate scaled dimensions for drawing
-                         const s = getCurrentScaledBrickSize(importedBrick.type, importedBrick.rotation);
-                         return {
-                             x: importedBrick.x, // Use stored pixel position
-                             y: importedBrick.y, // Use stored pixel position
-
-                             // Re-calculate placed dimensions based on current settings and stored type/rotation
-                             w_placed: s.displayW_top,
-                             h_placed: s.displayH_top,
-
-                             // Store base dimensions in cm (from current settings, which might be imported)
-                             base_w_cm: s.base_w_cm,
-                             base_h_cm: s.base_h_cm,
-                             base_d_cm: s.base_d_cm,
-
-                             // Store scaled base dimensions (pixels) based on current settings
-                             scaled_w: s.scaled_w,
-                             scaled_h: s.scaled_h,
-                             scaled_d: s.scaled_d,
-
-                            color: brickTypes[importedBrick.type].color, // Re-calculate color based on current type
-                             rotation: importedBrick.rotation, // Use stored rotation
-                             type: importedBrick.type // Use stored type
-                         };
-                     }).filter(brick => brick !== null)); // Filter out any nulls from invalid bricks
-
-
-                    currentLayer = layers.length > 0 ? layers.length - 1 : 0; // Set to last layer, or 0 if empty
-                    if(layers.length === 0) layers = [[]]; // Ensure at least one layer exists
-
-                    // Reset history for the new imported state
-                    history = [layers.map(layer => layer.map(brick => ({ ...brick })))];
-                    historyIndex = 0;
-
-                    updateLayerSelect(); // Update select box and label
-                    resizeCanvases(); // Ensure canvases are sized correctly
-                    drawAll(); // Redraw all views
-                    updateBrickCounts(); // Update counts based on imported data
-
-                } catch (error) {
-                    alert('Erreur lors de l\'importation du fichier : ' + error.message);
-                    console.error('Import Error:', error);
-                } finally {
-                     // Reset the file input so the same file can be imported again if needed
-                    e.target.value = '';
-                }
-            };
-            reader.readAsText(file);
-        }
-
-
-         // Helper function to draw the color legend in PDF
-         function addLegendToPDF(doc, x, y, availableWidth) {
-             const legendItems = Object.values(brickTypes); // Get array of {color, label} objects
-             const squareSize = 3; // mm (slightly smaller for legend)
-             const textMargin = 1; // mm between square and text
-             const itemSpacing = 15; // mm between legend items - Increased spacing significantly
-             let currentX = x;
-             const startY = y;
-
-             doc.setFontSize(8);
-             doc.setTextColor(0, 0, 0); // Black text for legend
-             doc.setFont(undefined, 'normal'); // Ensure font is not bold
-
-             legendItems.forEach(item => {
-                 // Use a more accurate way to estimate text width if possible, or increase spacing significantly
-                 const textWidth = doc.getTextWidth(item.label); // Use jsPDF's method for accuracy
-                 const itemTotalWidth = squareSize + textMargin + textWidth + itemSpacing;
-
-                 // Basic check if item fits on the current line, move to new line if needed (manual wrapping)
-                 // This assumes a single row legend unless wrapping is needed
-                 // if (currentX + itemTotalWidth > x + availableWidth && currentX > x) {
-                 //     currentX = x;
-                 //     startY += squareSize + 4; // Move to next line with some padding
-                 // }
-
-
-                 // Draw color square
-                 doc.setFillColor(item.color);
-                 doc.rect(currentX, startY - squareSize * 0.7, squareSize, squareSize, 'F'); // Position square
-
-                 // Add text label
-                 doc.text(item.label, currentX + squareSize + textMargin, startY); // Position text
-
-                 // Move to the start position for the next item
-                 currentX += itemTotalWidth;
-             });
-         }
-
-         // Helper function to add a scale bar to PDF
-         function addScaleBarToPDF(doc, canvas, finalWidthMM, x, y) {
-            const scaleCm = 20; // Length to represent in cm
-            const originalCanvasWidthPx = canvas.width; // Original canvas width in pixels
-
-            if (originalCanvasWidthPx <= 0 || scale <= 0) { // Added check for scale
-                 console.warn("Original canvas width or scale is non-positive, cannot draw scale bar.");
-                 return;
-            }
-
-            // Calculate the length of 20 cm in pixels based on the simulator's scale
-            const scaleLengthPx = scaleCm * scale; // 20 cm * (pixels/cm)
-
-            // Calculate the equivalent length in mm in the PDF, based on how the canvas was scaled
-            const scaleFactorPDF = finalWidthMM / originalCanvasWidthPx; // mm per pixel in the PDF
-            const scaleBarLengthMM = scaleLengthPx * scaleFactorPDF;
-            const barHeight = 0.8; // mm - Reduced bar height significantly
-            const tickHeight = 3; // mm - Reduced tick height
-            const textMargin = 2; // mm
-
-            const barY = y + tickHeight / 2 - barHeight / 2; // Align bar vertically with ticks text
-
-            doc.setFontSize(8);
-            doc.setTextColor(0, 0, 0); // Black text
-            doc.setFont(undefined, 'normal'); // Ensure font is not bold
-
-            // Draw main line
-            doc.rect(x, barY, scaleBarLengthMM, barHeight, 'F'); // Use doc.rect with 'F'
-
-            // Draw end ticks
-            doc.rect(x, barY - tickHeight / 2, barHeight, tickHeight, 'F'); // Use doc.rect with 'F' (using barHeight for tick width)
-            doc.rect(x + scaleBarLengthMM - barHeight, barY - tickHeight / 2, barHeight, tickHeight, 'F'); // Use doc.rect with 'F'
-
-             // Add text label "20 cm"
-             doc.text(`${scaleCm} cm`, x + scaleBarLengthMM + textMargin, y + tickHeight / 2 + doc.getFontSize() * 0.35); // Position text next to bar, aligned vertically
-         }
-
-        // Helper function to add footer to a page
-        function addFooter(doc, pageNumber) {
-             const pageWidth = doc.internal.pageSize.getWidth();
-             const pageHeight = doc.internal.pageSize.getHeight();
-             const margin = 10;
-             const footerTextRight = `Mur simulateur 2D - Julien BROHEZ - Version ${APP_VERSION}`;
-             const footerTextLeft = `${wallTitleInput.value.trim() || 'Plan de pose sans titre'} - Page ${pageNumber} sur ${doc.internal.getNumberOfPages()}`;
-
-
-             doc.setFontSize(8);
-             doc.setTextColor('#666'); // Lighter gray for footer
-             doc.setFont(undefined, 'normal'); // Ensure font is not bold
-
-             // Right aligned text
-             const textWidthRight = doc.getTextWidth(footerTextRight);
-             const xPosRight = pageWidth - margin - textWidthRight;
-             const yPos = pageHeight - 5; // 5mm from the bottom
-
-             doc.text(footerTextRight, xPosRight, yPos);
-             // Left aligned text (Page Numbering)
-             const xPosLeft = margin;
-             doc.text(footerTextLeft, xPosLeft, yPos, { align: 'left' });
-        }
-
-
-        function exportToPDF() {
-            // Ensure jsPDF is available
-            if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
-                alert("La bibliothèque jspdf n'est pas chargée. Impossible d'exporter en PDF.");
-                console.error("jsPDF not loaded.");
-                return;
-            }
-
-            try {
-                const { jsPDF } = window.jspdf;
-                // Orientation portrait ('p'), size 'a4'
-                const doc = new jsPDF('p', 'mm', 'a4');
-                const pageWidth = doc.internal.pageSize.getWidth(); // A4 Portrait width in mm
-                const pageHeight = doc.internal.pageSize.getHeight(); // A4 Portrait height in mm
-                const margin = 10; // mm
-                let cursorY = margin; // Keep track of vertical position on the page
-
-                 // Get the wall title from the input field
-                 const wallTitle = wallTitleInput.value.trim() || 'Plan de pose sans titre'; // Use placeholder if empty
-
-                 // Joint dimensions text
-                 const jointDimensionsText = `Joints: Vertical=${verticalJointWidth} mm, Horizontal=${horizontalJointWidth} mm`;
-                 // Space between image, label, legend, and scale bar
-                const spacingAfterLabel = 5; // Space between label and legend/scale
-                const spacingAfterLegendAndScale = 7; // Space after legend/scale bar
-                const spacingAfterDimensions = 5; // Space after dimensions text
-                const spacingAfterJoints = 5; // Space after joint dimensions
-
-                const addCanvasSectionToPDF = (docInstance, canvasId, desiredWidthMM, labelText, xPos, startY) => {
-                    const canvas = document.getElementById(canvasId);
-                    // Create a temporary canvas to get a higher resolution image for PDF
-                    const scaleFactor = 3; // Increased resolution
-                    const tempCanvas = document.createElement('canvas');
-                    tempCanvas.width = canvas.width * scaleFactor;
-                    tempCanvas.height = canvas.height * scaleFactor;
-
-                    const tempCtx = tempCanvas.getContext('2d');
-                    tempCtx.fillStyle = 'white'; // Ensure background is white
-                    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-                    tempCtx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
-
-
-                    const imgData = tempCanvas.toDataURL('image/png');
-
-                    const canvasAspectRatio = canvas.width / canvas.height;
-                    const finalWidthMM = desiredWidthMM;
-                    const finalHeightMM = finalWidthMM / canvasAspectRatio;
-
-                    // Check if adding this section will exceed page height
-                    // Estimate height: Image height + label height + legend height + scale bar height + all vertical spacings
-                     const estimatedSectionHeight = finalHeightMM + 3 + 3 + 5 + 5 + spacingAfterLabel + 2; // Rough estimate
-                     if (startY + estimatedSectionHeight > pageHeight - margin && startY > margin) {
-                         docInstance.addPage();
-                         startY = margin; // Reset Y to top margin on new page
-                     }
-
-
-                    docInstance.addImage(imgData, 'PNG', xPos, startY, finalWidthMM, finalHeightMM);
-                    // Add label below the image
-                     docInstance.setFontSize(14); // Increased font size for label
-                     docInstance.setFont(undefined, 'bold'); // Made label bold
-                     docInstance.setTextColor(0, 0, 0); // Black color for label
-                     const labelY = startY + finalHeightMM + 3;
-                    docInstance.text(labelText, xPos + finalWidthMM / 2, labelY, { align: 'center' }); // Position label below image
-                     docInstance.setFont(undefined, 'normal'); // Reset font style
-
-
-                     // Add legend below the label
-                     const estimatedLabelHeight = 3; // mm (approx)
-                     const legendY = labelY + spacingAfterLabel; // Position legend below the label
-                     addLegendToPDF(docInstance, xPos, legendY, finalWidthMM); // Add legend starting at image X position
-
-                     // Add scale bar below the legend
-                     const estimatedLegendHeight = 5; // mm
-                     const scaleBarY = legendY + estimatedLegendHeight + 2; // Position scale bar below legend
-                     addScaleBarToPDF(docInstance, canvas, finalWidthMM, xPos, scaleBarY);
-                    const estimatedScaleBarHeight = 5; // mm
-                     return startY + finalHeightMM + 3 + estimatedLegendHeight + estimatedScaleBarHeight + spacingAfterLabel + 2; // Return the Y position after this section
-                };
-                // Add Title
-                doc.setFontSize(16);
-                doc.setFont(undefined, 'bold'); // Set font to bold
-                doc.setTextColor(0, 0, 0); // Black color for title
-                doc.text(wallTitle, pageWidth / 2, cursorY + 5, { align: 'center' }); // Use the input title
-                cursorY += 10; // Space after title
-
-                 // Add Brick Dimensions Text for all types
-                 doc.setFontSize(9);
-                 doc.setFont(undefined, 'normal');
-                 doc.setTextColor(0, 0, 0);
-
-                Object.keys(brickDimensions).forEach(typeKey => {
-                     const dims = brickDimensions[typeKey];
-                     const typeLabel = brickTypes[typeKey] ? brickTypes[typeKey].label : typeKey;
-                     const dimText = `${typeLabel}: L=${dims.w} cm, H=${dims.h} cm, l=${dims.d} cm`;
-                     doc.text(dimText, pageWidth / 2, cursorY + 5, { align: 'center' });
-                     cursorY += 4; // Space between dimension lines
-                });
-                cursorY += spacingAfterDimensions; // Space after the block of dimensions
-
-                // Add Joint Dimensions Text
-                 doc.setFontSize(9);
-                 doc.setFont(undefined, 'normal');
-                 doc.setTextColor(0, 0, 0);
-                 doc.text(jointDimensionsText, pageWidth / 2, cursorY + 5, { align: 'center' });
-                 cursorY += 5 + spacingAfterJoints; // Space after joint dimensions
-
-
-                // Add Top View (Plan) - take a good portion of the width
-                const viewWidth = pageWidth - 2 * margin; // Use a consistent width for all main views
-                 const centeredXPos = margin; // Since viewWidth is pageWidth - 2*margin, xPos is just margin
-
-                 const topViewLabel = `Vue en plan (Assise ${currentLayer + 1})`; // Get current layer label
-                cursorY += 7; // Spacing before section
-                cursorY = addCanvasSectionToPDF(doc, 'topView', viewWidth, topViewLabel, centeredXPos, cursorY);
-                cursorY += spacingAfterLegendAndScale; // Spacing after section
-
-
-                // Add Front View (Centered)
-                cursorY += 7; // Spacing before section
-                cursorY = addCanvasSectionToPDF(doc, 'frontView', viewWidth, 'Vue de face', centeredXPos, cursorY);
-                cursorY += spacingAfterLegendAndScale; // Spacing after section
-
-
-                // Add Left View (Centered, stacked)
-                cursorY += 7; // Spacing before section
-                cursorY = addCanvasSectionToPDF(doc, 'leftView', viewWidth, 'Vue gauche', centeredXPos, cursorY); // Use same width and centered position
-                cursorY += spacingAfterLegendAndScale; // Spacing after section
-
-
-                // Add Right View (Centered, stacked)
-                cursorY += 7; // Spacing before section
-                cursorY = addCanvasSectionToPDF(doc, 'rightView', viewWidth, 'Vue droite', centeredXPos, cursorY); // Use same width and centered position
-                cursorY += spacingAfterLegendAndScale; // Spacing after section
-
-
-                // Add Brick Counts Table to PDF
-                 cursorY += 15; // Space before counts table header
-
-                 const counts = { entire: 0, threeQuarters: 0, half: 0, quarter: 0 };
-                 layers.forEach(layer => layer.forEach(brick => {
-                     if (brick && typeof brick.type === 'string' && counts.hasOwnProperty(brick.type)) {
-                         counts[brick.type]++;
-                     }
-                 }));
-                const tableStartX = margin;
-                const tableCol1Width = 8; // Color Square column
-                const tableCol2Width = 60; // Type Label column (increased width)
-                const tableCol3Width = 20; // Count column
-                const tableRowHeight = 7; // mm
-                const tableHeaderHeight = 7; // mm
-                const squareSize = 4; // mm
-
-                 const tableTotalWidth = tableCol1Width + tableCol2Width + tableCol3Width;
-                 // Check if enough space for the table header and at least one row
-                 const requiredTableIntroHeight = tableHeaderHeight + tableRowHeight + 5; // Header + Column titles + padding
-                 if (cursorY + requiredTableIntroHeight > pageHeight - margin) {
-                     doc.addPage();
-                     cursorY = margin;
-                 }
-
-                // Draw Table Header
-                doc.setFontSize(10);
-                doc.setFont(undefined, 'bold'); // Set font to bold
-                doc.setTextColor(0, 0, 0);
-                doc.text('Compteur de Briques', tableStartX, cursorY); // Table Title
-                cursorY += tableHeaderHeight;
-                doc.line(tableStartX, cursorY - 2, tableStartX + tableTotalWidth, cursorY - 2); // Underline header
-
-                 doc.setFontSize(9);
-                 doc.setFont(undefined, 'normal'); // Reset font to normal
-                 doc.text('Type', tableStartX + tableCol1Width + 2, cursorY + tableRowHeight * 0.7);
-                 doc.text('Quantité', tableStartX + tableCol1Width + tableCol2Width + 2, cursorY + tableRowHeight * 0.7);
-                 cursorY += tableRowHeight;
-                 doc.line(tableStartX, cursorY - 2, tableStartX + tableTotalWidth, cursorY - 2); // Underline column titles
-
-
-                // Draw Table Rows
-                 const countTextColor = '#333';
-                 doc.setFontSize(9);
-                 doc.setTextColor(countTextColor);
-
-                Object.keys(counts).forEach(type => {
-                     const color = brickTypes[type].color;
-                     const label = brickTypes[type].label;
-                     const count = counts[type];
-
-                     // Check space for row before drawing
-                     if (cursorY + tableRowHeight > pageHeight - margin) {
-                         doc.addPage();
-                         cursorY = margin;
-                     }
-
-                     // Draw color square
-                     doc.setFillColor(color);
-                     doc.rect(tableStartX + (tableCol1Width - squareSize) / 2, cursorY + (tableRowHeight - squareSize) / 2, squareSize, squareSize, 'F');
-                     // Draw Label
-                     doc.text(label, tableStartX + tableCol1Width + 2, cursorY + tableRowHeight * 0.7); // Adjust Y for vertical alignment
-
-                     // Draw Count
-                     doc.text(count.toString(), tableStartX + tableCol1Width + tableCol2Width + 2, cursorY + tableRowHeight * 0.7); // Adjust Y
-
-                     // Draw horizontal line *after* drawing the row content
-                     doc.line(tableStartX, cursorY + tableRowHeight - 2, tableStartX + tableTotalWidth, cursorY + tableRowHeight - 2);
-                     cursorY += tableRowHeight; // Move to next row
-                 });
-                // The last line of the table is drawn inside the loop, no need for a separate call here
-
-
-                 // Add Footer to all pages
-                 const totalPages = doc.internal.getNumberOfPages();
-                 for (let i = 1; i <= totalPages; i++) {
-                     doc.setPage(i);
-                     addFooter(doc, i);
-                 }
-
-
-                doc.save(`${wallTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`); // Sanitize filename
-                 doc.setFont(undefined, 'normal'); // Reset font style globally
-                 doc.setTextColor(0, 0, 0); // Reset text color globally
-
-
-            } catch (error) {
-                alert('Erreur lors de la génération du PDF : ' + error.message);
-                console.error('PDF Generation Error:', error);
-            }
-        }
-
-        // Raccourcis clavier
-        document.addEventListener('keydown', (e) => {
-            // Use key code for better compatibility, although 'key' is modern
-            // Ctrl+Z or Cmd+Z for undo
-            if ((e.key === 'z' || e.keyCode === 90) && (e.ctrlKey || e.metaKey)) {
-                undo();
-                e.preventDefault(); // Prevent browser undo action
-            }
-             // Ctrl+Y or Cmd+Y or Ctrl+Shift+Z for redo (optional)
-            // if (((e.key === 'y' || e.keyCode === 89) && (e.ctrlKey || e.metaKey)) ||
-            //      ((e.key === 'Z' || e.keyCode === 90) && (e.ctrlKey || e.metaKey) && e.shiftKey)) {
-            //     redo();
-            //     e.preventDefault();
-            // }
-            // 'R' for rotate
-            if (e.key === 'r' || e.keyCode === 82) {
-                rotateBrick();
-                e.preventDefault(); // Prevent potential unwanted actions
-            }
-            // ArrowUp for next layer
-            if (e.key === 'ArrowUp' || e.keyCode === 38) {
-                if (currentLayer < layers.length - 1) {
-                    changeLayer(currentLayer + 1);
-                    e.preventDefault(); // Prevent scrolling
-                }
-            }
-            // ArrowDown for previous layer
-            if (e.key === 'ArrowDown' || e.keyCode === 40) {
-                if (currentLayer > 0) {
-                    changeLayer(currentLayer - 1);
-                    e.preventDefault(); // Prevent scrolling
-                }
-            }
-             // Number keys 1-4 to select brick type (optional)
-             // if (e.key >= '1' && e.key <= '4') {
-             //     const types = ['entire', 'threeQuarters', 'half', 'quarter'];
-             //     const index = parseInt(e.key) - 1;
-             //     if (index < types.length) {
-             //          selectType(types[index]);
-             //          e.preventDefault();
-             //     }
-             // }
-        });
-        // Initialisation au chargement
-        window.addEventListener('resize', resizeCanvases);
-         // Initial call to select type and draw on page load (before start is clicked)
-         // selectType('entire'); // Highlight the default selected type on load
-
-    </script>
+      }
+    });
+
+    // Window Resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      layerboxPos.x = window.innerWidth / 2 - document.getElementById('layerbox').offsetWidth / 2;
+      document.getElementById('layerbox').style.left = `${layerboxPos.x}px`;
+    });
+
+    // Draggable Layerbox
+    makeDraggable(document.getElementById('layerbox'), layerboxPos);
+
+    // Animation Loop
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Initial Layer Select
+    updateLayerSelect();
+  </script>
 </body>
 </html>
