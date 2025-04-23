@@ -9,20 +9,20 @@
     body { margin: 0; overflow: hidden; background: #ffffff; color: #000000; font-family: Arial, sans-serif; }
     canvas { width: 100%; height: 100vh; }
     .toolbox, .layerbox, .actions, .brick-counter, .title, .version, .title-input { position: absolute; background: #e2e8f0; padding: 8px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); z-index: 10; }
-    .toolbox { top: 10px; left: 10px; width: 256px; }
-    .layerbox { top: 160px; left: 50%; transform: translateX(-50%); cursor: move; width: auto; max-width: 600px; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
+    .toolbox { top: 50px; left: 60px; width: 256px; }
+    .layerbox { top: 200px; left: 50%; transform: translateX(-50%); cursor: move; width: auto; max-width: 600px; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
     .layerbox * { pointer-events: auto; }
-    .actions { top: 10px; right: 10px; width: 256px; }
-    .brick-counter { bottom: 10px; right: 10px; width: 200px; }
-    .title { top: 10px; left: 50%; transform: translateX(-50%); text-align: center; pointer-events: none; }
+    .actions { top: 50px; right: 10px; width: 256px; }
+    .brick-counter { bottom: 50px; right: 10px; width: 200px; }
+    .title { top: 50px; left: 50%; transform: translateX(-50%); text-align: center; pointer-events: none; }
     .title h1 { font-size: 24px; margin: 0; }
     .title p { font-size: 14px; margin: 4px 0 0; }
-    .title-input { top: 80px; left: 50%; transform: translateX(-50%); width: 300px; cursor: move; pointer-events: none; }
+    .title-input { top: 120px; left: 50%; transform: translateX(-50%); width: 300px; cursor: move; pointer-events: none; }
     .title-input * { pointer-events: auto; }
-    .version { bottom: 10px; left: 10px; font-size: 12px; padding: 8px; }
+    .version { bottom: 50px; left: 60px; font-size: 12px; padding: 8px; }
     button { padding: 4px; border-radius: 4px; border: none; cursor: pointer; font-size: 12px; font-weight: bold; color: #000000; }
     button:hover { opacity: 0.8; }
-    .delete-active { background-color: #b7791f !important; }
+    .delete-active, .move-active, .rotate-active { background-color: #b7791f !important; }
     input, select { background: #edf2f7; color: #000000; border: none; padding: 4px; border-radius: 4px; width: 100%; }
     label { font-size: 14px; margin-bottom: 4px; display: block; }
     h2 { font-size: 18px; margin-bottom: 8px; color: #000000; }
@@ -33,17 +33,84 @@
     #homepage { display: flex; }
     #app { display: none; }
     #notification { display: none; }
+    .menu-bar { position: fixed; top: 0; left: 0; width: 100%; background: #f1f1f1; border-bottom: 1px solid #d1d5db; display: flex; align-items: center; z-index: 20; }
+    .menu-bar ul { list-style: none; margin: 0; padding: 0; display: flex; }
+    .menu-bar li { position: relative; }
+    .menu-bar li a { display: block; padding: 8px 16px; color: #000000; text-decoration: none; font-size: 14px; }
+    .menu-bar li:hover { background: #e5e7eb; }
+    .menu-bar .dropdown { display: none; position: absolute; top: 100%; left: 0; background: #ffffff; border: 1px solid #d1d5db; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+    .menu-bar li:hover .dropdown { display: block; }
+    .menu-bar .dropdown a { padding: 8px 16px; display: block; color: #000000; }
+    .menu-bar .dropdown a:hover { background: #f1f1f1; }
+    .left-toolbar { position: fixed; top: 40px; left: 0; width: 50px; background: #e2e8f0; height: calc(100vh - 80px); display: flex; flex-direction: column; align-items: center; padding: 8px 0; box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1); }
+    .left-toolbar button { margin: 4px 0; width: 40px; height: 40px; background: #edf2f7; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .left-toolbar button:hover { background: #d1d5db; }
+    .instruction-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #f1f1f1; border-top: 1px solid #d1d5db; padding: 8px; text-align: center; font-size: 14px; color: #000000; z-index: 20; }
+    .rotate-overlay { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #e2e8f0; padding: 16px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); z-index: 30; }
+    .rotate-overlay label { margin-bottom: 8px; }
+    .rotate-overlay input[type="range"] { width: 200px; }
+    .rotate-overlay button { margin-top: 8px; width: 100%; background: #3182ce; color: #ffffff; }
   </style>
 </head>
 <body>
   <div id="notification" class="absolute bg-red-600 text-white px-4 py-2 rounded-lg" style="display: none; z-index: 20;"></div>
   <div id="homepage" class="flex flex-col items-center justify-center h-screen">
-    <h1 class="text-5xl font-bold text-black">Wall Simulateur 3d</h1>
+    <img src="https://julienbro.github.io/simulateur-briques/logo.png" alt="Wall Simulateur 3d Logo" class="mb-4">
     <p class="text-lg text-black mt-2">Made by Julien BROHEZ</p>
     <p class="text-lg text-black mt-2">Version 1.0.0</p>
     <button id="start-button" class="mt-6 bg-green-600 text-white px-6 py-3 text-lg rounded-lg hover:bg-green-700 transition">Commencer</button>
   </div>
   <div id="app">
+    <div class="menu-bar">
+      <ul>
+        <li>
+          <a href="#">Fichier</a>
+          <div class="dropdown">
+            <a href="#" id="save-file">Enregistrer</a>
+            <a href="#" id="open-file">Ouvrir</a>
+            <a href="#" id="export-pdf">Exporter PDF</a>
+            <a href="#" id="export-png">Exporter PNG</a>
+          </div>
+        </li>
+        <li>
+          <a href="#">Vue</a>
+          <div class="dropdown">
+            <a href="#" id="toggle-grid">Afficher/Cacher Grille</a>
+            <a href="#" id="reset-camera">Réinitialiser Caméra</a>
+          </div>
+        </li>
+        <li>
+          <a href="#">Assises</a>
+          <div class="dropdown">
+            <a href="#" id="add-layer">Ajouter Assise</a>
+          </div>
+        </li>
+        <li>
+          <a href="#">Aide</a>
+          <div class="dropdown">
+            <a href="#">À propos</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="left-toolbar">
+      <button title="Sélectionner">🖱️</button>
+      <button title="Placer Brique">🧱</button>
+      <button title="Effacer" id="delete-mode">🗑️</button>
+      <button title="Déplacer" id="move-mode">↔️</button>
+      <button title="Tourner" id="rotate-mode">🔄</button>
+      <button title="Annuler" id="undo">↩️</button>
+      <button title="Refaire" id="redo">↪️</button>
+    </div>
+    <div id="rotate-overlay" class="rotate-overlay">
+      <label>Rotation Y (°)</label>
+      <input type="range" id="rotate-slider" min="0" max="355" step="15" value="0">
+      <div id="rotate-value" style="text-align: center; font-size: 12px; margin-top: 4px;">0°</div>
+      <button id="confirm-rotation">Confirmer</button>
+    </div>
+    <div id="instruction-bar" class="instruction-bar">
+      Double-cliquez pour placer une brique
+    </div>
     <div id="title" class="title">
       <h1>Wall Simulateur 3d</h1>
       <p>Créé par Julien BROHEZ</p>
@@ -87,24 +154,16 @@
         <input type="checkbox" id="show-grid">
         <span>Afficher la grille</span>
       </div>
-      <button id="delete-mode" style="background-color: #d69e2e; margin-top: 8px;">🗑️ Effacer</button>
     </div>
     <div id="layerbox" class="layerbox">
       <div style="display: flex; align-items: center; gap: 12px;">
         <label>Assise active</label>
         <select id="layer-select"></select>
-        <button id="add-layer" style="background-color: #3182ce;">➕</button>
       </div>
     </div>
     <div class="actions">
       <h2>📄 Actions</h2>
-      <button id="undo" style="background-color: #e53e3e;">↩️ Annuler</button>
-      <button id="redo" style="background-color: #e53e3e; margin-top: 8px;">↪️ Refaire</button>
-      <button id="save-file" style="background-color: #38a169; margin-top: 8px;">💾 Enregistrer</button>
-      <button id="open-file" style="background-color: #3182ce; margin-top: 8px;">📂 Ouvrir</button>
       <input type="file" id="file-input" accept=".json" style="display: none;">
-      <button id="export-pdf" style="background-color: #38a169; margin-top: 8px;">📄 Exporter PDF</button>
-      <button id="export-png" style="background-color: #3182ce; margin-top: 8px;">🖼️ Exporter PNG</button>
     </div>
     <div id="brick-counter" class="brick-counter">
       <h2>🧮 Compteur d'éléments</h2>
@@ -118,7 +177,6 @@
   <script>
     const { jsPDF } = window.jspdf;
 
-    // Constants
     const BRICK_SIZES = {
       M50_entire: [0.19, 0.05, 0.09],
       M50_three_quarter: [0.14, 0.05, 0.09],
@@ -178,7 +236,6 @@
     const BRICK_TYPES = ['M50', 'M57', 'M65', 'M90', 'WF', 'WFD', 'Bloc9', 'Bloc14', 'Bloc19', 'Bloc29'];
     const SIZE_VARIANTS = ['entire', 'three_quarter', 'half', 'quarter'];
 
-    // State
     let layers = [[/* assise 0 */]];
     let currentLayer = 0;
     let selectedSize = 'M50_entire';
@@ -187,13 +244,16 @@
     let rotationY = 0;
     let whiteBricks = false;
     let deleteMode = false;
+    let moveMode = false;
+    let rotateMode = false;
     let projectTitle = '';
-    let layerboxPos = { x: window.innerWidth / 2 - 150, y: 160 };
-    let titleInputPos = { x: window.innerWidth / 2 - 150, y: 80 };
+    let layerboxPos = { x: window.innerWidth / 2 - 150, y: 200 };
+    let titleInputPos = { x: window.innerWidth / 2 - 150, y: 120 };
     let history = [{ layers: JSON.parse(JSON.stringify(layers)), projectTitle: '' }];
     let historyIndex = 0;
+    let selectedBrick = null;
+    let ghostBrick = null;
 
-    // Three.js Setup
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
     camera.position.set(0.5, 0.5, 1);
@@ -203,7 +263,6 @@
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.shadowMap.autoUpdate = false;
 
-    // Gradient Sky
     const canvas = document.createElement('canvas');
     canvas.width = 512;
     canvas.height = 512;
@@ -215,7 +274,6 @@
     context.fillRect(0, 0, 512, 512);
     const skyTexture = new THREE.CanvasTexture(canvas);
 
-    // Lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
     directionalLight.position.set(1, 2, 2);
@@ -229,35 +287,29 @@
     directionalLight.shadow.camera.near = 0.1;
     directionalLight.shadow.camera.far = 10;
 
-    // Controls
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enablePan = true;
     controls.enableZoom = true;
     controls.enableRotate = true;
 
-    // Ground Plane (Visible Floor)
     const planeGeometry = new THREE.PlaneGeometry(4, 4);
     const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xf0f0f0, visible: true });
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.rotation.x = -Math.PI / 2;
 
-    // Shadow Plane
     const shadowMaterial = new THREE.ShadowMaterial({ opacity: 0.5 });
     const shadowPlane = new THREE.Mesh(planeGeometry, shadowMaterial);
     shadowPlane.rotation.x = -Math.PI / 2;
     shadowPlane.receiveShadow = true;
 
-    // Grid Helper
     const gridHelper = new THREE.GridHelper(4, 400, 0x000000, 0x000000);
     gridHelper.material.opacity = 0.2;
     gridHelper.material.transparent = true;
     gridHelper.visible = false;
 
-    // Raycaster for mouse interaction
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
-    // Initialize Three.js after clicking "Commencer"
     function initThreeJS() {
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.getElementById('app').appendChild(renderer.domElement);
@@ -265,7 +317,6 @@
       scene.add(ambientLight, directionalLight, plane, shadowPlane, gridHelper);
     }
 
-    // Create Brick
     function createBrick(position, size, type, transparent = false, highlight = false, rotation = [0, 0, 0], isColliding = false) {
       const geometry = new THREE.BoxGeometry(...size);
       const brickType = type.split('_')[0];
@@ -281,6 +332,7 @@
       mesh.rotation.set(...rotation);
       mesh.castShadow = !transparent;
       mesh.receiveShadow = true;
+      mesh.userData.type = type;
 
       if (!transparent) {
         const edges = new THREE.EdgesGeometry(geometry);
@@ -294,24 +346,25 @@
       return mesh;
     }
 
-    // Update Scene Bricks
     function updateScene() {
       scene.children = scene.children.filter(child => !child.isMesh && !child.isLineSegments || child === plane || child === shadowPlane || child === gridHelper);
       let hoveredBrick = null;
-      if (deleteMode) {
+      if (deleteMode || moveMode || rotateMode) {
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects(scene.children.filter(child => child.isMesh && child !== plane && child !== shadowPlane));
         if (intersects.length > 0) {
           hoveredBrick = intersects[0].object;
         }
       }
-      layers.flat().forEach(([x, y, z, type, rotY]) => {
-        const isHovered = deleteMode && hoveredBrick && Math.abs(hoveredBrick.position.x - x) < 0.001 && Math.abs(hoveredBrick.position.y - y) < 0.001 && Math.abs(hoveredBrick.position.z - z) < 0.001;
+      layers.flat().forEach(([x, y, z, type, rotY], index) => {
+        const isHovered = (deleteMode || moveMode || rotateMode) && hoveredBrick && Math.abs(hoveredBrick.position.x - x) < 0.001 && Math.abs(hoveredBrick.position.y - y) < 0.001 && Math.abs(hoveredBrick.position.z - z) < 0.001;
         const brick = createBrick([x, y, z], BRICK_SIZES[type], type, false, isHovered, [0, rotY || 0, 0]);
+        brick.userData.index = index;
+        brick.userData.layerIndex = layers.findIndex(layer => layer.some(b => b[0] === x && b[1] === y && b[2] === z));
         scene.add(brick);
         if (brick.userData.edges) scene.add(brick.userData.edges);
       });
-      if (hoverPoint && !deleteMode && hoverPoint.x !== undefined && hoverPoint.z !== undefined) {
+      if (hoverPoint && !deleteMode && !moveMode && !rotateMode && hoverPoint.x !== undefined && hoverPoint.z !== undefined) {
         let snapX = Math.round(hoverPoint.x * 100) / 100;
         let snapZ = Math.round(hoverPoint.z * 100) / 100;
         const threshold = jointThickness + 0.001;
@@ -342,11 +395,56 @@
         const hoverBrick = createBrick([snapX, y, snapZ], BRICK_SIZES[selectedSize], selectedSize, true, false, [0, rotationY, 0], isColliding);
         scene.add(hoverBrick);
       }
+      if (moveMode && selectedBrick && hoverPoint) {
+        let snapX = Math.round(hoverPoint.x * 100) / 100;
+        let snapZ = Math.round(hoverPoint.z * 100) / 100;
+        const threshold = jointThickness + 0.001;
+        const allPositions = layers.flat().filter(([x, y, z]) => !(Math.abs(x - selectedBrick[0]) < 0.001 && Math.abs(y - selectedBrick[1]) < 0.001 && Math.abs(z - selectedBrick[2]) < 0.001));
+        for (const [x, , z] of allPositions) {
+          if (Math.abs(snapX - x) <= threshold) snapX = x;
+          if (Math.abs(snapZ - z) <= threshold) snapZ = z;
+        }
+        const y = selectedBrick[1];
+        let isColliding = false;
+        const newBox = new THREE.Box3().setFromCenterAndSize(
+          new THREE.Vector3(snapX, y, snapZ),
+          new THREE.Vector3(BRICK_SIZES[selectedBrick[3]][0], BRICK_SIZES[selectedBrick[3]][1], BRICK_SIZES[selectedBrick[3]][2])
+        );
+        newBox.applyMatrix4(new THREE.Matrix4().makeRotationY(selectedBrick[4] || 0));
+        for (const [x, y2, z, type, rotY] of layers[currentLayer]) {
+          if (y !== y2) continue;
+          if (Math.abs(x - selectedBrick[0]) < 0.001 && Math.abs(y - selectedBrick[1]) < 0.001 && Math.abs(z - selectedBrick[2]) < 0.001) continue;
+          const existingBox = new THREE.Box3().setFromCenterAndSize(
+            new THREE.Vector3(x, y2, z),
+            new THREE.Vector3(BRICK_SIZES[type][0], BRICK_SIZES[type][1], BRICK_SIZES[type][2])
+          );
+          existingBox.applyMatrix4(new THREE.Matrix4().makeRotationY(rotY || 0));
+          if (newBox.intersectsBox(existingBox)) {
+            isColliding = true;
+            break;
+          }
+        }
+        ghostBrick = createBrick([snapX, y, snapZ], BRICK_SIZES[selectedBrick[3]], selectedBrick[3], true, false, [0, selectedBrick[4] || 0, 0], isColliding);
+        scene.add(ghostBrick);
+      }
       updateBrickCount();
       renderer.shadowMap.needsUpdate = true;
+      updateInstructions();
     }
 
-    // Update Brick Count
+    function updateInstructions() {
+      const instructionBar = document.getElementById('instruction-bar');
+      if (deleteMode) {
+        instructionBar.textContent = 'Cliquez sur une brique pour la supprimer';
+      } else if (moveMode) {
+        instructionBar.textContent = selectedBrick ? 'Déplacez la brique et cliquez pour confirmer la position' : 'Sélectionnez une brique à déplacer';
+      } else if (rotateMode) {
+        instructionBar.textContent = selectedBrick ? 'Ajustez la rotation et confirmez' : 'Sélectionnez une brique à tourner';
+      } else {
+        instructionBar.textContent = 'Double-cliquez pour placer une brique';
+      }
+    }
+
     function updateBrickCount() {
       const counts = {};
       BRICK_TYPES.forEach(type => {
@@ -374,19 +472,16 @@
       document.getElementById('brick-type-counts').innerHTML = html || 'Aucun élément placé';
     }
 
-    // Get Brick Y Position
     function getBrickY(size) {
       return size[1] / 2 + jointThickness + currentLayer * (size[1] + jointThickness);
     }
 
-    // Save History State
     function saveState() {
       history = history.slice(0, historyIndex + 1);
       history.push({ layers: JSON.parse(JSON.stringify(layers)), projectTitle });
       historyIndex++;
     }
 
-    // Add Brick with Collision Detection
     function addBrick(point) {
       if (!point || point.x === undefined || point.z === undefined) return;
       const allPositions = layers.flat();
@@ -434,7 +529,6 @@
       updateScene();
     }
 
-    // Delete Brick
     function deleteBrick() {
       raycaster.setFromCamera(mouse, camera);
       const intersects = raycaster.intersectObjects(scene.children.filter(child => child.isMesh && child !== plane && child !== shadowPlane));
@@ -448,12 +542,108 @@
           });
         }
         deleteMode = false;
-        document.getElementById('delete-mode').classList.remove('delete-active');
+        document.querySelectorAll('#delete-mode').forEach(btn => btn.classList.remove('delete-active'));
         updateScene();
       }
     }
 
-    // Add Layer
+    function selectBrickForMove() {
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(scene.children.filter(child => child.isMesh && child !== plane && child !== shadowPlane));
+      if (intersects.length > 0) {
+        const clickedMesh = intersects[0].object;
+        const layerIndex = clickedMesh.userData.layerIndex;
+        const brickIndex = layers[layerIndex].findIndex(([x, y, z]) => 
+          Math.abs(x - clickedMesh.position.x) < 0.001 && 
+          Math.abs(y - clickedMesh.position.y) < 0.001 && 
+          Math.abs(z - clickedMesh.position.z) < 0.001
+        );
+        selectedBrick = [...layers[layerIndex][brickIndex], layerIndex, brickIndex];
+        layers[layerIndex].splice(brickIndex, 1);
+        updateScene();
+      }
+    }
+
+    function confirmMove(point) {
+      if (!point || point.x === undefined || point.z === undefined) return;
+      const threshold = jointThickness + 0.001;
+      let snapX = Math.round(point.x * 100) / 100;
+      let snapZ = Math.round(point.z * 100) / 100;
+      const allPositions = layers.flat();
+      for (const [x, , z] of allPositions) {
+        if (Math.abs(snapX - x) <= threshold) snapX = x;
+        if (Math.abs(snapZ - z) <= threshold) snapZ = z;
+      }
+
+      const y = selectedBrick[1];
+      const newBox = new THREE.Box3().setFromCenterAndSize(
+        new THREE.Vector3(snapX, y, snapZ),
+        new THREE.Vector3(BRICK_SIZES[selectedBrick[3]][0], BRICK_SIZES[selectedBrick[3]][1], BRICK_SIZES[selectedBrick[3]][2])
+      );
+      const rotationMatrix = new THREE.Matrix4().makeRotationY(selectedBrick[4] || 0);
+      newBox.applyMatrix4(rotationMatrix);
+
+      for (const [x, y2, z, type, rotY] of layers[currentLayer]) {
+        if (y !== y2) continue;
+        const existingBox = new THREE.Box3().setFromCenterAndSize(
+          new THREE.Vector3(x, y2, z),
+          new THREE.Vector3(BRICK_SIZES[type][0], BRICK_SIZES[type][1], BRICK_SIZES[type][2])
+        );
+        const existingRotation = new THREE.Matrix4().makeRotationY(rotY || 0);
+        existingBox.applyMatrix4(existingRotation);
+        if (newBox.intersectsBox(existingBox)) {
+          const notification = document.getElementById('notification');
+          notification.textContent = 'Erreur : Chevauchement détecté';
+          notification.style.left = `${Math.min(window.innerWidth - 200, Math.max(0, mouse.x * window.innerWidth / 2 + window.innerWidth / 2 + 10))}px`;
+          notification.style.top = `${-mouse.y * window.innerHeight / 2 + window.innerHeight / 2 + 10}px`;
+          notification.style.display = 'block';
+          setTimeout(() => notification.style.display = 'none', 2000);
+          layers[selectedBrick[5]].splice(selectedBrick[6], 0, [selectedBrick[0], selectedBrick[1], selectedBrick[2], selectedBrick[3], selectedBrick[4]]);
+          selectedBrick = null;
+          moveMode = false;
+          document.querySelectorAll('#move-mode').forEach(btn => btn.classList.remove('move-active'));
+          updateScene();
+          return;
+        }
+      }
+
+      layers[selectedBrick[5]][selectedBrick[6]] = [snapX, y, snapZ, selectedBrick[3], selectedBrick[4]];
+      selectedBrick = null;
+      moveMode = false;
+      document.querySelectorAll('#move-mode').forEach(btn => btn.classList.remove('move-active'));
+      updateScene();
+    }
+
+    function selectBrickForRotate() {
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(scene.children.filter(child => child.isMesh && child !== plane && child !== shadowPlane));
+      if (intersects.length > 0) {
+        const clickedMesh = intersects[0].object;
+        const layerIndex = clickedMesh.userData.layerIndex;
+        const brickIndex = layers[layerIndex].findIndex(([x, y, z]) => 
+          Math.abs(x - clickedMesh.position.x) < 0.001 && 
+          Math.abs(y - clickedMesh.position.y) < 0.001 && 
+          Math.abs(z - clickedMesh.position.z) < 0.001
+        );
+        selectedBrick = [...layers[layerIndex][brickIndex], layerIndex, brickIndex];
+        const overlay = document.getElementById('rotate-overlay');
+        overlay.style.display = 'block';
+        document.getElementById('rotate-slider').value = (selectedBrick[4] || 0) * 180 / Math.PI;
+        document.getElementById('rotate-value').textContent = `${Math.round((selectedBrick[4] || 0) * 180 / Math.PI)}°`;
+      }
+    }
+
+    function confirmRotation() {
+      const newRotation = (document.getElementById('rotate-slider').value * Math.PI) / 180;
+      saveState();
+      layers[selectedBrick[5]][selectedBrick[6]][4] = newRotation;
+      selectedBrick = null;
+      rotateMode = false;
+      document.querySelectorAll('#rotate-mode').forEach(btn => btn.classList.remove('rotate-active'));
+      document.getElementById('rotate-overlay').style.display = 'none';
+      updateScene();
+    }
+
     function addLayer() {
       saveState();
       layers.push([]);
@@ -462,7 +652,6 @@
       updateScene();
     }
 
-    // Undo
     function undo() {
       if (historyIndex <= 0) return;
       historyIndex--;
@@ -473,7 +662,6 @@
       updateScene();
     }
 
-    // Redo
     function redo() {
       if (historyIndex >= history.length - 1) return;
       historyIndex++;
@@ -484,7 +672,13 @@
       updateScene();
     }
 
-    // Export PDF
+    function resetCamera() {
+      camera.position.set(0.5, 0.5, 1);
+      controls.target.set(0, 0, 0);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
     function exportPDF() {
       const originalWidth = window.innerWidth;
       const originalHeight = window.innerHeight;
@@ -498,7 +692,6 @@
       renderer.setSize(exportWidth, exportHeight);
       renderer.setClearColor(0xffffff, 1);
 
-      // Page 1: Top view
       let minX = 0, maxX = 0, minZ = 0, maxZ = 0;
       layers.flat().forEach(([x, , z]) => {
         minX = Math.min(minX, x - 0.39 / 2);
@@ -533,7 +726,6 @@
       pdf.text('Wall Simulateur 3d', width - 3, height - 1.5, { align: 'right' });
       pdf.text('Made by Julien BROHEZ', width - 3, height - 1, { align: 'right' });
 
-      // Page 2: Front view
       pdf.addPage();
       const frontLineGeometry = new THREE.BufferGeometry().setFromPoints([
         new THREE.Vector3(-2, 0, 0),
@@ -566,7 +758,6 @@
       pdf.text('Made by Julien BROHEZ', width - 3, height - 1, { align: 'right' });
       scene.remove(frontLine);
 
-      // Page 3: Side view
       pdf.addPage();
       const sideLineGeometry = new THREE.BufferGeometry().setFromPoints([
         new THREE.Vector3(0, 0, -2),
@@ -599,7 +790,6 @@
       pdf.text('Made by Julien BROHEZ', width - 3, height - 1, { align: 'right' });
       scene.remove(sideLine);
 
-      // Page 4: 3D view
       pdf.addPage();
       renderer.shadowMap.enabled = true;
       scene.background = skyTexture;
@@ -625,7 +815,6 @@
       pdf.text('Wall Simulateur 3d', width - 3, height - 1.5, { align: 'right' });
       pdf.text('Made by Julien BROHEZ', width - 3, height - 1, { align: 'right' });
 
-      // Page 5: Element inventory
       pdf.addPage();
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(12);
@@ -658,7 +847,6 @@
       pdf.save('vue-elements.pdf');
     }
 
-    // Export PNG
     function exportPNG() {
       if (projectTitle) {
         const canvas = document.createElement('canvas');
@@ -685,7 +873,6 @@
       }
     }
 
-    // Update Layer Select
     function updateLayerSelect() {
       const select = document.getElementById('layer-select');
       select.innerHTML = '';
@@ -698,7 +885,6 @@
       });
     }
 
-    // Drag Handling
     function makeDraggable(element, pos) {
       let isDragging = false;
       let startX, startY;
@@ -716,10 +902,10 @@
         let y = e.clientY - startY;
 
         if (element.id === 'layerbox') {
-          y = Math.max(160, Math.min(y, 210));
+          y = Math.max(200, Math.min(y, 250));
           x = Math.max(0, Math.min(x, window.innerWidth - element.offsetWidth));
         } else if (element.id === 'title-input') {
-          y = Math.max(80, Math.min(y, 130));
+          y = Math.max(120, Math.min(y, 170));
           x = Math.max(0, Math.min(x, window.innerWidth - element.offsetWidth));
         }
 
@@ -734,7 +920,6 @@
       });
     }
 
-    // Save File
     function saveFile() {
       const data = JSON.stringify({ layers, projectTitle });
       const blob = new Blob([data], { type: 'application/json' });
@@ -746,7 +931,6 @@
       URL.revokeObjectURL(url);
     }
 
-    // Open File
     function openFile() {
       document.getElementById('file-input').click();
     }
@@ -764,7 +948,6 @@
       );
     }
 
-    // Event Listeners
     function setupEventListeners() {
       document.getElementById('project-title').addEventListener('input', (e) => {
         projectTitle = e.target.value.slice(0, 100);
@@ -804,13 +987,49 @@
         updateScene();
       });
       document.getElementById('add-layer').addEventListener('click', addLayer);
-      document.getElementById('undo').addEventListener('click', undo);
-      document.getElementById('redo').addEventListener('click', redo);
-      document.getElementById('delete-mode').addEventListener('click', () => {
-        deleteMode = !deleteMode;
-        document.getElementById('delete-mode').classList.toggle('delete-active', deleteMode);
-        updateScene();
+      document.querySelectorAll('#delete-mode').forEach(btn => {
+        btn.addEventListener('click', () => {
+          deleteMode = !deleteMode;
+          moveMode = false;
+          rotateMode = false;
+          selectedBrick = null;
+          document.querySelectorAll('#delete-mode').forEach(b => b.classList.toggle('delete-active', deleteMode));
+          document.querySelectorAll('#move-mode').forEach(b => b.classList.remove('move-active'));
+          document.querySelectorAll('#rotate-mode').forEach(b => b.classList.remove('rotate-active'));
+          document.getElementById('rotate-overlay').style.display = 'none';
+          updateScene();
+        });
       });
+      document.querySelectorAll('#move-mode').forEach(btn => {
+        btn.addEventListener('click', () => {
+          moveMode = !moveMode;
+          deleteMode = false;
+          rotateMode = false;
+          selectedBrick = null;
+          document.querySelectorAll('#move-mode').forEach(b => b.classList.toggle('move-active', moveMode));
+          document.querySelectorAll('#delete-mode').forEach(b => b.classList.remove('delete-active'));
+          document.querySelectorAll('#rotate-mode').forEach(b => b.classList.remove('rotate-active'));
+          document.getElementById('rotate-overlay').style.display = 'none';
+          updateScene();
+        });
+      });
+      document.querySelectorAll('#rotate-mode').forEach(btn => {
+        btn.addEventListener('click', () => {
+          rotateMode = !rotateMode;
+          deleteMode = false;
+          moveMode = false;
+          selectedBrick = null;
+          document.querySelectorAll('#rotate-mode').forEach(b => b.classList.toggle('rotate-active', rotateMode));
+          document.querySelectorAll('#delete-mode').forEach(b => b.classList.remove('delete-active'));
+          document.querySelectorAll('#move-mode').forEach(b => b.classList.remove('move-active'));
+          document.getElementById('rotate-overlay').style.display = 'none';
+          updateScene();
+        });
+      });
+      document.getElementById('rotate-slider').addEventListener('input', (e) => {
+        document.getElementById('rotate-value').textContent = `${e.target.value}°`;
+      });
+      document.getElementById('confirm-rotation').addEventListener('click', confirmRotation);
       document.getElementById('save-file').addEventListener('click', saveFile);
       document.getElementById('open-file').addEventListener('click', openFile);
       document.getElementById('file-input').addEventListener('change', (e) => {
@@ -851,13 +1070,21 @@
       });
       document.getElementById('export-pdf').addEventListener('click', exportPDF);
       document.getElementById('export-png').addEventListener('click', exportPNG);
+      document.getElementById('undo').addEventListener('click', undo);
+      document.getElementById('redo').addEventListener('click', redo);
+      document.getElementById('toggle-grid').addEventListener('click', () => {
+        gridHelper.visible = !gridHelper.visible;
+        document.getElementById('show-grid').checked = gridHelper.visible;
+        renderer.render(scene, camera);
+      });
+      document.getElementById('reset-camera').addEventListener('click', resetCamera);
 
       document.addEventListener('mousemove', (e) => {
         mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
         mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObject(plane);
-        if (intersects.length > 0 && !deleteMode) {
+        if (intersects.length > 0 && !deleteMode && !rotateMode) {
           hoverPoint = intersects[0].point;
         } else {
           hoverPoint = null;
@@ -868,11 +1095,22 @@
       document.addEventListener('click', (e) => {
         if (deleteMode) {
           deleteBrick();
+        } else if (moveMode) {
+          if (!selectedBrick) {
+            selectBrickForMove();
+          } else {
+            const intersects = raycaster.intersectObject(plane);
+            if (intersects.length > 0) {
+              confirmMove(intersects[0].point);
+            }
+          }
+        } else if (rotateMode && !selectedBrick) {
+          selectBrickForRotate();
         }
       });
 
       document.addEventListener('dblclick', (e) => {
-        if (!deleteMode) {
+        if (!deleteMode && !moveMode && !rotateMode) {
           raycaster.setFromCamera(mouse, camera);
           const intersects = raycaster.intersectObject(plane);
           if (intersects.length > 0) {
@@ -895,7 +1133,6 @@
       makeDraggable(document.getElementById('title-input'), titleInputPos);
     }
 
-    // Homepage Button
     document.getElementById('start-button').addEventListener('click', () => {
       document.getElementById('homepage').style.display = 'none';
       document.getElementById('app').style.display = 'block';
@@ -905,7 +1142,6 @@
       animate();
     });
 
-    // Animation Loop
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
