@@ -58,8 +58,7 @@
   <div id="app">
     <div class="menu-bar">
       <ul>
-        <li>
-          <a href="#">Fichier</a>
+        <li><a href="#">Fichier</a>
           <div class="dropdown">
             <a href="#" id="save-file">Enregistrer</a>
             <a href="#" id="open-file">Ouvrir</a>
@@ -67,22 +66,19 @@
             <a href="#" id="export-png">Exporter PNG</a>
           </div>
         </li>
-        <li>
-          <a href="#">Vue</a>
+        <li><a href="#">Vue</a>
           <div class="dropdown">
             <a href="#" id="toggle-white-bricks">Afficher/Cacher en blanc</a>
             <a href="#" id="toggle-grid">Afficher/Cacher Grille</a>
             <a href="#" id="reset-camera">Réinitialiser Caméra</a>
           </div>
         </li>
-        <li>
-          <a href="#">Assises</a>
+        <li><a href="#">Assises</a>
           <div class="dropdown">
             <a href="#" id="add-layer">Ajouter Assise</a>
           </div>
         </li>
-        <li>
-          <a href="#">Aide</a>
+        <li><a href="#">Aide</a>
           <div class="dropdown">
             <a href="#">À propos</a>
           </div>
@@ -159,90 +155,55 @@
   <script>
     const { jsPDF } = window.jspdf;
 
+    // Constants
     const BRICK_SIZES = {
-      M50_entire: [0.19, 0.05, 0.09],
-      M50_three_quarter: [0.14, 0.05, 0.09],
-      M50_half: [0.09, 0.05, 0.09],
-      M50_quarter: [0.04, 0.05, 0.09],
-      M57_entire: [0.19, 0.057, 0.09],
-      M57_three_quarter: [0.14, 0.057, 0.09],
-      M57_half: [0.09, 0.057, 0.09],
-      M57_quarter: [0.04, 0.057, 0.09],
-      M65_entire: [0.19, 0.065, 0.09],
-      M65_three_quarter: [0.14, 0.065, 0.09],
-      M65_half: [0.09, 0.065, 0.09],
-      M65_quarter: [0.04, 0.065, 0.09],
-      M90_entire: [0.19, 0.09, 0.09],
-      M90_three_quarter: [0.14, 0.09, 0.09],
-      M90_half: [0.09, 0.09, 0.09],
-      M90_quarter: [0.04, 0.09, 0.09],
-      WF_entire: [0.21, 0.09, 0.09],
-      WF_three_quarter: [0.15, 0.05, 0.09],
-      WF_half: [0.10, 0.05, 0.09],
-      WF_quarter: [0.05, 0.05, 0.09],
-      WFD_entire: [0.21, 0.09, 0.09],
-      WFD_three_quarter: [0.15, 0.05, 0.09],
-      WFD_half: [0.10, 0.05, 0.09],
-      WFD_quarter: [0.05, 0.05, 0.09],
-      Bloc9_entire: [0.39, 0.19, 0.09],
-      Bloc9_three_quarter: [0.29, 0.19, 0.09],
-      Bloc9_half: [0.19, 0.19, 0.09],
-      Bloc9_quarter: [0.14, 0.19, 0.09],
-      Bloc14_entire: [0.39, 0.19, 0.14],
-      Bloc14_three_quarter: [0.29, 0.19, 0.14],
-      Bloc14_half: [0.19, 0.19, 0.14],
-      Bloc14_quarter: [0.14, 0.19, 0.14],
-      Bloc19_entire: [0.39, 0.19, 0.19],
-      Bloc19_three_quarter: [0.29, 0.19, 0.19],
-      Bloc19_half: [0.19, 0.19, 0.19],
-      Bloc19_quarter: [0.14, 0.19, 0.19],
-      Bloc29_entire: [0.39, 0.19, 0.29],
-      Bloc29_three_quarter: [0.29, 0.19, 0.29],
-      Bloc29_half: [0.19, 0.19, 0.29],
-      Bloc29_quarter: [0.14, 0.19, 0.29],
+      M50_entire: [0.19, 0.05, 0.09], M50_three_quarter: [0.14, 0.05, 0.09], M50_half: [0.09, 0.05, 0.09], M50_quarter: [0.04, 0.05, 0.09],
+      M57_entire: [0.19, 0.057, 0.09], M57_three_quarter: [0.14, 0.057, 0.09], M57_half: [0.09, 0.057, 0.09], M57_quarter: [0.04, 0.057, 0.09],
+      M65_entire: [0.19, 0.065, 0.09], M65_three_quarter: [0.14, 0.065, 0.09], M65_half: [0.09, 0.065, 0.09], M65_quarter: [0.04, 0.065, 0.09],
+      M90_entire: [0.19, 0.09, 0.09], M90_three_quarter: [0.14, 0.09, 0.09], M90_half: [0.09, 0.09, 0.09], M90_quarter: [0.04, 0.09, 0.09],
+      WF_entire: [0.21, 0.09, 0.09], WF_three_quarter: [0.15, 0.05, 0.09], WF_half: [0.10, 0.05, 0.09], WF_quarter: [0.05, 0.05, 0.09],
+      WFD_entire: [0.21, 0.09, 0.09], WFD_three_quarter: [0.15, 0.05, 0.09], WFD_half: [0.10, 0.05, 0.09], WFD_quarter: [0.05, 0.05, 0.09],
+      Bloc9_entire: [0.39, 0.19, 0.09], Bloc9_three_quarter: [0.29, 0.19, 0.09], Bloc9_half: [0.19, 0.19, 0.09], Bloc9_quarter: [0.14, 0.19, 0.09],
+      Bloc14_entire: [0.39, 0.19, 0.14], Bloc14_three_quarter: [0.29, 0.19, 0.14], Bloc14_half: [0.19, 0.19, 0.14], Bloc14_quarter: [0.14, 0.19, 0.14],
+      Bloc19_entire: [0.39, 0.19, 0.19], Bloc19_three_quarter: [0.29, 0.19, 0.19], Bloc19_half: [0.19, 0.19, 0.19], Bloc19_quarter: [0.14, 0.19, 0.19],
+      Bloc29_entire: [0.39, 0.19, 0.29], Bloc29_three_quarter: [0.29, 0.19, 0.29], Bloc29_half: [0.19, 0.19, 0.29], Bloc29_quarter: [0.14, 0.19, 0.29],
     };
 
     const COLOR_MAP = {
-      M50: '#e07b39',
-      M57: '#c0392b',
-      M65: '#8e44ad',
-      M90: '#2980b9',
-      WF: '#27ae60',
-      WFD: '#16a085',
-      Bloc9: '#d35400',
-      Bloc14: '#7f8c8d',
-      Bloc19: '#2c3e50',
-      Bloc29: '#f1c40f',
+      M50: '#e07b39', M57: '#c0392b', M65: '#8e44ad', M90: '#2980b9', WF: '#27ae60',
+      WFD: '#16a085', Bloc9: '#d35400', Bloc14: '#7f8c8d', Bloc19: '#2c3e50', Bloc29: '#f1c40f',
     };
 
     const SIZE_COLOR_MAP = {
-      entire: '#ff0000',
-      three_quarter: '#00ff00',
-      half: '#0000ff',
-      quarter: '#ffff00'
+      entire: '#ff0000', three_quarter: '#00ff00', half: '#0000ff', quarter: '#ffff00',
     };
 
     const BRICK_TYPES = ['M50', 'M57', 'M65', 'M90', 'WF', 'WFD', 'Bloc9', 'Bloc14', 'Bloc19', 'Bloc29'];
     const SIZE_VARIANTS = ['entire', 'three_quarter', 'half', 'quarter'];
+    const VERSION = '1.0.0';
 
-    let layers = [[/* assise 0 */]];
-    let currentLayer = 0;
-    let selectedSize = 'M50_entire';
-    let hoverPoint = null;
-    let jointThickness = 0.012;
-    let rotationY = 0;
-    let whiteBricks = false;
-    let deleteMode = false;
-    let moveMode = false;
-    let rotateMode = false;
-    let projectTitle = '';
-    let layerboxPos = { x: 60, y: 360 };
-    let titleInputPos = { x: window.innerWidth / 2 - 150, y: 50 };
-    let history = [{ layers: JSON.parse(JSON.stringify(layers)), projectTitle: '' }];
-    let historyIndex = 0;
-    let selectedBrick = null;
-    let ghostBrick = null;
+    // State
+    let state = {
+      layers: [[/* assise 0 */]],
+      currentLayer: 0,
+      selectedSize: 'M50_entire',
+      hoverPoint: null,
+      jointThickness: 0.012,
+      rotationY: 0,
+      whiteBricks: false,
+      deleteMode: false,
+      moveMode: false,
+      rotateMode: false,
+      projectTitle: '',
+      layerboxPos: { x: 60, y: 360 },
+      titleInputPos: { x: window.innerWidth / 2 - 150, y: 50 },
+      history: [{ layers: [[/* assise 0 */]], projectTitle: '' }],
+      historyIndex: 0,
+      selectedBrick: null,
+      ghostBrick: null,
+    };
 
+    // Three.js Setup
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
     camera.position.set(0.5, 0.5, 1);
@@ -252,23 +213,11 @@
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.shadowMap.autoUpdate = false;
 
-    const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 512;
-    const context = canvas.getContext('2d');
-    const gradient = context.createLinearGradient(0, 0, 0, 512);
-    gradient.addColorStop(0, '#87CEEB');
-    gradient.addColorStop(1, '#FFFFFF');
-    context.fillStyle = gradient;
-    context.fillRect(0, 0, 512, 512);
-    const skyTexture = new THREE.CanvasTexture(canvas);
-
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
     directionalLight.position.set(1, 2, 2);
     directionalLight.castShadow = true;
-    directionalLight.shadow.mapSize.width = 2048;
-    directionalLight.shadow.mapSize.height = 2048;
+    directionalLight.shadow.mapSize.set(2048, 2048);
     directionalLight.shadow.camera.left = -2;
     directionalLight.shadow.camera.right = 2;
     directionalLight.shadow.camera.top = 2;
@@ -299,20 +248,36 @@
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
+    // Sky Texture
+    function createSkyTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const context = canvas.getContext('2d');
+      const gradient = context.createLinearGradient(0, 0, 0, 512);
+      gradient.addColorStop(0, '#87CEEB');
+      gradient.addColorStop(1, '#FFFFFF');
+      context.fillStyle = gradient;
+      context.fillRect(0, 0, 512, 512);
+      return new THREE.CanvasTexture(canvas);
+    }
+
+    // Initialization
     function initThreeJS() {
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.getElementById('app').appendChild(renderer.domElement);
-      scene.background = skyTexture;
+      scene.background = createSkyTexture();
       scene.add(ambientLight, directionalLight, plane, shadowPlane, gridHelper);
     }
 
+    // Brick Creation
     function createBrick(position, size, type, transparent = false, highlight = false, rotation = [0, 0, 0], isColliding = false, isJointAligned = false) {
       const geometry = new THREE.BoxGeometry(...size);
       const brickType = type.split('_')[0];
       const brickSize = type.split('_')[1];
-      const color = transparent 
-        ? (isColliding ? '#ff0000' : (isJointAligned ? '#0000ff' : '#00ff00')) 
-        : (whiteBricks ? '#ffffff' : (highlight ? '#00ffff' : (SIZE_COLOR_MAP[brickSize] || COLOR_MAP[brickType] || 'orange')));
+      const color = transparent
+        ? (isColliding ? '#ff0000' : (isJointAligned ? '#0000ff' : '#00ff00'))
+        : (state.whiteBricks ? '#ffffff' : (highlight ? '#00ffff' : (SIZE_COLOR_MAP[brickSize] || COLOR_MAP[brickType] || 'orange')));
       const material = new THREE.MeshStandardMaterial({
         color,
         transparent,
@@ -338,132 +303,119 @@
       return mesh;
     }
 
+    // Scene Update
     function updateScene() {
       scene.children = scene.children.filter(child => !child.isMesh && !child.isLineSegments || child === plane || child === shadowPlane || child === gridHelper);
       let hoveredBrick = null;
-      if (deleteMode || moveMode || rotateMode) {
+
+      if (state.deleteMode || state.moveMode || state.rotateMode) {
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects(scene.children.filter(child => child.isMesh && child !== plane && child !== shadowPlane));
         if (intersects.length > 0) {
           hoveredBrick = intersects[0].object;
         }
       }
-      layers.flat().forEach(([x, y, z, type, rotY], index) => {
-        const isHovered = (deleteMode || moveMode || rotateMode) && hoveredBrick && Math.abs(hoveredBrick.position.x - x) < 0.001 && Math.abs(hoveredBrick.position.y - y) < 0.001 && Math.abs(hoveredBrick.position.z - z) < 0.001;
+
+      state.layers.flat().forEach(([x, y, z, type, rotY], index) => {
+        const isHovered = (state.deleteMode || state.moveMode || state.rotateMode) && hoveredBrick &&
+          Math.abs(hoveredBrick.position.x - x) < 0.001 && Math.abs(hoveredBrick.position.y - y) < 0.001 && Math.abs(hoveredBrick.position.z - z) < 0.001;
         const brick = createBrick([x, y, z], BRICK_SIZES[type], type, false, isHovered, [0, rotY || 0, 0]);
         brick.userData.index = index;
-        brick.userData.layerIndex = layers.findIndex(layer => layer.some(b => b[0] === x && b[1] === y && b[2] === z));
+        brick.userData.layerIndex = state.layers.findIndex(layer => layer.some(b => b[0] === x && b[1] === y && b[2] === z));
         scene.add(brick);
         if (brick.userData.edges) scene.add(brick.userData.edges);
       });
-      if (hoverPoint && !deleteMode && !moveMode && !rotateMode && hoverPoint.x !== undefined && hoverPoint.z !== undefined) {
-        let snapX = Math.round(hoverPoint.x * 100) / 100;
-        let snapZ = Math.round(hoverPoint.z * 100) / 100;
-        const threshold = jointThickness + 0.001;
-        const allPositions = layers.flat();
-        for (const [x, , z] of allPositions) {
-          if (Math.abs(snapX - x) <= threshold) snapX = x;
-          if (Math.abs(snapZ - z) <= threshold) snapZ = z;
-        }
-        const y = getBrickY(BRICK_SIZES[selectedSize]);
-        let isColliding = false;
-        const newBox = new THREE.Box3().setFromCenterAndSize(
-          new THREE.Vector3(snapX, y, snapZ),
-          new THREE.Vector3(BRICK_SIZES[selectedSize][0], BRICK_SIZES[selectedSize][1], BRICK_SIZES[selectedSize][2])
-        );
-        newBox.applyMatrix4(new THREE.Matrix4().makeRotationY(rotationY));
-        for (const [x, y2, z, type, rotY] of layers[currentLayer]) {
-          if (y !== y2) continue;
-          const existingBox = new THREE.Box3().setFromCenterAndSize(
-            new THREE.Vector3(x, y2, z),
-            new THREE.Vector3(BRICK_SIZES[type][0], BRICK_SIZES[type][1], BRICK_SIZES[type][2])
-          );
-          existingBox.applyMatrix4(new THREE.Matrix4().makeRotationY(rotY || 0));
-          if (newBox.intersectsBox(existingBox)) {
-            isColliding = true;
-            break;
-          }
-        }
-        const isJointAligned = layers[currentLayer].some(([x, y2, z]) => {
-          if (y !== y2) return false;
-          const dx = Math.abs(snapX - x);
-          const dz = Math.abs(snapZ - z);
-          return (
-            (Math.abs(dx - jointThickness) < 0.001 && dz < 0.001) ||
-            (Math.abs(dz - jointThickness) < 0.001 && dx < 0.001)
-          );
-        });
-        const hoverBrick = createBrick([snapX, y, snapZ], BRICK_SIZES[selectedSize], selectedSize, true, false, [0, rotationY, 0], isColliding, isJointAligned);
+
+      if (state.hoverPoint && !state.deleteMode && !state.moveMode && !state.rotateMode) {
+        const { snapX, snapZ, isColliding, isJointAligned } = snapToGrid(state.hoverPoint, state.selectedSize);
+        const y = getBrickY(BRICK_SIZES[state.selectedSize]);
+        const hoverBrick = createBrick([snapX, y, snapZ], BRICK_SIZES[state.selectedSize], state.selectedSize, true, false, [0, state.rotationY, 0], isColliding, isJointAligned);
         scene.add(hoverBrick);
       }
-      if (moveMode && selectedBrick && hoverPoint) {
-        let snapX = Math.round(hoverPoint.x * 100) / 100;
-        let snapZ = Math.round(hoverPoint.z * 100) / 100;
-        const threshold = jointThickness + 0.001;
-        const allPositions = layers.flat().filter(([x, y, z]) => !(Math.abs(x - selectedBrick[0]) < 0.001 && Math.abs(y - selectedBrick[1]) < 0.001 && Math.abs(z - selectedBrick[2]) < 0.001));
-        for (const [x, , z] of allPositions) {
-          if (Math.abs(snapX - x) <= threshold) snapX = x;
-          if (Math.abs(snapZ - z) <= threshold) snapZ = z;
-        }
-        const y = selectedBrick[1];
-        let isColliding = false;
-        const newBox = new THREE.Box3().setFromCenterAndSize(
-          new THREE.Vector3(snapX, y, snapZ),
-          new THREE.Vector3(BRICK_SIZES[selectedBrick[3]][0], BRICK_SIZES[selectedBrick[3]][1], BRICK_SIZES[selectedBrick[3]][2])
-        );
-        newBox.applyMatrix4(new THREE.Matrix4().makeRotationY(selectedBrick[4] || 0));
-        for (const [x, y2, z, type, rotY] of layers[currentLayer]) {
-          if (y !== y2) continue;
-          const existingBox = new THREE.Box3().setFromCenterAndSize(
-            new THREE.Vector3(x, y2, z),
-            new THREE.Vector3(BRICK_SIZES[type][0], BRICK_SIZES[type][1], BRICK_SIZES[type][2])
-          );
-          existingBox.applyMatrix4(new THREE.Matrix4().makeRotationY(rotY || 0));
-          if (newBox.intersectsBox(existingBox)) {
-            isColliding = true;
-            break;
-          }
-        }
-        const isJointAligned = layers[currentLayer].some(([x, y2, z]) => {
-          if (y !== y2) return false;
-          const dx = Math.abs(snapX - x);
-          const dz = Math.abs(snapZ - z);
-          return (
-            (Math.abs(dx - jointThickness) < 0.001 && dz < 0.001) ||
-            (Math.abs(dz - jointThickness) < 0.001 && dx < 0.001)
-          );
-        });
-        ghostBrick = createBrick([snapX, y, snapZ], BRICK_SIZES[selectedBrick[3]], selectedBrick[3], true, false, [0, selectedBrick[4] || 0, 0], isColliding, isJointAligned);
-        scene.add(ghostBrick);
+
+      if (state.moveMode && state.selectedBrick && state.hoverPoint) {
+        const { snapX, snapZ, isColliding, isJointAligned } = snapToGrid(state.hoverPoint, state.selectedBrick[3], state.selectedBrick);
+        const y = state.selectedBrick[1];
+        state.ghostBrick = createBrick([snapX, y, snapZ], BRICK_SIZES[state.selectedBrick[3]], state.selectedBrick[3], true, false, [0, state.selectedBrick[4] || 0, 0], isColliding, isJointAligned);
+        scene.add(state.ghostBrick);
       }
+
       updateBrickCount();
       renderer.shadowMap.needsUpdate = true;
       updateInstructions();
     }
 
+    // Snap to Grid
+    function snapToGrid(point, sizeType, excludeBrick = null) {
+      let snapX = Math.round(point.x * 100) / 100;
+      let snapZ = Math.round(point.z * 100) / 100;
+      const threshold = state.jointThickness + 0.001;
+      const allPositions = state.layers.flat().filter(b => !excludeBrick || !(Math.abs(b[0] - excludeBrick[0]) < 0.001 && Math.abs(b[1] - excludeBrick[1]) < 0.001 && Math.abs(b[2] - excludeBrick[2]) < 0.001));
+
+      for (const [x, , z] of allPositions) {
+        if (Math.abs(snapX - x) <= threshold) snapX = x;
+        if (Math.abs(snapZ - z) <= threshold) snapZ = z;
+      }
+
+      const y = excludeBrick ? excludeBrick[1] : getBrickY(BRICK_SIZES[sizeType]);
+      const newBox = new THREE.Box3().setFromCenterAndSize(
+        new THREE.Vector3(snapX, y, snapZ),
+        new THREE.Vector3(BRICK_SIZES[sizeType][0], BRICK_SIZES[sizeType][1], BRICK_SIZES[sizeType][2])
+      );
+      newBox.applyMatrix4(new THREE.Matrix4().makeRotationY(excludeBrick ? excludeBrick[4] || 0 : state.rotationY));
+
+      let isColliding = false;
+      for (const [x, y2, z, type, rotY] of state.layers[state.currentLayer]) {
+        if (y !== y2) continue;
+        const existingBox = new THREE.Box3().setFromCenterAndSize(
+          new THREE.Vector3(x, y2, z),
+          new THREE.Vector3(BRICK_SIZES[type][0], BRICK_SIZES[type][1], BRICK_SIZES[type][2])
+        );
+        existingBox.applyMatrix4(new THREE.Matrix4().makeRotationY(rotY || 0));
+        if (newBox.intersectsBox(existingBox)) {
+          isColliding = true;
+          break;
+        }
+      }
+
+      const isJointAligned = state.layers[state.currentLayer].some(([x, y2, z]) => {
+        if (y !== y2) return false;
+        const dx = Math.abs(snapX - x);
+        const dz = Math.abs(snapZ - z);
+        return (
+          (Math.abs(dx - state.jointThickness) < 0.001 && dz < 0.001) ||
+          (Math.abs(dz - state.jointThickness) < 0.001 && dx < 0.001)
+        );
+      });
+
+      return { snapX, snapZ, isColliding, isJointAligned };
+    }
+
+    // Instructions Update
     function updateInstructions() {
       const instructionBar = document.getElementById('instruction-bar');
-      if (deleteMode) {
+      if (state.deleteMode) {
         instructionBar.textContent = 'Cliquez sur une brique pour la supprimer';
-      } else if (moveMode) {
-        instructionBar.textContent = selectedBrick ? 'Déplacez la brique et cliquez pour confirmer la position' : 'Sélectionnez une brique à déplacer';
-      } else if (rotateMode) {
-        instructionBar.textContent = selectedBrick ? 'Ajustez la rotation et confirmez' : 'Sélectionnez une brique à tourner';
+      } else if (state.moveMode) {
+        instructionBar.textContent = state.selectedBrick ? 'Déplacez la brique et cliquez pour confirmer la position' : 'Sélectionnez une brique à déplacer';
+      } else if (state.rotateMode) {
+        instructionBar.textContent = state.selectedBrick ? 'Ajustez la rotation et confirmez' : 'Sélectionnez une brique à tourner';
       } else {
         instructionBar.textContent = 'Double-cliquez pour placer une brique';
       }
     }
 
+    // Brick Count Update
     function updateBrickCount() {
-      const counts = {};
-      BRICK_TYPES.forEach(type => {
-        counts[type] = {
-          entire: layers.flat().filter(b => b[3] === `${type}_entire`).length,
-          three_quarter: layers.flat().filter(b => b[3] === `${type}_three_quarter`).length,
-          half: layers.flat().filter(b => b[3] === `${type}_half`).length,
-          quarter: layers.flat().filter(b => b[3] === `${type}_quarter`).length,
+      const counts = BRICK_TYPES.reduce((acc, type) => {
+        acc[type] = {
+          entire: state.layers.flat().filter(b => b[3] === `${type}_entire`).length,
+          three_quarter: state.layers.flat().filter(b => b[3] === `${type}_three_quarter`).length,
+          half: state.layers.flat().filter(b => b[3] === `${type}_half`).length,
+          quarter: state.layers.flat().filter(b => b[3] === `${type}_quarter`).length,
         };
-      });
+        return acc;
+      }, {});
 
       let html = '<table class="border-collapse border border-gray-400 w-full text-sm">';
       html += '<thead><tr class="bg-gray-200">';
@@ -479,13 +431,11 @@
         const typeCounts = counts[type];
         if (Object.values(typeCounts).some(count => count > 0)) {
           hasNonZero = true;
-          html += '<tr>';
-          html += `<td class="border border-gray-400 p-2">${type}</td>`;
+          html += `<tr><td class="border border-gray-400 p-2">${type}</td>`;
           html += `<td class="border border-gray-400 p-2">${typeCounts.entire}</td>`;
           html += `<td class="border border-gray-400 p-2">${typeCounts.three_quarter}</td>`;
           html += `<td class="border border-gray-400 p-2">${typeCounts.half}</td>`;
-          html += `<td class="border border-gray-400 p-2">${typeCounts.quarter}</td>`;
-          html += '</tr>';
+          html += `<td class="border border-gray-400 p-2">${typeCounts.quarter}</td></tr>`;
         }
       });
 
@@ -493,223 +443,147 @@
       document.getElementById('brick-type-counts').innerHTML = hasNonZero ? html : 'Aucun élément placé';
     }
 
+    // Utility Functions
     function getBrickY(size) {
-      return size[1] / 2 + jointThickness + currentLayer * (size[1] + jointThickness);
+      return size[1] / 2 + state.jointThickness + state.currentLayer * (size[1] + state.jointThickness);
     }
 
     function saveState() {
-      history = history.slice(0, historyIndex + 1);
-      history.push({ layers: JSON.parse(JSON.stringify(layers)), projectTitle });
-      historyIndex++;
+      state.history = state.history.slice(0, state.historyIndex + 1);
+      state.history.push({ layers: JSON.parse(JSON.stringify(state.layers)), projectTitle: state.projectTitle });
+      state.historyIndex++;
     }
 
+    // Brick Operations
     function addBrick(point) {
       if (!point || point.x === undefined || point.z === undefined) return;
-      const allPositions = layers.flat();
-      const threshold = jointThickness + 0.001;
-      const size = BRICK_SIZES[selectedSize];
-      let snapX = Math.round(point.x * 100) / 100;
-      let snapZ = Math.round(point.z * 100) / 100;
-      let snappedX = snapX;
-      let snappedZ = snapZ;
-
-      for (const [x, , z] of allPositions) {
-        if (Math.abs(snappedX - x) <= threshold) snappedX = x;
-        if (Math.abs(snappedZ - z) <= threshold) snappedZ = z;
+      const { snapX, snapZ, isColliding } = snapToGrid(point, state.selectedSize);
+      if (isColliding) {
+        showNotification('Erreur : Chevauchement détecté', point);
+        return;
       }
 
-      const y = getBrickY(size);
-      const newBox = new THREE.Box3().setFromCenterAndSize(
-        new THREE.Vector3(snappedX, y, snappedZ),
-        new THREE.Vector3(size[0], size[1], size[2])
-      );
-      const rotationMatrix = new THREE.Matrix4().makeRotationY(rotationY);
-      newBox.applyMatrix4(rotationMatrix);
-
-      // Temporarily disable shadow plane to prevent shadow interference
-      const originalShadowPlaneVisible = shadowPlane.visible;
-      shadowPlane.visible = false;
-
-      for (const [x, y2, z, type, rotY] of layers[currentLayer]) {
-        if (y !== y2) continue;
-        const existingBox = new THREE.Box3().setFromCenterAndSize(
-          new THREE.Vector3(x, y2, z),
-          new THREE.Vector3(BRICK_SIZES[type][0], BRICK_SIZES[type][1], BRICK_SIZES[type][2])
-        );
-        const existingRotation = new THREE.Matrix4().makeRotationY(rotY || 0);
-        existingBox.applyMatrix4(existingRotation);
-        if (newBox.intersectsBox(existingBox)) {
-          const notification = document.getElementById('notification');
-          notification.textContent = 'Erreur : Chevauchement détecté';
-          notification.style.left = `${Math.min(window.innerWidth - 200, Math.max(0, mouse.x * window.innerWidth / 2 + window.innerWidth / 2 + 10))}px`;
-          notification.style.top = `${-mouse.y * window.innerHeight / 2 + window.innerHeight / 2 + 10}px`;
-          notification.style.display = 'block';
-          setTimeout(() => notification.style.display = 'none', 2000);
-          shadowPlane.visible = originalShadowPlaneVisible;
-          return;
-        }
-      }
-
-      // Restore shadow plane visibility
-      shadowPlane.visible = originalShadowPlaneVisible;
-
+      const y = getBrickY(BRICK_SIZES[state.selectedSize]);
       saveState();
-      layers[currentLayer].push([snappedX, y, snappedZ, selectedSize, rotationY]);
+      state.layers[state.currentLayer].push([snapX, y, snapZ, state.selectedSize, state.rotationY]);
       updateScene();
     }
 
     function deleteBrick() {
-      raycaster.setFromCamera(mouse, camera);
       const intersects = raycaster.intersectObjects(scene.children.filter(child => child.isMesh && child !== plane && child !== shadowPlane));
       if (intersects.length > 0) {
         const clickedMesh = intersects[0].object;
         const position = clickedMesh.position;
         saveState();
-        for (let i = 0; i < layers.length; i++) {
-          layers[i] = layers[i].filter(([x, y, z]) => {
-            return !(Math.abs(x - position.x) < 0.001 && Math.abs(y - position.y) < 0.001 && Math.abs(z - position.z) < 0.001);
-          });
-        }
-        deleteMode = false;
+        state.layers = state.layers.map(layer => layer.filter(([x, y, z]) => 
+          !(Math.abs(x - position.x) < 0.001 && Math.abs(y - position.y) < 0.001 && Math.abs(z - position.z) < 0.001)
+        ));
+        state.deleteMode = false;
         document.querySelectorAll('#delete-mode').forEach(btn => btn.classList.remove('delete-active'));
         updateScene();
       }
     }
 
     function selectBrickForMove() {
-      raycaster.setFromCamera(mouse, camera);
       const intersects = raycaster.intersectObjects(scene.children.filter(child => child.isMesh && child !== plane && child !== shadowPlane));
       if (intersects.length > 0) {
         const clickedMesh = intersects[0].object;
         const layerIndex = clickedMesh.userData.layerIndex;
-        const brickIndex = layers[layerIndex].findIndex(([x, y, z]) => 
-          Math.abs(x - clickedMesh.position.x) < 0.001 && 
-          Math.abs(y - clickedMesh.position.y) < 0.001 && 
-          Math.abs(z - clickedMesh.position.z) < 0.001
+        const brickIndex = state.layers[layerIndex].findIndex(([x, y, z]) => 
+          Math.abs(x - clickedMesh.position.x) < 0.001 && Math.abs(y - clickedMesh.position.y) < 0.001 && Math.abs(z - clickedMesh.position.z) < 0.001
         );
-        selectedBrick = [...layers[layerIndex][brickIndex], layerIndex];
-        layers[layerIndex].splice(brickIndex, 1);
+        state.selectedBrick = [...state.layers[layerIndex][brickIndex], layerIndex];
+        state.layers[layerIndex].splice(brickIndex, 1);
         updateScene();
       }
     }
 
     function confirmMove(point) {
       if (!point || point.x === undefined || point.z === undefined) return;
-      const threshold = jointThickness + 0.001;
-      let snapX = Math.round(point.x * 100) / 100;
-      let snapZ = Math.round(point.z * 100) / 100;
-      const allPositions = layers.flat().filter(([x, y, z]) => !(Math.abs(x - selectedBrick[0]) < 0.001 && Math.abs(y - selectedBrick[1]) < 0.001 && Math.abs(z - selectedBrick[2]) < 0.001));
-      for (const [x, , z] of allPositions) {
-        if (Math.abs(snapX - x) <= threshold) snapX = x;
-        if (Math.abs(snapZ - z) <= threshold) snapZ = z;
+      const { snapX, snapZ, isColliding } = snapToGrid(point, state.selectedBrick[3], state.selectedBrick);
+      if (isColliding) {
+        showNotification('Erreur : Chevauchement détecté', point);
+        state.layers[state.selectedBrick[5]].push([state.selectedBrick[0], state.selectedBrick[1], state.selectedBrick[2], state.selectedBrick[3], state.selectedBrick[4]]);
+        state.selectedBrick = null;
+        state.moveMode = false;
+        document.querySelectorAll('#move-mode').forEach(btn => btn.classList.remove('move-active'));
+        updateScene();
+        return;
       }
-
-      const y = selectedBrick[1];
-      const newBox = new THREE.Box3().setFromCenterAndSize(
-        new THREE.Vector3(snapX, y, snapZ),
-        new THREE.Vector3(BRICK_SIZES[selectedBrick[3]][0], BRICK_SIZES[selectedBrick[3]][1], BRICK_SIZES[selectedBrick[3]][2])
-      );
-      const rotationMatrix = new THREE.Matrix4().makeRotationY(selectedBrick[4] || 0);
-      newBox.applyMatrix4(rotationMatrix);
-
-      // Temporarily disable shadow plane to prevent shadow interference
-      const originalShadowPlaneVisible = shadowPlane.visible;
-      shadowPlane.visible = false;
-
-      for (const [x, y2, z, type, rotY] of layers[currentLayer]) {
-        if (y !== y2) continue;
-        const existingBox = new THREE.Box3().setFromCenterAndSize(
-          new THREE.Vector3(x, y2, z),
-          new THREE.Vector3(BRICK_SIZES[type][0], BRICK_SIZES[type][1], BRICK_SIZES[type][2])
-        );
-        const existingRotation = new THREE.Matrix4().makeRotationY(rotY || 0);
-        existingBox.applyMatrix4(existingRotation);
-        if (newBox.intersectsBox(existingBox)) {
-          const notification = document.getElementById('notification');
-          notification.textContent = 'Erreur : Chevauchement détecté';
-          notification.style.left = `${Math.min(window.innerWidth - 200, Math.max(0, mouse.x * window.innerWidth / 2 + window.innerWidth / 2 + 10))}px`;
-          notification.style.top = `${-mouse.y * window.innerHeight / 2 + window.innerHeight / 2 + 10}px`;
-          notification.style.display = 'block';
-          setTimeout(() => notification.style.display = 'none', 2000);
-          layers[selectedBrick[5]].push([selectedBrick[0], selectedBrick[1], selectedBrick[2], selectedBrick[3], selectedBrick[4]]);
-          selectedBrick = null;
-          moveMode = false;
-          document.querySelectorAll('#move-mode').forEach(btn => btn.classList.remove('move-active'));
-          shadowPlane.visible = originalShadowPlaneVisible;
-          updateScene();
-          return;
-        }
-      }
-
-      // Restore shadow plane visibility
-      shadowPlane.visible = originalShadowPlaneVisible;
 
       saveState();
-      layers[selectedBrick[5]].push([snapX, y, snapZ, selectedBrick[3], selectedBrick[4]]);
-      selectedBrick = null;
-      moveMode = false;
+      state.layers[state.selectedBrick[5]].push([snapX, state.selectedBrick[1], snapZ, state.selectedBrick[3], state.selectedBrick[4]]);
+      state.selectedBrick = null;
+      state.moveMode = false;
       document.querySelectorAll('#move-mode').forEach(btn => btn.classList.remove('move-active'));
       updateScene();
     }
 
     function selectBrickForRotate() {
-      raycaster.setFromCamera(mouse, camera);
       const intersects = raycaster.intersectObjects(scene.children.filter(child => child.isMesh && child !== plane && child !== shadowPlane));
       if (intersects.length > 0) {
         const clickedMesh = intersects[0].object;
         const layerIndex = clickedMesh.userData.layerIndex;
-        const brickIndex = layers[layerIndex].findIndex(([x, y, z]) => 
-          Math.abs(x - clickedMesh.position.x) < 0.001 && 
-          Math.abs(y - clickedMesh.position.y) < 0.001 && 
-          Math.abs(z - clickedMesh.position.z) < 0.001
+        const brickIndex = state.layers[layerIndex].findIndex(([x, y, z]) => 
+          Math.abs(x - clickedMesh.position.x) < 0.001 && Math.abs(y - clickedMesh.position.y) < 0.001 && Math.abs(z - clickedMesh.position.z) < 0.001
         );
-        selectedBrick = [...layers[layerIndex][brickIndex], layerIndex, brickIndex];
+        state.selectedBrick = [...state.layers[layerIndex][brickIndex], layerIndex, brickIndex];
         const overlay = document.getElementById('rotate-overlay');
         overlay.style.display = 'block';
-        document.getElementById('rotate-slider').value = (selectedBrick[4] || 0) * 180 / Math.PI;
-        document.getElementById('rotate-value').textContent = `${Math.round((selectedBrick[4] || 0) * 180 / Math.PI)}°`;
+        document.getElementById('rotate-slider').value = (state.selectedBrick[4] || 0) * 180 / Math.PI;
+        document.getElementById('rotate-value').textContent = `${Math.round((state.selectedBrick[4] || 0) * 180 / Math.PI)}°`;
       }
     }
 
     function confirmRotation() {
       const newRotation = (document.getElementById('rotate-slider').value * Math.PI) / 180;
       saveState();
-      layers[selectedBrick[5]][selectedBrick[6]][4] = newRotation;
-      selectedBrick = null;
-      rotateMode = false;
+      state.layers[state.selectedBrick[5]][state.selectedBrick[6]][4] = newRotation;
+      state.selectedBrick = null;
+      state.rotateMode = false;
       document.querySelectorAll('#rotate-mode').forEach(btn => btn.classList.remove('rotate-active'));
       document.getElementById('rotate-overlay').style.display = 'none';
       updateScene();
     }
 
+    // Layer Management
     function addLayer() {
       saveState();
-      layers.push([]);
-      currentLayer = layers.length - 1;
+      state.layers.push([]);
+      state.currentLayer = state.layers.length - 1;
       updateLayerSelect();
       updateScene();
     }
 
+    function updateLayerSelect() {
+      const select = document.getElementById('layer-select');
+      select.innerHTML = state.layers.map((_, i) => 
+        `<option value="${i}" ${i === state.currentLayer ? 'selected' : ''}>Assise ${i + 1}</option>`
+      ).join('');
+    }
+
+    // History Management
     function undo() {
-      if (historyIndex <= 0) return;
-      historyIndex--;
-      layers = JSON.parse(JSON.stringify(history[historyIndex].layers));
-      projectTitle = history[historyIndex].projectTitle;
-      document.getElementById('project-title').value = projectTitle;
+      if (state.historyIndex <= 0) return;
+      state.historyIndex--;
+      state.layers = JSON.parse(JSON.stringify(state.history[state.historyIndex].layers));
+      state.projectTitle = state.history[state.historyIndex].projectTitle;
+      document.getElementById('project-title').value = state.projectTitle;
       updateLayerSelect();
       updateScene();
     }
 
     function redo() {
-      if (historyIndex >= history.length - 1) return;
-      historyIndex++;
-      layers = JSON.parse(JSON.stringify(history[historyIndex].layers));
-      projectTitle = history[historyIndex].projectTitle;
-      document.getElementById('project-title').value = projectTitle;
+      if (state.historyIndex >= state.history.length - 1) return;
+      state.historyIndex++;
+      state.layers = JSON.parse(JSON.stringify(state.history[state.historyIndex].layers));
+      state.projectTitle = state.history[state.historyIndex].projectTitle;
+      document.getElementById('project-title').value = state.projectTitle;
       updateLayerSelect();
       updateScene();
     }
 
+    // Camera Control
     function resetCamera() {
       camera.position.set(0.5, 0.5, 1);
       controls.target.set(0, 0, 0);
@@ -717,33 +591,35 @@
       renderer.render(scene, camera);
     }
 
+    // Export Functions
     function exportPDF() {
       const originalWidth = window.innerWidth;
       const originalHeight = window.innerHeight;
       const exportWidth = 1920;
-      const exportHeight = Math.round(exportWidth * (27.7 / 21)); // Aspect ratio 21/27.7 ≈ 0.758
+      const exportHeight = Math.round(exportWidth * (27.7 / 21));
       const pdf = new jsPDF({ orientation: 'landscape', unit: 'cm', format: [29.7, 21] });
       const width = pdf.internal.pageSize.getWidth();
       const height = pdf.internal.pageSize.getHeight();
-      const appTitle = projectTitle || 'Mur Simulateur 3d';
-      const versionText = 'Version 1.0.0';
+      const appTitle = state.projectTitle || 'Mur Simulateur 3d';
       let page = 1;
 
       renderer.setSize(exportWidth, exportHeight);
       renderer.setClearColor(0xffffff, 1);
 
-      let minX = 0, maxX = 0, minZ = 0, maxZ = 0, maxY = 0;
-      layers.flat().forEach(([x, y, z, type]) => {
+      const bounds = state.layers.flat().reduce((acc, [x, y, z, type]) => {
         const size = BRICK_SIZES[type];
-        minX = Math.min(minX, x - size[0] / 2);
-        maxX = Math.max(maxX, x + size[0] / 2);
-        minZ = Math.min(minZ, z - size[2] / 2);
-        maxZ = Math.max(maxZ, z + size[2] / 2);
-        maxY = Math.max(maxY, y + size[1] / 2);
-      });
-      const centerX = (minX + maxX) / 2;
-      const centerZ = (minZ + maxZ) / 2;
-      const centerY = maxY / 2;
+        return {
+          minX: Math.min(acc.minX, x - size[0] / 2),
+          maxX: Math.max(acc.maxX, x + size[0] / 2),
+          minZ: Math.min(acc.minZ, z - size[2] / 2),
+          maxZ: Math.max(acc.maxZ, z + size[2] / 2),
+          maxY: Math.max(acc.maxY, y + size[1] / 2),
+        };
+      }, { minX: 0, maxX: 0, minZ: 0, maxZ: 0, maxY: 0 });
+
+      const centerX = (bounds.minX + bounds.maxX) / 2;
+      const centerZ = (bounds.minZ + bounds.maxZ) / 2;
+      const centerY = bounds.maxY / 2;
 
       function addCommonElements(viewName, isFourthPage = false) {
         pdf.setLineWidth(0.05);
@@ -752,30 +628,15 @@
         pdf.text('10 cm', 1, height - 1.5);
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(16);
-        if (isFourthPage) {
-          pdf.text(appTitle, width / 2, 3.5, { align: 'center' });
-        } else {
-          pdf.text(appTitle, width / 2, 0.5, { align: 'center' });
-        }
+        pdf.text(appTitle, width / 2, isFourthPage ? 3.5 : 0.5, { align: 'center' });
         pdf.setFontSize(12);
-        if (isFourthPage) {
-          pdf.text(viewName, width / 2, height - 3.5, { align: 'center' });
-        } else {
-          pdf.text(viewName, width / 2, height - 1, { align: 'center' });
-        }
+        pdf.text(viewName, width / 2, isFourthPage ? height - 3.5 : height - 1, { align: 'center' });
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(8);
-        if (isFourthPage) {
-          pdf.text(appTitle, width - 1.5, height - 4.5, { align: 'right' });
-          pdf.text('Conçu par Julien BROHEZ', width - 1.5, height - 4, { align: 'right' });
-          pdf.text(versionText, width - 1.5, height - 3.5, { align: 'right' });
-          pdf.text(`${page} sur 5`, 1.5, height - 3.5);
-        } else {
-          pdf.text(appTitle, width - 3, height - 1.5, { align: 'right' });
-          pdf.text('Conçu par Julien BROHEZ', width - 3, height - 1, { align: 'right' });
-          pdf.text(versionText, width - 3, height - 0.5, { align: 'right' });
-          pdf.text(`${page} sur 5`, 1, height - 0.5);
-        }
+        pdf.text(appTitle, width - (isFourthPage ? 1.5 : 3), height - (isFourthPage ? 4.5 : 1.5), { align: 'right' });
+        pdf.text('Conçu par Julien BROHEZ', width - (isFourthPage ? 1.5 : 3), height - (isFourthPage ? 4 : 1), { align: 'right' });
+        pdf.text(VERSION, width - (isFourthPage ? 1.5 : 3), height - (isFourthPage ? 3.5 : 0.5), { align: 'right' });
+        pdf.text(`${page} sur 5`, 1.5, height - (isFourthPage ? 3.5 : 0.5));
       }
 
       function addMarginMarks() {
@@ -786,18 +647,14 @@
         pdf.line(14.35, 20, 15.35, 20);
       }
 
-      // Top view (1:10 scale, no shadows, no ground plane)
+      // Top View
       renderer.shadowMap.enabled = false;
       const originalPlaneVisible = plane.visible;
       const originalShadowPlaneVisible = shadowPlane.visible;
       plane.visible = false;
       shadowPlane.visible = false;
       scene.background = null;
-      const topCamera = new THREE.OrthographicCamera(
-        -0.722, 0.722, // 1.444 meters width (14.44 cm × 10)
-        0.95, -0.95, // 1.9 meters height (19 cm × 10)
-        0.1, 100
-      );
+      const topCamera = new THREE.OrthographicCamera(-0.722, 0.722, 0.95, -0.95, 0.1, 100);
       topCamera.position.set(centerX, 1, centerZ);
       topCamera.lookAt(centerX, 0, centerZ);
       renderer.render(scene, topCamera);
@@ -809,21 +666,15 @@
       pdf.text('Échelle : 1/10', 1, height - 1);
       page++;
 
-      // Front view (1:10 scale)
+      // Front View
       pdf.addPage();
-      const frontLineGeometry = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(-0.722, 0, 0),
-        new THREE.Vector3(0.722, 0, 0)
-      ]);
-      const frontLineMaterial = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 5 });
-      const frontLine = new THREE.Line(frontLineGeometry, frontLineMaterial);
+      const frontLine = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-0.722, 0, 0), new THREE.Vector3(0.722, 0, 0)]),
+        new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 5 })
+      );
       scene.add(frontLine);
       renderer.shadowMap.enabled = true;
-      const frontCamera = new THREE.OrthographicCamera(
-        -0.722, 0.722, // 1.444 meters width
-        0.95, -0.95, // 1.9 meters height
-        0.1, 100
-      );
+      const frontCamera = new THREE.OrthographicCamera(-0.722, 0.722, 0.95, -0.95, 0.1, 100);
       frontCamera.position.set(centerX, centerY, 0.722);
       frontCamera.lookAt(centerX, centerY, 0);
       renderer.render(scene, frontCamera);
@@ -834,20 +685,14 @@
       scene.remove(frontLine);
       page++;
 
-      // Side view (1:10 scale)
+      // Side View
       pdf.addPage();
-      const sideLineGeometry = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(0, 0, -0.95),
-        new THREE.Vector3(0, 0, 0.95)
-      ]);
-      const sideLineMaterial = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 5 });
-      const sideLine = new THREE.Line(sideLineGeometry, sideLineMaterial);
-      scene.add(sideLine);
-      const sideCamera = new THREE.OrthographicCamera(
-        -0.722, 0.722, // 1.444 meters width
-        0.95, -0.95, // 1.9 meters height
-        0.1, 100
+      const sideLine = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, -0.95), new THREE.Vector3(0, 0, 0.95)]),
+        new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 5 })
       );
+      scene.add(sideLine);
+      const sideCamera = new THREE.OrthographicCamera(-0.722, 0.722, 0.95, -0.95, 0.1, 100);
       sideCamera.position.set(0.722, centerY, centerZ);
       sideCamera.lookAt(0, centerY, centerZ);
       renderer.render(scene, sideCamera);
@@ -858,10 +703,10 @@
       scene.remove(sideLine);
       page++;
 
-      // 3D view
+      // 3D View
       pdf.addPage();
       renderer.shadowMap.enabled = true;
-      scene.background = skyTexture;
+      scene.background = createSkyTexture();
       camera.aspect = exportWidth / exportHeight;
       camera.updateProjectionMatrix();
       camera.lookAt(controls.target);
@@ -871,7 +716,7 @@
       addCommonElements('Vue 3D', true);
       page++;
 
-      // Inventory page
+      // Inventory Page
       pdf.addPage();
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(16);
@@ -883,7 +728,7 @@
       let y = 2;
       BRICK_TYPES.forEach(type => {
         SIZE_VARIANTS.forEach(variant => {
-          const count = layers.flat().filter(b => b[3] === `${type}_${variant}`).length;
+          const count = state.layers.flat().filter(b => b[3] === `${type}_${variant}`).length;
           if (count > 0) {
             pdf.text(`${type} (${variant}): ${count} éléments`, 1, y);
             y += 1;
@@ -893,94 +738,46 @@
       pdf.setFontSize(8);
       pdf.text(appTitle, width - 3, height - 1.5, { align: 'right' });
       pdf.text('Conçu par Julien BROHEZ', width - 3, height - 1, { align: 'right' });
-      pdf.text(versionText, width - 3, height - 0.5, { align: 'right' });
+      pdf.text(VERSION, width - 3, height - 0.5, { align: 'right' });
       pdf.text(`${page} sur 5`, 1, height - 0.5);
 
       renderer.setSize(originalWidth, originalHeight);
       camera.aspect = originalWidth / originalHeight;
       camera.updateProjectionMatrix();
       renderer.shadowMap.enabled = true;
-      scene.background = skyTexture;
+      scene.background = createSkyTexture();
       renderer.setClearColor(0x000000, 0);
 
       pdf.save('vue-elements.pdf');
     }
 
     function exportPNG() {
-      if (projectTitle) {
-        const canvas = document.createElement('canvas');
-        canvas.width = renderer.domElement.width;
-        canvas.height = renderer.domElement.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(renderer.domElement, 0, 0);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, canvas.width, 50);
-        ctx.fillStyle = '#000000';
-        ctx.font = 'bold 30px Helvetica';
-        ctx.textAlign = 'center';
-        ctx.fillText(projectTitle, canvas.width / 2, 40);
-        const link = document.createElement('a');
-        link.download = 'vue-elements.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-      } else {
-        renderer.render(scene, camera);
-        const link = document.createElement('a');
-        link.download = 'vue-elements.png';
-        link.href = renderer.domElement.toDataURL('image/png');
-        link.click();
-      }
+      renderer.render(scene, camera);
+      const canvas = state.projectTitle ? createTitledCanvas() : renderer.domElement;
+      const link = document.createElement('a');
+      link.download = 'vue-elements.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
     }
 
-    function updateLayerSelect() {
-      const select = document.getElementById('layer-select');
-      select.innerHTML = '';
-      layers.forEach((_, i) => {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = `Assise ${i + 1}`;
-        if (i === currentLayer) option.selected = true;
-        select.appendChild(option);
-      });
+    function createTitledCanvas() {
+      const canvas = document.createElement('canvas');
+      canvas.width = renderer.domElement.width;
+      canvas.height = renderer.domElement.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(renderer.domElement, 0, 0);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, 50);
+      ctx.fillStyle = '#000000';
+      ctx.font = 'bold 30px Helvetica';
+      ctx.textAlign = 'center';
+      ctx.fillText(state.projectTitle, canvas.width / 2, 40);
+      return canvas;
     }
 
-    function makeDraggable(element, pos) {
-      let isDragging = false;
-      let startX, startY;
-
-      element.addEventListener('mousedown', (e) => {
-        if (e.target.tagName === 'LABEL' || e.target.tagName === 'INPUT') return;
-        isDragging = true;
-        startX = e.clientX - pos.x;
-        startY = e.clientY - pos.y;
-      });
-
-      document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        let x = e.clientX - startX;
-        let y = e.clientY - startY;
-
-        if (element.id === 'layerbox') {
-          y = Math.max(360, Math.min(y, 410));
-          x = Math.max(0, Math.min(x, window.innerWidth - element.offsetWidth));
-        } else if (element.id === 'title-input') {
-          y = Math.max(50, Math.min(y, 100));
-          x = Math.max(0, Math.min(x, window.innerWidth - element.offsetWidth));
-        }
-
-        pos.x = x;
-        pos.y = y;
-        element.style.left = `${x}px`;
-        element.style.top = `${y}px`;
-      });
-
-      document.addEventListener('mouseup', () => {
-        isDragging = false;
-      });
-    }
-
+    // File Operations
     function saveFile() {
-      const data = JSON.stringify({ layers, projectTitle });
+      const data = JSON.stringify({ layers: state.layers, projectTitle: state.projectTitle });
       const blob = new Blob([data], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -1007,179 +804,199 @@
       );
     }
 
-    function setupEventListeners() {
-      document.getElementById('project-title').addEventListener('input', (e) => {
-        projectTitle = e.target.value.slice(0, 100);
-        saveState();
-      });
-      document.getElementById('brick-type').addEventListener('change', (e) => {
-        const brickType = e.target.value;
-        const sizeVariant = document.getElementById('brick-size').value;
-        selectedSize = `${brickType}_${sizeVariant}`;
-        updateScene();
-      });
-      document.getElementById('brick-size').addEventListener('change', (e) => {
-        const sizeVariant = e.target.value;
-        const brickType = document.getElementById('brick-type').value;
-        selectedSize = `${brickType}_${sizeVariant}`;
-        updateScene();
-      });
-      document.getElementById('rotation-y').addEventListener('input', (e) => {
-        rotationY = (e.target.value * Math.PI) / 180;
-        document.getElementById('rotation-value').textContent = `${e.target.value}°`;
-        updateScene();
-      });
-      document.getElementById('joint-thickness').addEventListener('input', (e) => {
-        jointThickness = parseFloat(e.target.value) / 100;
-        updateScene();
-      });
-      document.getElementById('layer-select').addEventListener('change', (e) => {
-        currentLayer = parseInt(e.target.value);
-        updateScene();
-      });
-      document.getElementById('add-layer').addEventListener('click', addLayer);
-      document.querySelectorAll('#delete-mode').forEach(btn => {
-        btn.addEventListener('click', () => {
-          deleteMode = !deleteMode;
-          moveMode = false;
-          rotateMode = false;
-          selectedBrick = null;
-          document.querySelectorAll('#delete-mode').forEach(b => b.classList.toggle('delete-active', deleteMode));
-          document.querySelectorAll('#move-mode').forEach(b => b.classList.remove('move-active'));
-          document.querySelectorAll('#rotate-mode').forEach(b => b.classList.remove('rotate-active'));
-          document.getElementById('rotate-overlay').style.display = 'none';
-          updateScene();
-        });
-      });
-      document.querySelectorAll('#move-mode').forEach(btn => {
-        btn.addEventListener('click', () => {
-          moveMode = !moveMode;
-          deleteMode = false;
-          rotateMode = false;
-          selectedBrick = null;
-          document.querySelectorAll('#move-mode').forEach(b => b.classList.toggle('move-active', moveMode));
-          document.querySelectorAll('#delete-mode').forEach(b => b.classList.remove('delete-active'));
-          document.querySelectorAll('#rotate-mode').forEach(b => b.classList.remove('rotate-active'));
-          document.getElementById('rotate-overlay').style.display = 'none';
-          updateScene();
-        });
-      });
-      document.querySelectorAll('#rotate-mode').forEach(btn => {
-        btn.addEventListener('click', () => {
-          rotateMode = !rotateMode;
-          deleteMode = false;
-          moveMode = false;
-          selectedBrick = null;
-          document.querySelectorAll('#rotate-mode').forEach(b => b.classList.toggle('rotate-active', rotateMode));
-          document.querySelectorAll('#delete-mode').forEach(b => b.classList.remove('delete-active'));
-          document.querySelectorAll('#move-mode').forEach(b => b.classList.remove('move-active'));
-          document.getElementById('rotate-overlay').style.display = 'none';
-          updateScene();
-        });
-      });
-      document.getElementById('rotate-slider').addEventListener('input', (e) => {
-        document.getElementById('rotate-value').textContent = `${e.target.value}°`;
-      });
-      document.getElementById('confirm-rotation').addEventListener('click', confirmRotation);
-      document.getElementById('save-file').addEventListener('click', saveFile);
-      document.getElementById('open-file').addEventListener('click', openFile);
-      document.getElementById('file-input').addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          try {
-            const data = JSON.parse(event.target.result);
-            if (validateLayers(data)) {
-              layers = data.layers;
-              projectTitle = data.projectTitle || '';
-              document.getElementById('project-title').value = projectTitle;
-              currentLayer = Math.min(currentLayer, layers.length - 1);
-              history = [{ layers: JSON.parse(JSON.stringify(layers)), projectTitle }];
-              historyIndex = 0;
-              updateLayerSelect();
-              updateScene();
-            } else {
-              const notification = document.getElementById('notification');
-              notification.textContent = 'Erreur : Format de fichier invalide';
-              notification.style.left = `${window.innerWidth / 2}px`;
-              notification.style.top = `${window.innerHeight / 2}px`;
-              notification.style.display = 'block';
-              setTimeout(() => notification.style.display = 'none', 2000);
-            }
-          } catch (err) {
-            const notification = document.getElementById('notification');
-            notification.textContent = `Erreur : ${err.message}`;
-            notification.style.left = `${window.innerWidth / 2}px`;
-            notification.style.top = `${window.innerHeight / 2}px`;
-            notification.style.display = 'block';
-            setTimeout(() => notification.style.display = 'none', 2000);
-          }
-        };
-        reader.readAsText(file);
-        e.target.value = '';
-      });
-      document.getElementById('export-pdf').addEventListener('click', exportPDF);
-      document.getElementById('export-png').addEventListener('click', exportPNG);
-      document.getElementById('toggle-white-bricks').addEventListener('click', () => {
-        whiteBricks = !whiteBricks;
-        updateScene();
-      });
-      document.getElementById('toggle-grid').addEventListener('click', () => {
-        gridHelper.visible = !gridHelper.visible;
-        renderer.render(scene, camera);
-      });
-      document.getElementById('reset-camera').addEventListener('click', resetCamera);
-
-      document.addEventListener('mousemove', (e) => {
-        mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-        raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObject(plane);
-        if (intersects.length > 0 && !deleteMode && !rotateMode) {
-          hoverPoint = intersects[0].point;
-        } else {
-          hoverPoint = null;
-        }
-        updateScene();
-      });
-
-      document.addEventListener('click', (e) => {
-        if (deleteMode) {
-          deleteBrick();
-        } else if (moveMode) {
-          if (!selectedBrick) {
-            selectBrickForMove();
+    function handleFileInput(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = event => {
+        try {
+          const data = JSON.parse(event.target.result);
+          if (validateLayers(data)) {
+            state.layers = data.layers;
+            state.projectTitle = data.projectTitle || '';
+            document.getElementById('project-title').value = state.projectTitle;
+            state.currentLayer = Math.min(state.currentLayer, state.layers.length - 1);
+            state.history = [{ layers: JSON.parse(JSON.stringify(state.layers)), projectTitle: state.projectTitle }];
+            state.historyIndex = 0;
+            updateLayerSelect();
+            updateScene();
           } else {
-            const intersects = raycaster.intersectObject(plane);
-            if (intersects.length > 0) {
-              confirmMove(intersects[0].point);
-            }
+            showNotification('Erreur : Format de fichier invalide', { x: window.innerWidth / 2, y: window.innerHeight / 2 });
           }
-        } else if (rotateMode && !selectedBrick) {
-          selectBrickForRotate();
+        } catch (err) {
+          showNotification(`Erreur : ${err.message}`, { x: window.innerWidth / 2, y: window.innerHeight / 2 });
         }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    }
+
+    // Notification
+    function showNotification(message, point) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.style.left = point.x === window.innerWidth / 2 
+        ? `${point.x}px` 
+        : `${Math.min(window.innerWidth - 200, Math.max(0, mouse.x * window.innerWidth / 2 + window.innerWidth / 2 + 10))}px`;
+      notification.style.top = point.y === window.innerHeight / 2 
+        ? `${point.y}px` 
+        : `${-mouse.y * window.innerHeight / 2 + window.innerHeight / 2 + 10}px`;
+      notification.style.display = 'block';
+      setTimeout(() => notification.style.display = 'none', 2000);
+    }
+
+    // Draggable Elements
+    function makeDraggable(element, pos) {
+      let isDragging = false;
+      let startX, startY;
+
+      element.addEventListener('mousedown', e => {
+        if (e.target.tagName === 'LABEL' || e.target.tagName === 'INPUT') return;
+        isDragging = true;
+        startX = e.clientX - pos.x;
+        startY = e.clientY - pos.y;
       });
 
-      document.addEventListener('dblclick', (e) => {
-        if (!deleteMode && !moveMode && !rotateMode) {
-          raycaster.setFromCamera(mouse, camera);
-          const intersects = raycaster.intersectObject(plane);
-          if (intersects.length > 0) {
-            addBrick(intersects[0].point);
-          }
+      document.addEventListener('mousemove', e => {
+        if (!isDragging) return;
+        let x = e.clientX - startX;
+        let y = e.clientY - startY;
+
+        if (element.id === 'layerbox') {
+          y = Math.max(360, Math.min(y, 410));
+          x = Math.max(0, Math.min(x, window.innerWidth - element.offsetWidth));
+        } else if (element.id === 'title-input') {
+          y = Math.max(50, Math.min(y, 100));
+          x = Math.max(0, Math.min(x, window.innerWidth - element.offsetWidth));
         }
+
+        pos.x = x;
+        pos.y = y;
+        element.style.left = `${x}px`;
+        element.style.top = `${y}px`;
       });
 
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        titleInputPos.x = window.innerWidth / 2 - document.getElementById('title-input').offsetWidth / 2;
-        document.getElementById('title-input').style.left = `${titleInputPos.x}px`;
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
       });
     }
 
+    // Mode Toggling
+    function toggleMode(mode, activeClass) {
+      state[mode] = !state[mode];
+      state.deleteMode = mode === 'deleteMode' ? state.deleteMode : false;
+      state.moveMode = mode === 'moveMode' ? state.moveMode : false;
+      state.rotateMode = mode === 'rotateMode' ? state.rotateMode : false;
+      state.selectedBrick = null;
+      document.querySelectorAll('#delete-mode').forEach(btn => btn.classList.toggle('delete-active', state.deleteMode));
+      document.querySelectorAll('#move-mode').forEach(btn => btn.classList.toggle('move-active', state.moveMode));
+      document.querySelectorAll('#rotate-mode').forEach(btn => btn.classList.toggle('rotate-active', state.rotateMode));
+      document.getElementById('rotate-overlay').style.display = 'none';
+      updateScene();
+    }
+
+    // Event Listeners
+    const eventListeners = {
+      element: [
+        ['project-title', 'input', e => {
+          state.projectTitle = e.target.value.slice(0, 100);
+          saveState();
+        }],
+        ['brick-type', 'change', e => {
+          state.selectedSize = `${e.target.value}_${document.getElementById('brick-size').value}`;
+          updateScene();
+        }],
+        ['brick-size', 'change', e => {
+          state.selectedSize = `${document.getElementById('brick-type').value}_${e.target.value}`;
+          updateScene();
+        }],
+        ['rotation-y', 'input', e => {
+          state.rotationY = (e.target.value * Math.PI) / 180;
+          document.getElementById('rotation-value').textContent = `${e.target.value}°`;
+          updateScene();
+        }],
+        ['joint-thickness', 'input', e => {
+          state.jointThickness = parseFloat(e.target.value) / 100;
+          updateScene();
+        }],
+        ['layer-select', 'change', e => {
+          state.currentLayer = parseInt(e.target.value);
+          updateScene();
+        }],
+        ['add-layer', 'click', addLayer],
+        ['delete-mode', 'click', () => toggleMode('deleteMode', 'delete-active')],
+        ['move-mode', 'click', () => toggleMode('moveMode', 'move-active')],
+        ['rotate-mode', 'click', () => toggleMode('rotateMode', 'rotate-active')],
+        ['rotate-slider', 'input', e => {
+          document.getElementById('rotate-value').textContent = `${e.target.value}°`;
+        }],
+        ['confirm-rotation', 'click', confirmRotation],
+        ['save-file', 'click', saveFile],
+        ['open-file', 'click', openFile],
+        ['file-input', 'change', handleFileInput],
+        ['export-pdf', 'click', exportPDF],
+        ['export-png', 'click', exportPNG],
+        ['toggle-white-bricks', 'click', () => {
+          state.whiteBricks = !state.whiteBricks;
+          updateScene();
+        }],
+        ['toggle-grid', 'click', () => {
+          gridHelper.visible = !gridHelper.visible;
+          renderer.render(scene, camera);
+        }],
+        ['reset-camera', 'click', resetCamera],
+        ['undo', 'click', undo],
+        ['redo', 'click', redo],
+      ],
+      global: [
+        ['mousemove', e => {
+          mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+          mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+          raycaster.setFromCamera(mouse, camera);
+          const intersects = raycaster.intersectObject(plane);
+          state.hoverPoint = intersects.length > 0 && !state.deleteMode && !state.rotateMode ? intersects[0].point : null;
+          updateScene();
+        }],
+        ['click', () => {
+          if (state.deleteMode) deleteBrick();
+          else if (state.moveMode) state.selectedBrick ? confirmMove(state.hoverPoint) : selectBrickForMove();
+          else if (state.rotateMode && !state.selectedBrick) selectBrickForRotate();
+        }],
+        ['dblclick', () => {
+          if (!state.deleteMode && !state.moveMode && !state.rotateMode && state.hoverPoint) addBrick(state.hoverPoint);
+        }],
+        ['resize', () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+          state.titleInputPos.x = window.innerWidth / 2 - document.getElementById('title-input').offsetWidth / 2;
+          document.getElementById('title-input').style.left = `${state.titleInputPos.x}px`;
+        }],
+      ],
+    };
+
+    function setupEventListeners() {
+      eventListeners.element.forEach(([id, event, handler]) => {
+        const elements = id.includes('mode') ? document.querySelectorAll(`#${id}`) : [document.getElementById(id)];
+        elements.forEach(el => el.addEventListener(event, handler));
+      });
+
+      eventListeners.global.forEach(([event, handler]) => {
+        document.addEventListener(event, handler);
+      });
+
+      makeDraggable(document.getElementById('layerbox'), state.layerboxPos);
+      makeDraggable(document.getElementById('title-input'), state.titleInputPos);
+    }
+
+    // Animation Loop
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    // Start Application
     document.getElementById('start-button').addEventListener('click', () => {
       document.getElementById('homepage').style.display = 'none';
       document.getElementById('app').style.display = 'block';
@@ -1188,12 +1005,6 @@
       updateLayerSelect();
       animate();
     });
-
-    function animate() {
-      requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
-    }
   </script>
 </body>
 </html>
