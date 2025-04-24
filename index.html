@@ -436,7 +436,7 @@
       }
 
       if (state.moveMode && state.selectedBrick && state.hoverPoint) {
-        const { snapX, snapZ, isJointAligned } = snapToGrid(state.hoverPoint, state.selectedBrick[3], state.selectedBrick);
+        const { snapX, snapZ, isJointAligned } = snapToGrid(state.hoverPoint, state.selectedBrick[3]);
         const y = state.selectedBrick[1];
         state.ghostBrick = createBrick([snapX, y, snapZ], BRICK_SIZES[state.selectedBrick[3]], state.selectedBrick[3], true, false, [0, state.selectedBrick[4] || 0, 0], isJointAligned);
         scene.add(state.ghostBrick);
@@ -466,12 +466,29 @@
         if (Math.abs(snapZ - z) <= threshold) snapZ = z;
       }
 
-      const y = excludeBrick ? excludeBrick[1] : getBrickY(BRICK_SIZES[sizeType]);
+      const size = BRICK_SIZES[sizeType];
+      const rotationY = state.rotationY;
+      let offsetX = 0, offsetZ = 0;
+
+      if (!state.deleteMode && !state.moveMode && !state.rotateMode) {
+        const cosRY = Math.cos(rotationY);
+        const sinRY = Math.sin(rotationY);
+        const halfWidth = size[0] / 2;
+        const halfDepth = size[2] / 2;
+
+        offsetX = halfWidth * cosRY + halfDepth * sinRY;
+        offsetZ = halfWidth * sinRY - halfDepth * cosRY;
+
+        snapX += offsetX;
+        snapZ += offsetZ;
+      }
+
+      const y = excludeBrick ? excludeBrick[1] : getBrickY(size);
 
       const isJointAligned = state.layers[state.currentLayer].some(([x, y2, z]) => {
         if (y !== y2) return false;
-        const dx = Math.abs(snapX - x);
-        const dz = Math.abs(snapZ - z);
+        const dx = Math.abs(snapX - offsetX - x);
+        const dz = Math.abs(snapZ - offsetZ - z);
         return (
           (Math.abs(dx - state.jointThickness) < 0.001 && dz < 0.001) ||
           (Math.abs(dz - state.jointThickness) < 0.001 && dx < 0.001)
@@ -628,17 +645,16 @@
         const brickIndex = state.layers[layerIndex].findIndex(([x, y, z]) => 
           Math.abs(x - clickedMesh.position.x) < 0.001 && Math.abs(y - clickedMesh.position.y) < 0.001 && Math.abs(z - clickedMesh.position.z) < 0.001
         );
-        state.selectedBrick = [...state.layers[layerIndex][brickIndex], layerIndex];
-        state.layers[layerIndex].splice(brickIndex, 1);
+        state.selectedBrick = [...state.layers[layerIndex][brickIndex], layerIndex, brickIndex];
         updateScene();
       }
     }
 
     function confirmMove(point) {
-      if (!point || point.x === undefined || point.z === undefined) return;
-      const { snapX, snapZ } = snapToGrid(point, state.selectedBrick[3], state.selectedBrick);
+      if (!point || point.x === undefined || point.z === undefined || !state.selectedBrick) return;
+      const { snapX, snapZ } = snapToGrid(point, state.selectedBrick[3]);
       saveState();
-      state.layers[state.selectedBrick[5]].push([snapX, state.selectedBrick[1], snapZ, state.selectedBrick[3], state.selectedBrick[4]]);
+      state.layers[state.selectedBrick[5]][state.selectedBrick[6]] = [snapX, state.selectedBrick[1], snapZ, state.selectedBrick[3], state.selectedBrick[4]];
       state.selectedBrick = null;
       state.moveMode = false;
       document.querySelectorAll('#move-mode').forEach(btn => btn.classList.remove('move-active'));
@@ -1091,7 +1107,10 @@
         }],
         ['click', () => {
           if (state.deleteMode) deleteBrick();
-          else if (state.moveMode) state.selectedBrick ? confirmMove(state.hoverPoint) : selectBrickForMove();
+          else if (state.moveMode) {
+            if (state.selectedBrick) confirmMove(state.hoverPoint);
+            else selectBrickForMove();
+          }
           else if (state.rotateMode && !state.selectedBrick) selectBrickForRotate();
         }],
         ['dblclick', () => {
