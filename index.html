@@ -44,7 +44,7 @@
     .left-toolbar button svg { width: 24px; height: 24px; stroke: #000000; stroke-width: 2; fill: none; }
     .left-toolbar button.delete-active svg, .left-toolbar button.move-active svg, .left-toolbar button.rotate-active svg { stroke: #ffffff; }
     .instruction-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #f1f1f1; border-top: 1px solid #d1d5db; padding: 8px; text-align: center; font-size: 14px; color: #000000; z-index: 20; }
-    .rotate-overlay { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #e2e8f0; padding: 16px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); z-index: 30; }
+    .rotate-overlay { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #e2e8f0; padding: 16px; border-radius: 8px; box:shadow: 0 4px 6px rgba(0, 0, 0, 0.3); z-index: 30; }
     .rotate-overlay label { margin-bottom: 8px; }
     .rotate-overlay input[type="range"] { width: 200px; }
     .rotate-overlay button { margin-top: 8px; width: 100%; background: #3182ce; color: #ffffff; }
@@ -176,16 +176,16 @@
       <h2>🧱 Outils de pose</h2>
       <label for="brick-type">Type de brique/bloc</label>
       <select id="brick-type">
-        <option value="M50">Brique M50</option>
-        <option value="M57">Brique M57</option>
-        <option value="M65">Brique M65</option>
-        <option value="M90">Brique M90</option>
-        <option value="WF">Brique WF</option>
-        <option value="WFD">Brique WFD</option>
-        <option value="Bloc9">Bloc de 9</option>
-        <option value="Bloc14">Bloc de 14</option>
-        <option value="Bloc19">Bloc de 19</option>
-        <option value="Bloc29">Bloc de 29</option>
+        <option value="M50">Brique M50 (19x5x9 cm)</option>
+        <option value="M57">Brique M57 (19x5.7x9 cm)</option>
+        <option value="M65">Brique M65 (19x6.5x9 cm)</option>
+        <option value="M90">Brique M90 (19x9x9 cm)</option>
+        <option value="WF">Brique WF (21x9x9 cm)</option>
+        <option value="WFD">Brique WFD (21x9x9 cm)</option>
+        <option value="Bloc9">Bloc de 9 (39x19x9 cm)</option>
+        <option value="Bloc14">Bloc de 14 (39x19x14 cm)</option>
+        <option value="Bloc19">Bloc de 19 (39x19x19 cm)</option>
+        <option value="Bloc29">Bloc de 29 (39x19x29 cm)</option>
       </select>
       <label for="brick-size">Taille</label>
       <select id="brick-size">
@@ -404,6 +404,13 @@
         scene.add(state.ghostBrick);
       }
 
+      if (state.rotateMode && state.selectedBrick) {
+        const [x, y, z, type, , , ] = state.selectedBrick;
+        const rotation = [(document.getElementById('rotate-slider').value * Math.PI) / 180];
+        state.ghostBrick = createBrick([x, y, z], BRICK_SIZES[type], type, true, false, [0, rotation, 0]);
+        scene.add(state.ghostBrick);
+      }
+
       updateBrickCount();
       renderer.shadowMap.needsUpdate = true;
       updateInstructions();
@@ -562,6 +569,7 @@
         overlay.style.display = 'block';
         document.getElementById('rotate-slider').value = (state.selectedBrick[4] || 0) * 180 / Math.PI;
         document.getElementById('rotate-value').textContent = `${Math.round((state.selectedBrick[4] || 0) * 180 / Math.PI)}°`;
+        updateScene();
       }
     }
 
@@ -959,6 +967,7 @@
         ['rotate-mode', 'click', () => toggleMode('rotateMode', 'rotate-active')],
         ['rotate-slider', 'input', e => {
           document.getElementById('rotate-value').textContent = `${e.target.value}°`;
+          updateScene();
         }],
         ['confirm-rotation', 'click', confirmRotation],
         ['save-file', 'click', saveFile],
