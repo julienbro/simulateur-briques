@@ -27,7 +27,7 @@
     #app { display: none; }
     #notification { display: none; }
     .menu-bar { position: fixed; top: 0; left: 0; width: 100%; background: #f1f1f1; border-bottom: 1px solid #d1d5db; display: flex; align-items: center; justify-content: space-between; z-index: 20; padding: 0 16px; height: 40px; }
-    .menu-bar .left-menus, .menu-bar .right-menus { display: flex; }
+    .menu-bar .left-menus, .menu-bar .right-menus, .menu-bar .view-controls { display: flex; }
     .menu-bar .center-menus { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; }
     .menu-bar ul { list-style: none; margin: 0; padding: 0; display: flex; }
     .menu-bar li { position: relative; }
@@ -38,13 +38,16 @@
     .menu-bar .dropdown a { padding: 8px 16px; display: block; color: #000000; }
     .menu-bar .dropdown a:hover { background: #f1f1f1; }
     .menu-bar .add-layer-btn { background: #3182ce; color: #ffffff; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .menu-bar .view-controls button { margin: 0 4px; width: 32px; height: 32px; background: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, background-color 0.2s; }
+    .menu-bar .view-controls button:hover { background: #d1d5db; transform: scale(1.1); }
+    .menu-bar .view-controls button svg { width: 20px; height: 20px; stroke: #000000; stroke-width: 2; fill: none; }
     .left-toolbar { position: fixed; top: 40px; left: 0; width: 56px; background: #e2e8f0; height: calc(100vh - 80px); display: flex; flex-direction: column; align-items: center; padding: 8px 0; box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1); }
     .left-toolbar button { margin: 6px 0; width: 44px; height: 44px; background: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, background-color 0.2s; }
     .left-toolbar button:hover { background: #d1d5db; transform: scale(1.1); }
     .left-toolbar button svg { width: 24px; height: 24px; stroke: #000000; stroke-width: 2; fill: none; }
     .left-toolbar button.delete-active svg, .left-toolbar button.move-active svg, .left-toolbar button.rotate-active svg { stroke: #ffffff; }
     .instruction-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #f1f1f1; border-top: 1px solid #d1d5db; padding: 8px; text-align: center; font-size: 14px; color: #000000; z-index: 20; }
-    .rotate-overlay { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #e2e8f0; padding: 16px; border-radius: 8px; box:shadow: 0 4px 6px rgba(0, 0, 0, 0.3); z-index: 30; }
+    .rotate-overlay { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #e2e8f0; padding: 16px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); z-index: 30; }
     .rotate-overlay label { margin-bottom: 8px; }
     .rotate-overlay input[type="range"] { width: 200px; }
     .rotate-overlay button { margin-top: 8px; width: 100%; background: #3182ce; color: #ffffff; }
@@ -81,11 +84,48 @@
         </ul>
       </div>
       <div class="center-menus">
-        <label for="layer-select">Assise active</label>
-        <select id="layer-select"></select>
-        <button id="add-layer-btn" class="add-layer-btn" title="Ajouter Assise">+</button>
+        <div class="flex items-center gap-2">
+          <label for="layer-select" class="text-sm whitespace-nowrap">Assise active</label>
+          <select id="layer-select" class="text-sm"></select>
+          <button id="add-layer-btn" class="add-layer-btn" title="Ajouter Assise">+</button>
+        </div>
       </div>
       <div class="right-menus">
+        <div class="view-controls">
+          <button id="view-front" title="Vue de face">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+              <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+              <path d="M12 3c7.2 0 12 9 12 9s-4.8 9 -12 9s-12 -9 -12 -9s4.8 -9 12 -9z" />
+            </svg>
+          </button>
+          <button id="view-left" title="Vue de gauche">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" transform="rotate(90)">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+              <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+              <path d="M12 3c7.2 0 12 9 12 9s-4.8 9 -12 9s-12 -9 -12 -9s4.8 -9 12 -9z" />
+            </svg>
+          </button>
+          <button id="view-right" title="Vue de droite">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-90)">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+              <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+              <path d="M12 3c7.2 0 12 9 12 9s-4.8 9 -12 9s-12 -9 -12 -9s4.8 -9 12 -9z" />
+            </svg>
+          </button>
+          <button id="view-oblique" title="Vue oblique">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-3d-cube-sphere" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+              <path d="M6 17.6l-2 -1.1v-2.5" />
+              <path d="M4 10v-2.5l2 -1.1" />
+              <path d="M10 4.1l2 -1.1l2 1.1" />
+              <path d="M18 6.4l2 1.1v2.5" />
+              <path d="M20 14v2.5l-2 1.12" />
+              <path d="M14 19.9l-2 1.1l-2 -1.1" />
+              <path d="M12 4v3m-8 3v3m8 6v3m8 -3v-3m-8 -6v-3" />
+            </svg>
+          </button>
+        </div>
         <ul>
           <li><a href="#">Aide</a>
             <div class="dropdown">
@@ -125,16 +165,11 @@
         </svg>
       </button>
       <button title="Déplacer" id="move-mode">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrows-move" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrows-diagonal" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-          <path d="M12 9l-4 4" />
-          <path d="M8 13l4 4" />
-          <path d="M15 12l4 -4" />
-          <path d="M19 8l-4 4" />
-          <path d="M9 12l-4 4" />
-          <path d="M5 16l4 -4" />
-          <path d="M12 15l4 4" />
-          <path d="M16 19l-4 -4" />
+          <path d="M16 4h4v4" />
+          <path d="M14 20h-4v-4" />
+          <path d="M20 4l-14 16" />
         </svg>
       </button>
       <button title="Tourner" id="rotate-mode">
@@ -210,7 +245,7 @@
       <h2>🧮 Compteur d'éléments</h2>
       <div id="brick-type-counts" class="brick-type-count"></div>
     </div>
-    <div id="version" class="version">Version 1.0.0</div>
+    <div id="version" class="version">Version 1.0.0 par Julien Brohez</div>
     <input type="file" id="file-input" accept=".json" style="display: none;">
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
@@ -504,6 +539,57 @@
       state.history = state.history.slice(0, state.historyIndex + 1);
       state.history.push({ layers: JSON.parse(JSON.stringify(state.layers)), projectTitle: state.projectTitle });
       state.historyIndex++;
+    }
+
+    // Camera View Functions
+    function getSceneCenter() {
+      const bounds = state.layers.flat().reduce((acc, [x, y, z, type]) => {
+        const size = BRICK_SIZES[type];
+        return {
+          minX: Math.min(acc.minX, x - size[0] / 2),
+          maxX: Math.max(acc.maxX, x + size[0] / 2),
+          minZ: Math.min(acc.minZ, z - size[2] / 2),
+          maxZ: Math.max(acc.maxZ, z + size[2] / 2),
+          maxY: Math.max(acc.maxY, y + size[1] / 2),
+        };
+      }, { minX: 0, maxX: 0, minZ: 0, maxZ: 0, maxY: 0 });
+      return {
+        x: (bounds.minX + bounds.maxX) / 2,
+        y: bounds.maxY / 2,
+        z: (bounds.minZ + bounds.maxZ) / 2,
+      };
+    }
+
+    function setFrontView() {
+      const center = getSceneCenter();
+      camera.position.set(center.x, center.y, center.z + 1);
+      controls.target.set(center.x, center.y, center.z);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    function setLeftView() {
+      const center = getSceneCenter();
+      camera.position.set(center.x - 1, center.y, center.z);
+      controls.target.set(center.x, center.y, center.z);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    function setRightView() {
+      const center = getSceneCenter();
+      camera.position.set(center.x + 1, center.y, center.z);
+      controls.target.set(center.x, center.y, center.z);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    function setObliqueView() {
+      const center = getSceneCenter();
+      camera.position.set(center.x + 0.5, center.y + 0.5, center.z + 0.5);
+      controls.target.set(center.x, center.y, center.z);
+      controls.update();
+      renderer.render(scene, camera);
     }
 
     // Brick Operations
@@ -986,6 +1072,10 @@
         ['reset-camera', 'click', resetCamera],
         ['undo', 'click', undo],
         ['redo', 'click', redo],
+        ['view-front', 'click', setFrontView],
+        ['view-left', 'click', setLeftView],
+        ['view-right', 'click', setRightView],
+        ['view-oblique', 'click', setObliqueView],
       ],
       global: [
         ['mousemove', e => {
@@ -1016,7 +1106,7 @@
 
     function setupEventListeners() {
       eventListeners.element.forEach(([id, event, handler]) => {
-        const elements = id.includes('mode') || id === 'add-layer-btn' ? document.querySelectorAll(`#${id}`) : [document.getElementById(id)];
+        const elements = id.includes('mode') || id === 'add-layer-btn' || id.includes('view-') ? document.querySelectorAll(`#${id}`) : [document.getElementById(id)];
         elements.forEach(el => el.addEventListener(event, handler));
       });
 
