@@ -271,12 +271,12 @@
     }
 
     // Brick Creation
-    function createBrick(position, size, type, transparent = false, highlight = false, rotation = [0, 0, 0], isColliding = false, isJointAligned = false) {
+    function createBrick(position, size, type, transparent = false, highlight = false, rotation = [0, 0, 0], isJointAligned = false) {
       const geometry = new THREE.BoxGeometry(...size);
       const brickType = type.split('_')[0];
       const brickSize = type.split('_')[1];
       const color = transparent
-        ? (isColliding ? '#ff0000' : (isJointAligned ? '#0000ff' : '#00ff00'))
+        ? (isJointAligned ? '#0000ff' : '#00ff00')
         : (state.whiteBricks ? '#ffffff' : (highlight ? '#00ffff' : (SIZE_COLOR_MAP[brickSize] || COLOR_MAP[brickType] || 'orange')));
       const material = new THREE.MeshStandardMaterial({
         color,
@@ -327,16 +327,16 @@
       });
 
       if (state.hoverPoint && !state.deleteMode && !state.moveMode && !state.rotateMode) {
-        const { snapX, snapZ, isColliding, isJointAligned } = snapToGrid(state.hoverPoint, state.selectedSize);
+        const { snapX, snapZ, isJointAligned } = snapToGrid(state.hoverPoint, state.selectedSize);
         const y = getBrickY(BRICK_SIZES[state.selectedSize]);
-        const hoverBrick = createBrick([snapX, y, snapZ], BRICK_SIZES[state.selectedSize], state.selectedSize, true, false, [0, state.rotationY, 0], isColliding, isJointAligned);
+        const hoverBrick = createBrick([snapX, y, snapZ], BRICK_SIZES[state.selectedSize], state.selectedSize, true, false, [0, state.rotationY, 0], isJointAligned);
         scene.add(hoverBrick);
       }
 
       if (state.moveMode && state.selectedBrick && state.hoverPoint) {
-        const { snapX, snapZ, isColliding, isJointAligned } = snapToGrid(state.hoverPoint, state.selectedBrick[3], state.selectedBrick);
+        const { snapX, snapZ, isJointAligned } = snapToGrid(state.hoverPoint, state.selectedBrick[3], state.selectedBrick);
         const y = state.selectedBrick[1];
-        state.ghostBrick = createBrick([snapX, y, snapZ], BRICK_SIZES[state.selectedBrick[3]], state.selectedBrick[3], true, false, [0, state.selectedBrick[4] || 0, 0], isColliding, isJointAligned);
+        state.ghostBrick = createBrick([snapX, y, snapZ], BRICK_SIZES[state.selectedBrick[3]], state.selectedBrick[3], true, false, [0, state.selectedBrick[4] || 0, 0], isJointAligned);
         scene.add(state.ghostBrick);
       }
 
@@ -358,25 +358,6 @@
       }
 
       const y = excludeBrick ? excludeBrick[1] : getBrickY(BRICK_SIZES[sizeType]);
-      const newBox = new THREE.Box3().setFromCenterAndSize(
-        new THREE.Vector3(snapX, y, snapZ),
-        new THREE.Vector3(BRICK_SIZES[sizeType][0], BRICK_SIZES[sizeType][1], BRICK_SIZES[sizeType][2])
-      );
-      newBox.applyMatrix4(new THREE.Matrix4().makeRotationY(excludeBrick ? excludeBrick[4] || 0 : state.rotationY));
-
-      let isColliding = false;
-      for (const [x, y2, z, type, rotY] of state.layers[state.currentLayer]) {
-        if (y !== y2) continue;
-        const existingBox = new THREE.Box3().setFromCenterAndSize(
-          new THREE.Vector3(x, y2, z),
-          new THREE.Vector3(BRICK_SIZES[type][0], BRICK_SIZES[type][1], BRICK_SIZES[type][2])
-        );
-        existingBox.applyMatrix4(new THREE.Matrix4().makeRotationY(rotY || 0));
-        if (newBox.intersectsBox(existingBox)) {
-          isColliding = true;
-          break;
-        }
-      }
 
       const isJointAligned = state.layers[state.currentLayer].some(([x, y2, z]) => {
         if (y !== y2) return false;
@@ -388,7 +369,7 @@
         );
       });
 
-      return { snapX, snapZ, isColliding, isJointAligned };
+      return { snapX, snapZ, isJointAligned };
     }
 
     // Instructions Update
@@ -457,12 +438,7 @@
     // Brick Operations
     function addBrick(point) {
       if (!point || point.x === undefined || point.z === undefined) return;
-      const { snapX, snapZ, isColliding } = snapToGrid(point, state.selectedSize);
-      if (isColliding) {
-        showNotification('Erreur : Chevauchement détecté', point);
-        return;
-      }
-
+      const { snapX, snapZ } = snapToGrid(point, state.selectedSize);
       const y = getBrickY(BRICK_SIZES[state.selectedSize]);
       saveState();
       state.layers[state.currentLayer].push([snapX, y, snapZ, state.selectedSize, state.rotationY]);
@@ -500,17 +476,7 @@
 
     function confirmMove(point) {
       if (!point || point.x === undefined || point.z === undefined) return;
-      const { snapX, snapZ, isColliding } = snapToGrid(point, state.selectedBrick[3], state.selectedBrick);
-      if (isColliding) {
-        showNotification('Erreur : Chevauchement détecté', point);
-        state.layers[state.selectedBrick[5]].push([state.selectedBrick[0], state.selectedBrick[1], state.selectedBrick[2], state.selectedBrick[3], state.selectedBrick[4]]);
-        state.selectedBrick = null;
-        state.moveMode = false;
-        document.querySelectorAll('#move-mode').forEach(btn => btn.classList.remove('move-active'));
-        updateScene();
-        return;
-      }
-
+      const { snapX, snapZ } = snapToGrid(point, state.selectedBrick[3], state.selectedBrick);
       saveState();
       state.layers[state.selectedBrick[5]].push([snapX, state.selectedBrick[1], snapZ, state.selectedBrick[3], state.selectedBrick[4]]);
       state.selectedBrick = null;
