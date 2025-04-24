@@ -27,7 +27,7 @@
     #app { display: none; }
     #notification { display: none; }
     .menu-bar { position: fixed; top: 0; left: 0; width: 100%; background: #f1f1f1; border-bottom: 1px solid #d1d5db; display: flex; align-items: center; justify-content: space-between; z-index: 20; padding: 0 16px; height: 40px; }
-    .menu-bar .left-menus, .menu-bar .right-menus, .menu-bar .view-controls { display: flex; }
+    .menu-bar .left-menus, .menu-bar .right-menus, .menu-bar .view-controls { display: flex; align-items: center; }
     .menu-bar .center-menus { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; }
     .menu-bar ul { list-style: none; margin: 0; padding: 0; display: flex; }
     .menu-bar li { position: relative; }
@@ -41,6 +41,7 @@
     .menu-bar .view-controls button { margin: 0 4px; width: 32px; height: 32px; background: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, background-color 0.2s; }
     .menu-bar .view-controls button:hover { background: #d1d5db; transform: scale(1.1); }
     .menu-bar .view-controls button svg { width: 20px; height: 20px; stroke: #000000; stroke-width: 2; fill: none; }
+    .menu-bar .view-controls span { font-size: 14px; color: #000000; margin-right: 8px; }
     .left-toolbar { position: fixed; top: 40px; left: 0; width: 56px; background: #e2e8f0; height: calc(100vh - 80px); display: flex; flex-direction: column; align-items: center; padding: 8px 0; box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1); }
     .left-toolbar button { margin: 6px 0; width: 44px; height: 44px; background: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, background-color 0.2s; }
     .left-toolbar button:hover { background: #d1d5db; transform: scale(1.1); }
@@ -92,43 +93,41 @@
       </div>
       <div class="right-menus">
         <div class="view-controls">
+          <span>Vue</span>
           <button id="view-front" title="Vue de face">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-up" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
               <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-              <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
-              <path d="M12 3c7.2 0 12 9 12 9s-4.8 9 -12 9s-12 -9 -12 -9s4.8 -9 12 -9z" />
+              <path d="M12 5v14" />
+              <path d="M18 11l-6 -6l-6 6" />
             </svg>
           </button>
           <button id="view-left" title="Vue de gauche">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" transform="rotate(90)">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-left" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
               <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-              <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
-              <path d="M12 3c7.2 0 12 9 12 9s-4.8 9 -12 9s-12 -9 -12 -9s4.8 -9 12 -9z" />
+              <path d="M5 12h14" />
+              <path d="M5 12l6 6" />
+              <path d="M5 12l6 -6" />
             </svg>
           </button>
           <button id="view-right" title="Vue de droite">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-90)">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-right" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
               <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-              <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
-              <path d="M12 3c7.2 0 12 9 12 9s-4.8 9 -12 9s-12 -9 -12 -9s4.8 -9 12 -9z" />
+              <path d="M5 12h14" />
+              <path d="M13 18l6 -6" />
+              <path d="M13 6l6 6" />
             </svg>
           </button>
           <button id="view-oblique" title="Vue oblique">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-3d-cube-sphere" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-up-right" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
               <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-              <path d="M6 17.6l-2 -1.1v-2.5" />
-              <path d="M4 10v-2.5l2 -1.1" />
-              <path d="M10 4.1l2 -1.1l2 1.1" />
-              <path d="M18 6.4l2 1.1v2.5" />
-              <path d="M20 14v2.5l-2 1.12" />
-              <path d="M14 19.9l-2 1.1l-2 -1.1" />
-              <path d="M12 4v3m-8 3v3m8 6v3m8 -3v-3m-8 -6v-3" />
+              <path d="M17 7l-10 10" />
+              <path d="M8 7h9v9" />
             </svg>
           </button>
         </div>
         <ul>
           <li><a href="#">Aide</a>
-            <div class="dropdown">
+            <div class="dropdown poussière">
               <a href="#">À propos</a>
             </div>
           </li>
