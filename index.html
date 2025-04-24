@@ -220,6 +220,7 @@
         <option value="Bloc14">Bloc de 14 (39x19x14 cm)</option>
         <option value="Bloc19">Bloc de 19 (39x19x19 cm)</option>
         <option value="Bloc29">Bloc de 29 (39x19x29 cm)</option>
+        <option value="ElementVide">Élément vide (40x19x3 cm)</option>
       </select>
       <label for="brick-size">Taille</label>
       <select id="brick-size">
@@ -265,18 +266,20 @@
       Bloc14_entire: [0.39, 0.19, 0.14], Bloc14_three_quarter: [0.29, 0.19, 0.14], Bloc14_half: [0.19, 0.19, 0.14], Bloc14_quarter: [0.14, 0.19, 0.14],
       Bloc19_entire: [0.39, 0.19, 0.19], Bloc19_three_quarter: [0.29, 0.19, 0.19], Bloc19_half: [0.19, 0.19, 0.19], Bloc19_quarter: [0.14, 0.19, 0.19],
       Bloc29_entire: [0.39, 0.19, 0.29], Bloc29_three_quarter: [0.29, 0.19, 0.29], Bloc29_half: [0.19, 0.19, 0.29], Bloc29_quarter: [0.14, 0.19, 0.29],
+      ElementVide_entire: [0.4, 0.19, 0.03], ElementVide_three_quarter: [0.3, 0.19, 0.03], ElementVide_half: [0.2, 0.19, 0.03], ElementVide_quarter: [0.15, 0.19, 0.03],
     };
 
     const COLOR_MAP = {
       M50: '#e07b39', M57: '#c0392b', M65: '#8e44ad', M90: '#2980b9', WF: '#27ae60',
       WFD: '#16a085', Bloc9: '#d35400', Bloc14: '#7f8c8d', Bloc19: '#2c3e50', Bloc29: '#f1c40f',
+      ElementVide: '#ADD8E6',
     };
 
     const SIZE_COLOR_MAP = {
       entire: '#ff0000', three_quarter: '#00ff00', half: '#0000ff', quarter: '#ffff00',
     };
 
-    const BRICK_TYPES = ['M50', 'M57', 'M65', 'M90', 'WF', 'WFD', 'Bloc9', 'Bloc14', 'Bloc19', 'Bloc29'];
+    const BRICK_TYPES = ['M50', 'M57', 'M65', 'M90', 'WF', 'WFD', 'Bloc9', 'Bloc14', 'Bloc19', 'Bloc29', 'ElementVide'];
     const SIZE_VARIANTS = ['entire', 'three_quarter', 'half', 'quarter'];
     const VERSION = '1.0.0';
 
@@ -373,23 +376,24 @@
       const geometry = new THREE.BoxGeometry(...size);
       const brickType = type.split('_')[0];
       const brickSize = type.split('_')[1];
+      const isElementVide = brickType === 'ElementVide';
       const color = transparent
         ? (isJointAligned ? '#0000ff' : '#00ff00')
         : (state.whiteBricks ? '#ffffff' : (highlight ? '#00ffff' : (SIZE_COLOR_MAP[brickSize] || COLOR_MAP[brickType] || 'orange')));
       const material = new THREE.MeshStandardMaterial({
         color,
-        transparent,
-        opacity: transparent ? 0.3 : 1,
-        wireframe: transparent,
+        transparent: isElementVide || transparent,
+        opacity: isElementVide ? 0.3 : (transparent ? 0.3 : 1),
+        wireframe: transparent && !isElementVide,
       });
       const mesh = new THREE.Mesh(geometry, material);
       mesh.position.set(...position);
       mesh.rotation.set(...rotation);
-      mesh.castShadow = !transparent;
+      mesh.castShadow = !transparent && !isElementVide;
       mesh.receiveShadow = true;
       mesh.userData.type = type;
 
-      if (!transparent) {
+      if (!transparent && !isElementVide) {
         const edges = new THREE.EdgesGeometry(geometry);
         const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 1 });
         const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
