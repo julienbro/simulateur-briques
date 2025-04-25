@@ -342,6 +342,7 @@ let state = {
   historyIndex: 0,
   selectedBrick: null,
   ghostBrick: null,
+  contextMenu: null, // Ajout de l'état pour le menu contextuel
 }
 
 // Three.js Setup
@@ -440,8 +441,7 @@ function createBrick(
   const color = transparent
     ? isJointAligned
       ? "#0000ff"
-      : "#00ff00"
-    : state.whiteBricks
+      : "#00ff00": state.whiteBricks
       ? "#ffffff"
       : highlight
         ? "#00ffff"
@@ -580,6 +580,9 @@ function updateScene() {
   updateBrickCount()
   renderer.shadowMap.needsUpdate = true
   updateInstructions()
+  if (state.contextMenu) {
+    document.body.appendChild(state.contextMenu);
+  }
 }
 
 // Snap to Grid
@@ -838,20 +841,20 @@ function selectBrickForMove() {
     ),
   )
   if (intersects.length > 0) {
-    const clickedMesh = intersects[0].object
-    const layerIndex = clickedMesh.userData.layerIndex
+    const clickedMesh = intersects[0].object;
+    const layerIndex = clickedMesh.userData.layerIndex;
     const brickIndex = state.layers[layerIndex].findIndex(
       ([x, y, z]) =>
         Math.abs(x - clickedMesh.position.x) < 0.001 &&
         Math.abs(y - clickedMesh.position.y) < 0.001 &&
         Math.abs(z - clickedMesh.position.z) < 0.001,
-    )
+    );
     state.selectedBrick = [
       ...state.layers[layerIndex][brickIndex],
       layerIndex,
       brickIndex,
-    ]
-    updateScene()
+    ];
+    updateScene();
   }
 }
 
@@ -865,13 +868,18 @@ function confirmMove(point) {
     return
   const { snapX, snapZ } = snapToGrid(point, state.selectedBrick[3])
   saveState()
-  state.layers[state.selectedBrick[5]][state.selectedBrick[6]] = [
+  const targetLayerIndex = state.selectedBrick[5]; // Use stored layer index
+  const targetBrickIndex = state.selectedBrick[6]; // Use stored brick index
+
+  // Directly update the brick's position in the correct layer
+  state.layers[targetLayerIndex][targetBrickIndex] = [
     snapX,
     state.selectedBrick[1],
     snapZ,
     state.selectedBrick[3],
     state.selectedBrick[4],
-  ]
+  ];
+
   state.selectedBrick = null
   state.moveMode = false
   document
@@ -914,7 +922,9 @@ function confirmRotation() {
   const newRotation =
     (document.getElementById("rotate-slider").value * Math.PI) / 180
   saveState()
-  state.layers[state.selectedBrick[5]][state.selectedBrick[6]][4] = newRotation
+  const targetLayerIndex = state.selectedBrick[5];
+  const targetBrickIndex = state.selectedBrick[6];
+  state.layers[targetLayerIndex][targetBrickIndex][4] = newRotation
   state.selectedBrick = null
   state.rotateMode = false
   document
@@ -1044,7 +1054,7 @@ function exportPDF() {
     pdf.text(appTitle, width / 2, isFourthPage ? 3.5 : 0.5, { align: "center" })
     pdf.setFontSize(12)
     pdf.text(viewName, width / 2, isFourthPage ? height - 3.5 : height - 1, {
-      align: "center",
+      align: "center"
     })
     pdf.setFont("helvetica", "normal")
     pdf.setFontSize(8)
@@ -1266,7 +1276,7 @@ function createTitledCanvas() {
   canvas.width = renderer.domElement.width
   canvas.height = renderer.domElement.height
   const ctx = canvas.getContext("2d")
-  ctx.drawImage(renderer.domElement, 0, 0)
+  ctx.drawImage(renderer.domElement, 0,0)
   ctx.fillStyle = "#ffffff"
   ctx.fillRect(0, 0, canvas.width, 50)
   ctx.fillStyle = "#000000"
@@ -1417,6 +1427,97 @@ const eventListeners = {
         selectBrickForRotate()
       }
     })
+
+    renderer.domElement.addEventListener("contextmenu", (e) => {
+      e.preventDefault(); // Prevent default browser context menu
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(
+        scene.children.filter((child) => child.isMesh && child !== plane && child !== shadowPlane),
+      );
+
+      if (intersects.length > 0) {
+        const clickedMesh = intersects[0].object;
+        state.selectedBrick = [
+          clickedMesh.position.x,
+          clickedMesh.position.y,
+          clickedMesh.position.z,
+          clickedMesh.userData.type,
+          0, // Rotation Y, will be updated if rotate is selected
+          clickedMesh.userData.layerIndex, // Store the layer index
+          clickedMesh.userData.index, // Store the brick index within the layer
+        ];
+
+        // Create and style the context menu
+        const contextMenu = document.createElement('div');
+        contextMenu.style.position = 'absolute';
+        contextMenu.style.left = `${e.clientX}px`;
+        contextMenu.style.top = `${e.clientY}px`;
+        contextMenu.style.backgroundColor = '#e2e8f0';
+        contextMenu.style.padding = '8px';
+        contextMenu.style.borderRadius = '8px';
+        contextMenu.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+        contextMenu.style.zIndex = '1000'; // Ensure it's above other elements
+
+        const moveOption = document.createElement('div');
+        moveOption.textContent = 'Déplacer';
+        moveOption.style.cursor = 'pointer';
+        moveOption.style.padding = '4px';
+        moveOption.addEventListener('click', () => {
+          state.moveMode = true;
+          state.deleteMode = false;
+          state.rotateMode = false;
+          document.querySelectorAll("#move-mode").forEach((btn) => btn.classList.add("move-active"));
+          document.querySelectorAll("#delete-mode").forEach((btn) => btn.classList.remove("delete-active"));
+          document.querySelectorAll("#rotate-mode").forEach((btn) => btn.classList.remove("rotate-active"));
+          updateScene();
+          removeContextMenu();
+        });
+
+        const rotateOption = document.createElement('div');
+        rotateOption.textContent = 'Tourner';
+        rotateOption.style.cursor = 'pointer';
+        rotateOption.style.padding = '4px';
+        rotateOption.addEventListener('click', () => {
+          state.rotateMode = true;
+          state.moveMode = false;
+          state.deleteMode = false;
+          document.querySelectorAll("#rotate-mode").forEach((btn) => btn.classList.add("rotate-active"));
+          document.querySelectorAll("#move-mode").forEach((btn) => btn.classList.remove("move-active"));
+          document.querySelectorAll("#delete-mode").forEach((btn) => btn.classList.remove("delete-active"));
+          selectBrickForRotate();
+          removeContextMenu();
+        });
+
+        const deleteOption = document.createElement('div');
+        deleteOption.textContent = 'Supprimer';
+        deleteOption.style.cursor = 'pointer';
+        deleteOption.style.padding = '4px';
+        deleteOption.addEventListener('click', () => {
+          deleteBrick();
+          removeContextMenu();
+        });
+
+        contextMenu.appendChild(moveOption);
+        contextMenu.appendChild(rotateOption);
+        contextMenu.appendChild(deleteOption);
+
+        removeContextMenu(); // Remove any existing context menu
+        state.contextMenu = contextMenu;
+        document.body.appendChild(contextMenu);
+      }
+    });
+
+    // Function to remove the context menu
+    function removeContextMenu() {
+      if (state.contextMenu) {
+        document.body.removeChild(state.contextMenu);
+        state.contextMenu = null;
+      }
+    }
+
+    // Add a global click listener to remove the context menu when clicking outside
+    document.addEventListener('click', removeContextMenu);
   },
   ui: () => {
     document.getElementById("start-button").addEventListener("click", () => {
@@ -1737,3 +1838,4 @@ function animate() {
 eventListeners.global()
 eventListeners.ui()
 animate()
+
