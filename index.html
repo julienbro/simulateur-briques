@@ -1,1160 +1,344 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mur Simulateur 3d</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { margin: 0; overflow: hidden; background: #ffffff; color: #000000; font-family: Arial, sans-serif; }
-    canvas { width: 100%; height: 100vh; }
-    .toolbox, .layerbox, .brick-counter, .version, .title-input { position: absolute; background: #e2e8f0; padding: 8px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); z-index: 10; }
-    .toolbox { top: 50px; left: 60px; width: 256px; }
-    .layerbox { top: 360px; left: 60px; cursor: move; width: auto; max-width: 600px; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
-    .layerbox * { pointer-events: auto; }
-    .brick-counter { bottom: 50px; right: 10px; width: 300px; }
-    .title-input { top: 50px; left: 50%; transform: translateX(-50%); width: 300px; cursor: move; pointer-events: none; }
-    .title-input * { pointer-events: auto; }
-    .version { bottom: 50px; left: 60px; font-size: 12px; padding: 8px; }
-    button { padding: 4px; border-radius: 4px; border: none; cursor: pointer; font-size: 12px; font-weight: bold; color: #000000; }
-    button:hover { opacity: 0.8; }
-    .delete-active, .move-active, .rotate-active { background-color: #b7791f !important; }
-    input, select { background: #edf2f7; color: #000000; border: none; padding: 4px; border-radius: 4px; width: 100%; }
-    label { font-size: 14px; margin-bottom: 4px; display: block; }
-    h2 { font-size: 18px; margin-bottom: 8px; color: #000000; }
-    .brick-type-count { font-size: 14px; }
-    #homepage { display: flex; }
-    #app { display: none; }
-    #notification { display: none; }
-    .menu-bar { position: fixed; top: 0; left: 0; width: 100%; background: #f1f1f1; border-bottom: 1px solid #d1d5db; display: flex; align-items: center; justify-content: space-between; z-index: 20; padding: 0 16px; height: 40px; }
-    .menu-bar .left-menus, .menu-bar .right-menus, .menu-bar .view-controls { display: flex; align-items: center; }
-    .menu-bar .center-menus { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; }
-    .menu-bar ul { list-style: none; margin: 0; padding: 0; display: flex; }
-    .menu-bar li { position: relative; }
-    .menu-bar li a { display: block; padding: 8px 16px; color: #000000; text-decoration: none; font-size: 14px; }
-    .menu-bar li:hover { background: #e5e7eb; }
-    .menu-bar .dropdown { display: none; position: absolute; top: 100%; left: 0; background: #ffffff; border: 1px solid #d1d5db; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
-    .menu-bar li:hover .dropdown { display: block; }
-    .menu-bar .dropdown a { padding: 8px 16px; display: block; color: #000000; }
-    .menu-bar .dropdown a:hover { background: #f1f1f1; }
-    .menu-bar .add-layer-btn { background: #3182ce; color: #ffffff; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-    .menu-bar .view-controls button { margin: 0 4px; width: 32px; height: 32px; background: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, background-color 0.2s; }
-    .menu-bar .view-controls button:hover { background: #d1d5db; transform: scale(1.1); }
-    .menu-bar .view-controls button svg { width: 20px; height: 20px; stroke: #000000; stroke-width: 2; fill: none; }
-    .menu-bar .view-controls span { font-size: 14px; color: #000000; margin-right: 8px; }
-    .left-toolbar { position: fixed; top: 40px; left: 0; width: 56px; background: #e2e8f0; height: calc(100vh - 80px); display: flex; flex-direction: column; align-items: center; padding: 8px 0; box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1); }
-    .left-toolbar button { margin: 6px 0; width: 44px; height: 44px; background: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, background-color 0.2s; }
-    .left-toolbar button:hover { background: #d1d5db; transform: scale(1.1); }
-    .left-toolbar button svg { width: 24px; height: 24px; stroke: #000000; stroke-width: 2; fill: none; }
-    .left-toolbar button.delete-active svg, .left-toolbar button.move-active svg, .left-toolbar button.rotate-active svg { stroke: #ffffff; }
-    .instruction-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #f1f1f1; border-top: 1px solid #d1d5db; padding: 8px; text-align: center; font-size: 14px; color: #000000; z-index: 20; }
-    .rotate-overlay { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #e2e8f0; padding: 16px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); z-index: 30; }
-    .rotate-overlay label { margin-bottom: 8px; }
-    .rotate-overlay input[type="range"] { width: 200px; }
-    .rotate-overlay button { margin-top: 8px; width: 100%; background: #3182ce; color: #ffffff; }
-    .brick-type-count table { width: 100%; }
-  </style>
-</head>
-<body>
-  <div id="notification" class="absolute bg-red-600 text-white px-4 py-2 rounded-lg" style="display: none; z-index: 20;"></div>
-  <div id="homepage" class="flex flex-col items-center justify-center h-screen">
-    <img src="https://julienbro.github.io/simulateur-briques/logo.png" alt="Mur Simulateur 3d Logo" class="mb-4">
-    <p class="text-lg text-black mt-2">Conçu par Julien BROHEZ</p>
-    <p class="text-lg text-black mt-2">Version 1.0.0</p>
-    <button id="start-button" class="mt-6 bg-green-600 text-white px-6 py-3 text-lg rounded-lg hover:bg-green-700 transition">Commencer</button>
-  </div>
-  <div id="app">
-    <div class="menu-bar">
-      <div class="left-menus">
-        <ul>
-          <li><a href="#">Fichier</a>
-            <div class="dropdown">
-              <a href="#" id="save-file">Enregistrer</a>
-              <a href="#" id="open-file">Ouvrir</a>
-              <a href="#" id="export-pdf">Exporter PDF</a>
-              <a href="#" id="export-png">Exporter PNG</a>
-            </div>
-          </li>
-          <li><a href="#">Vue</a>
-            <div class="dropdown">
-              <a href="#" id="toggle-white-bricks">Afficher/Cacher en blanc</a>
-              <a href="#" id="toggle-grid">Afficher/Cacher Grille</a>
-              <a href="#" id="reset-camera">Réinitialiser Caméra</a>
-            </div>
-          </li>
-        </ul>
-      </div>
-      <div class="center-menus">
-        <div class="flex items-center gap-2">
-          <label for="layer-select" class="text-sm whitespace-nowrap">Assise active</label>
-          <select id="layer-select" class="text-sm"></select>
-          <button id="add-layer-btn" class="add-layer-btn" title="Ajouter Assise">+</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mur Simulateur 3d</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div
+      id="notification"
+      class="absolute bg-red-600 text-white px-4 py-2 rounded-lg"
+      style="display: none; z-index: 20"
+    ></div>
+    <div
+      id="homepage"
+      class="flex flex-col items-center justify-center h-screen"
+    >
+      <img
+        src="https://julienbro.github.io/simulateur-briques/logo.png"
+        alt="Mur Simulateur 3d Logo"
+        class="mb-4"
+      />
+      <p class="text-lg text-black mt-2">Conçu par Julien BROHEZ</p>
+      <p class="text-lg text-black mt-2">Version 1.0.0</p>
+      <button
+        id="start-button"
+        class="mt-6 bg-green-600 text-white px-6 py-3 text-lg rounded-lg hover:bg-green-700 transition"
+      >
+        Commencer
+      </button>
+    </div>
+    <div id="app">
+      <div class="menu-bar">
+        <div class="left-menus">
+          <ul>
+            <li>
+              <a href="#">Fichier</a>
+              <div class="dropdown">
+                <a href="#" id="save-file">Enregistrer</a>
+                <a href="#" id="open-file">Ouvrir</a>
+                <a href="#" id="export-pdf">Exporter PDF</a>
+                <a href="#" id="export-png">Exporter PNG</a>
+              </div>
+            </li>
+            <li>
+              <a href="#">Vue</a>
+              <div class="dropdown">
+                <a href="#" id="toggle-white-bricks"
+                  >Afficher/Cacher en blanc</a
+                >
+                <a href="#" id="toggle-grid">Afficher/Cacher Grille</a>
+                <a href="#" id="reset-camera">Réinitialiser Caméra</a>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="center-menus">
+          <div class="flex items-center gap-2">
+            <label for="layer-select" class="text-sm whitespace-nowrap"
+              >Assise active</label
+            >
+            <select id="layer-select" class="text-sm"></select>
+            <button
+              id="add-layer-btn"
+              class="add-layer-btn"
+              title="Ajouter Assise"
+            >
+              +
+            </button>
+          </div>
+        </div>
+        <div class="right-menus">
+          <div class="view-controls">
+            <span>Vue</span>
+            <button id="view-front" title="Vue de face">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="icon icon-tabler icon-tabler-arrow-up"
+                viewBox="0 0 24 24"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M12 5v14" />
+                <path d="M18 11l-6 -6l-6 6" />
+              </svg>
+            </button>
+            <button id="view-left" title="Vue de gauche">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="icon icon-tabler icon-tabler-arrow-left"
+                viewBox="0 0 24 24"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M5 12h14" />
+                <path d="M5 12l6 6" />
+                <path d="M5 12l6 -6" />
+              </svg>
+            </button>
+            <button id="view-right" title="Vue de droite">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="icon icon-tabler icon-tabler-arrow-right"
+                viewBox="0 0 24 24"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M5 12h14" />
+                <path d="M13 18l6 -6" />
+                <path d="M13 6l6 6" />
+              </svg>
+            </button>
+            <button id="view-oblique" title="Vue oblique">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="icon icon-tabler icon-tabler-arrow-up-right"
+                viewBox="0 0 24 24"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M17 7l-10 10" />
+                <path d="M8 7h9v9" />
+              </svg>
+            </button>
+          </div>
+          <ul>
+            <li>
+              <a href="#">Aide</a>
+              <div class="dropdown">
+                <a href="#" id="keyboard-shortcuts">Raccourcis Clavier</a>
+                <a href="#" id="about">À propos</a>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
-      <div class="right-menus">
-        <div class="view-controls">
-          <span>Vue</span>
-          <button id="view-front" title="Vue de face">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-up" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-              <path d="M12 5v14" />
-              <path d="M18 11l-6 -6l-6 6" />
-            </svg>
-          </button>
-          <button id="view-left" title="Vue de gauche">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-left" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-              <path d="M5 12h14" />
-              <path d="M5 12l6 6" />
-              <path d="M5 12l6 -6" />
-            </svg>
-          </button>
-          <button id="view-right" title="Vue de droite">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-right" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-              <path d="M5 12h14" />
-              <path d="M13 18l6 -6" />
-              <path d="M13 6l6 6" />
-            </svg>
-          </button>
-          <button id="view-oblique" title="Vue oblique">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-up-right" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-              <path d="M17 7l-10 10" />
-              <path d="M8 7h9v9" />
-            </svg>
-          </button>
+      <div class="left-toolbar">
+        <button title="Sélectionner" id="select-mode">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="icon icon-tabler icon-tabler-pointer"
+            viewBox="0 0 24 24"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path
+              d="M7.904 17.563a1.2 1.2 0 0 0 2.228 0l6.101 -11.664a1.2 1.2 0 0 0 -1.442 -1.683l-11.426 5.897a1.2 1.2 0 0 0 0 2.228l6.539 3.222z"
+            />
+            <path d="M12 20h-2" />
+            <path d="M10 20l-1 2" />
+            <path d="M10 20l1 2" />
+          </svg>
+        </button>
+        <button title="Placer Brique" id="place-mode">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="icon icon-tabler icon-tabler-brick"
+            viewBox="0 0 24 24"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path
+              d="M3 7l9 -4l9 4v11a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-11z"
+            />
+            <path d="M11 15h2" />
+            <path d="M7 7v11" />
+            <path d="M17 7v11" />
+          </svg>
+        </button>
+        <button title="Effacer" id="delete-mode">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="icon icon-tabler icon-tabler-trash"
+            viewBox="0 0 24 24"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M4 7l16 0" />
+            <path d="M10 11l0 6" />
+            <path d="M14 11l0 6" />
+            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+          </svg>
+        </button>
+        <button title="Déplacer" id="move-mode">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="icon icon-tabler icon-tabler-arrows-diagonal"
+            viewBox="0 0 24 24"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M16 4h4v4" />
+            <path d="M14 20h-4v-4" />
+            <path d="M20 4l-14 16" />
+          </svg>
+        </button>
+        <button title="Tourner" id="rotate-mode">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="icon icon-tabler icon-tabler-rotate"
+            viewBox="0 0 24 24"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M19.95 11a8 8 0 1 0 -7 7" />
+            <path d="M15.5 11h4.5v-4.5" />
+          </svg>
+        </button>
+        <button title="Annuler" id="undo">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="icon icon-tabler icon-tabler-arrow-back-up"
+            viewBox="0 0 24 24"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M9 14l-4 -4l4 -4" />
+            <path d="M5 10h11a4 4 0 1 1 0 8h-1" />
+          </svg>
+        </button>
+        <button title="Refaire" id="redo">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="icon icon-tabler icon-tabler-arrow-forward-up"
+            viewBox="0 0 24 24"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M15 14l4 -4l-4 -4" />
+            <path d="M19 10h-11a4 4 0 1 0 0 8h1" />
+          </svg>
+        </button>
+      </div>
+      <div id="rotate-overlay" class="rotate-overlay">
+        <label>Rotation Y (°)</label>
+        <input
+          type="range"
+          id="rotate-slider"
+          min="0"
+          max="355"
+          step="15"
+          value="0"
+        />
+        <div
+          id="rotate-value"
+          style="text-align: center; font-size: 12px; margin-top: 4px"
+        >
+          0°
         </div>
-        <ul>
-          <li><a href="#">Aide</a>
-            <div class="dropdown poussière">
-              <a href="#">À propos</a>
-            </div>
-          </li>
-        </ul>
+        <button id="confirm-rotation">Confirmer</button>
       </div>
-    </div>
-    <div class="left-toolbar">
-      <button title="Sélectionner">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pointer" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-          <path d="M7.904 17.563a1.2 1.2 0 0 0 2.228 0l6.101 -11.664a1.2 1.2 0 0 0 -1.442 -1.683l-11.426 5.897a1.2 1.2 0 0 0 0 2.228l6.539 3.222z" />
-          <path d="M12 20h-2" />
-          <path d="M10 20l-1 2" />
-          <path d="M10 20l1 2" />
-        </svg>
-      </button>
-      <button title="Placer Brique">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brick" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-          <path d="M3 7l9 -4l9 4v11a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-11z" />
-          <path d="M11 15h2" />
-          <path d="M7 7v11" />
-          <path d="M17 7v11" />
-        </svg>
-      </button>
-      <button title="Effacer" id="delete-mode">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-          <path d="M4 7l16 0" />
-          <path d="M10 11l0 6" />
-          <path d="M14 11l0 6" />
-          <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-          <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-        </svg>
-      </button>
-      <button title="Déplacer" id="move-mode">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrows-diagonal" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-          <path d="M16 4h4v4" />
-          <path d="M14 20h-4v-4" />
-          <path d="M20 4l-14 16" />
-        </svg>
-      </button>
-      <button title="Tourner" id="rotate-mode">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-rotate" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-          <path d="M19.95 11a8 8 0 1 0 -7 7" />
-          <path d="M15.5 11h4.5v-4.5" />
-        </svg>
-      </button>
-      <button title="Annuler" id="undo">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-back-up" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-          <path d="M9 14l-4 -4l4 -4" />
-          <path d="M5 10h11a4 4 0 1 1 0 8h-1" />
-        </svg>
-      </button>
-      <button title="Refaire" id="redo">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-forward-up" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-          <path d="M15 14l4 -4l-4 -4" />
-          <path d="M19 10h-11a4 4 0 1 0 0 8h1" />
-        </svg>
-      </button>
-    </div>
-    <div id="rotate-overlay" class="rotate-overlay">
-      <label>Rotation Y (°)</label>
-      <input type="range" id="rotate-slider" min="0" max="355" step="15" value="0">
-      <div id="rotate-value" style="text-align: center; font-size: 12px; margin-top: 4px;">0°</div>
-      <button id="confirm-rotation">Confirmer</button>
-    </div>
-    <div id="instruction-bar" class="instruction-bar">
-      Double-cliquez pour placer une brique
-    </div>
-    <div id="title-input" class="title-input">
-      <label for="project-title">Titre du projet</label>
-      <input type="text" id="project-title" maxlength="100" placeholder="Entrez le titre du projet">
-    </div>
-    <div id="toolbox" class="toolbox">
-      <h2>🧱 Outils de pose</h2>
-      <label for="brick-type">Type de brique/bloc</label>
-      <select id="brick-type">
-        <option value="M50">Brique M50 (19x5x9 cm)</option>
-        <option value="M57">Brique M57 (19x5.7x9 cm)</option>
-        <option value="M65">Brique M65 (19x6.5x9 cm)</option>
-        <option value="M90">Brique M90 (19x9x9 cm)</option>
-        <option value="WF">Brique WF (21x9x9 cm)</option>
-        <option value="WFD">Brique WFD (21x9x9 cm)</option>
-        <option value="Bloc9">Bloc de 9 (39x19x9 cm)</option>
-        <option value="Bloc14">Bloc de 14 (39x19x14 cm)</option>
-        <option value="Bloc19">Bloc de 19 (39x19x19 cm)</option>
-        <option value="Bloc29">Bloc de 29 (39x19x29 cm)</option>
-        <option value="ElementVide">Élément vide (40x19x3 cm)</option>
-      </select>
-      <label for="brick-size">Taille</label>
-      <select id="brick-size">
-        <option value="entire">Entière</option>
-        <option value="three_quarter">Trois quarts</option>
-        <option value="half">Demi</option>
-        <option value="quarter">Quart</option>
-      </select>
-      <label>Rotation Y (°)</label>
-      <input type="range" id="rotation-y" min="0" max="355" step="15" value="0">
-      <div id="rotation-value" style="text-align: center; font-size: 12px;">0°</div>
-      <label>Épaisseur du joint (cm)</label>
-      <input type="number" id="joint-thickness" min="0" step="0.1" value="1.2">
-    </div>
-    <div id="layerbox" class="layerbox" style="display: none;">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <label>Assise active</label>
-        <select id="layer-select-duplicate"></select>
+      <div id="instruction-bar" class="instruction-bar">
+        Double-cliquez pour placer une brique
       </div>
+      <div id="title-input" class="title-input">
+        <label for="project-title">Titre du projet</label>
+        <input
+          type="text"
+          id="project-title"
+          maxlength="100"
+          placeholder="Entrez le titre du projet"
+        />
+      </div>
+      <div id="toolbox" class="toolbox">
+        <h2>🧱 Outils de pose</h2>
+        <label for="brick-type">Type de brique/bloc</label>
+        <select id="brick-type">
+          <option value="M50">Brique M50 (19x5x9 cm)</option>
+          <option value="M57">Brique M57 (19x5.7x9 cm)</option>
+          <option value="M65">Brique M65 (19x6.5x9 cm)</option>
+          <option value="M90">Brique M90 (19x9x9 cm)</option>
+          <option value="WF">Brique WF (21x9x9 cm)</option>
+          <option value="WFD">Brique WFD (21x9x9 cm)</option>
+          <option value="Bloc9">Bloc de 9 (39x19x9 cm)</option>
+          <option value="Bloc14">Bloc de 14 (39x19x14 cm)</option>
+          <option value="Bloc19">Bloc de 19 (39x19x19 cm)</option>
+          <option value="Bloc29">Bloc de 29 (39x19x29 cm)</option>
+          <option value="ElementVide1">Élément vide (40x19x1 cm)</option>
+          <option value="ElementVide2">Élément vide (40x19x2 cm)</option>
+          <option value="ElementVide">Élément vide (40x19x3 cm)</option>
+          <option value="ElementVide4">Élément vide (40x19x4 cm)</option>
+          <option value="ElementVide5">Élément vide (40x19x5 cm)</option>
+        </select>
+        <label for="brick-size">Taille</label>
+        <select id="brick-size">
+          <option value="entire">Entière</option>
+          <option value="three_quarter">Trois quarts</option>
+          <option value="half">Demi</option>
+          <option value="quarter">Quart</option>
+        </select>
+        <label>Rotation Y (°)</label>
+        <input
+          type="range"
+          id="rotation-y"
+          min="0"
+          max="355"
+          step="15"
+          value="0"
+        />
+        <div id="rotation-value" style="text-align: center; font-size: 12px">
+          0°
+        </div>
+        <label>Épaisseur du joint (cm)</label>
+        <input
+          type="number"
+          id="joint-thickness"
+          min="0"
+          step="0.1"
+          value="1.2"
+        />
+      </div>
+      <div id="layerbox" class="layerbox" style="display: none">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <label>Assise active</label>
+          <select id="layer-select-duplicate"></select>
+        </div>
+      </div>
+      <div id="brick-counter" class="brick-counter">
+        <h2>🧮 Compteur d'éléments</h2>
+        <div id="brick-type-counts" class="brick-type-count"></div>
+      </div>
+      <div id="version" class="version">Version 1.0.0 par Julien Brohez</div>
+      <input type="file" id="file-input" accept=".json" style="display: none" />
     </div>
-    <div id="brick-counter" class="brick-counter">
-      <h2>🧮 Compteur d'éléments</h2>
-      <div id="brick-type-counts" class="brick-type-count"></div>
-    </div>
-    <div id="version" class="version">Version 1.0.0 par Julien Brohez</div>
-    <input type="file" id="file-input" accept=".json" style="display: none;">
-  </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script>
-    const { jsPDF } = window.jspdf;
-
-    // Constants
-    const BRICK_SIZES = {
-      M50_entire: [0.19, 0.05, 0.09], M50_three_quarter: [0.14, 0.05, 0.09], M50_half: [0.09, 0.05, 0.09], M50_quarter: [0.04, 0.05, 0.09],
-      M57_entire: [0.19, 0.057, 0.09], M57_three_quarter: [0.14, 0.057, 0.09], M57_half: [0.09, 0.057, 0.09], M57_quarter: [0.04, 0.057, 0.09],
-      M65_entire: [0.19, 0.065, 0.09], M65_three_quarter: [0.14, 0.065, 0.09], M65_half: [0.09, 0.065, 0.09], M65_quarter: [0.04, 0.065, 0.09],
-      M90_entire: [0.19, 0.09, 0.09], M90_three_quarter: [0.14, 0.09, 0.09], M90_half: [0.09, 0.09, 0.09], M90_quarter: [0.04, 0.09, 0.09],
-      WF_entire: [0.21, 0.09, 0.09], WF_three_quarter: [0.15, 0.05, 0.09], WF_half: [0.10, 0.05, 0.09], WF_quarter: [0.05, 0.05, 0.09],
-      WFD_entire: [0.21, 0.09, 0.09], WFD_three_quarter: [0.15, 0.05, 0.09], WFD_half: [0.10, 0.05, 0.09], WFD_quarter: [0.05, 0.05, 0.09],
-      Bloc9_entire: [0.39, 0.19, 0.09], Bloc9_three_quarter: [0.29, 0.19, 0.09], Bloc9_half: [0.19, 0.19, 0.09], Bloc9_quarter: [0.14, 0.19, 0.09],
-      Bloc14_entire: [0.39, 0.19, 0.14], Bloc14_three_quarter: [0.29, 0.19, 0.14], Bloc14_half: [0.19, 0.19, 0.14], Bloc14_quarter: [0.14, 0.19, 0.14],
-      Bloc19_entire: [0.39, 0.19, 0.19], Bloc19_three_quarter: [0.29, 0.19, 0.19], Bloc19_half: [0.19, 0.19, 0.19], Bloc19_quarter: [0.14, 0.19, 0.19],
-      Bloc29_entire: [0.39, 0.19, 0.29], Bloc29_three_quarter: [0.29, 0.19, 0.29], Bloc29_half: [0.19, 0.19, 0.29], Bloc29_quarter: [0.14, 0.19, 0.29],
-      ElementVide_entire: [0.4, 0.19, 0.03], ElementVide_three_quarter: [0.3, 0.19, 0.03], ElementVide_half: [0.2, 0.19, 0.03], ElementVide_quarter: [0.15, 0.19, 0.03],
-    };
-
-    const COLOR_MAP = {
-      M50: '#e07b39', M57: '#c0392b', M65: '#8e44ad', M90: '#2980b9', WF: '#27ae60',
-      WFD: '#16a085', Bloc9: '#d35400', Bloc14: '#7f8c8d', Bloc19: '#2c3e50', Bloc29: '#f1c40f',
-      ElementVide: '#ADD8E6',
-    };
-
-    const SIZE_COLOR_MAP = {
-      entire: '#ff0000', three_quarter: '#00ff00', half: '#0000ff', quarter: '#ffff00',
-    };
-
-    const BRICK_TYPES = ['M50', 'M57', 'M65', 'M90', 'WF', 'WFD', 'Bloc9', 'Bloc14', 'Bloc19', 'Bloc29', 'ElementVide'];
-    const SIZE_VARIANTS = ['entire', 'three_quarter', 'half', 'quarter'];
-    const VERSION = '1.0.0';
-
-    // State
-    let state = {
-      layers: [[/* assise 0 */]],
-      currentLayer: 0,
-      selectedSize: 'M50_entire',
-      hoverPoint: null,
-      jointThickness: 0.012,
-      rotationY: 0,
-      whiteBricks: false,
-      deleteMode: false,
-      moveMode: false,
-      rotateMode: false,
-      projectTitle: '',
-      layerboxPos: { x: 60, y: 360 },
-      titleInputPos: { x: window.innerWidth / 2 - 150, y: 50 },
-      history: [{ layers: [[/* assise 0 */]], projectTitle: '' }],
-      historyIndex: 0,
-      selectedBrick: null,
-      ghostBrick: null,
-    };
-
-    // Three.js Setup
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0.5, 0.5, 1);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.shadowMap.autoUpdate = false;
-
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-    directionalLight.position.set(1, 2, 2);
-    directionalLight.castShadow = true;
-    directionalLight.shadow.mapSize.set(2048, 2048);
-    directionalLight.shadow.camera.left = -2;
-    directionalLight.shadow.camera.right = 2;
-    directionalLight.shadow.camera.top = 2;
-    directionalLight.shadow.camera.bottom = -2;
-    directionalLight.shadow.camera.near = 0.1;
-    directionalLight.shadow.camera.far = 10;
-
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enablePan = true;
-    controls.enableZoom = true;
-    controls.enableRotate = true;
-
-    const planeGeometry = new THREE.PlaneGeometry(4, 4);
-    const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xf0f0f0, visible: true });
-    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.rotation.x = -Math.PI / 2;
-
-    const shadowMaterial = new THREE.ShadowMaterial({ opacity: 0.5 });
-    const shadowPlane = new THREE.Mesh(planeGeometry, shadowMaterial);
-    shadowPlane.rotation.x = -Math.PI / 2;
-    shadowPlane.receiveShadow = true;
-
-    const gridHelper = new THREE.GridHelper(4, 400, 0x000000, 0x000000);
-    gridHelper.material.opacity = 0.2;
-    gridHelper.material.transparent = true;
-    gridHelper.visible = false;
-
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-
-    // Sky Texture
-    function createSkyTexture() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 512;
-      canvas.height = 512;
-      const context = canvas.getContext('2d');
-      const gradient = context.createLinearGradient(0, 0, 0, 512);
-      gradient.addColorStop(0, '#87CEEB');
-      gradient.addColorStop(1, '#FFFFFF');
-      context.fillStyle = gradient;
-      context.fillRect(0, 0, 512, 512);
-      return new THREE.CanvasTexture(canvas);
-    }
-
-    // Initialization
-    function initThreeJS() {
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      document.getElementById('app').appendChild(renderer.domElement);
-      scene.background = createSkyTexture();
-      scene.add(ambientLight, directionalLight, plane, shadowPlane, gridHelper);
-    }
-
-    // Brick Creation
-    function createBrick(position, size, type, transparent = false, highlight = false, rotation = [0, 0, 0], isJointAligned = false) {
-      const geometry = new THREE.BoxGeometry(...size);
-      const brickType = type.split('_')[0];
-      const brickSize = type.split('_')[1];
-      const isElementVide = brickType === 'ElementVide';
-      const color = transparent
-        ? (isJointAligned ? '#0000ff' : '#00ff00')
-        : (state.whiteBricks ? '#ffffff' : (highlight ? '#00ffff' : (SIZE_COLOR_MAP[brickSize] || COLOR_MAP[brickType] || 'orange')));
-      const material = new THREE.MeshStandardMaterial({
-        color,
-        transparent: isElementVide || transparent,
-        opacity: isElementVide ? 0.3 : (transparent ? 0.3 : 1),
-        wireframe: transparent && !isElementVide,
-      });
-      const mesh = new THREE.Mesh(geometry, material);
-      mesh.position.set(...position);
-      mesh.rotation.set(...rotation);
-      mesh.castShadow = !transparent && !isElementVide;
-      mesh.receiveShadow = true;
-      mesh.userData.type = type;
-
-      if (!transparent && !isElementVide) {
-        const edges = new THREE.EdgesGeometry(geometry);
-        const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 1 });
-        const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
-        edgeLines.position.set(...position);
-        edgeLines.rotation.set(...rotation);
-        mesh.userData.edges = edgeLines;
-      }
-
-      return mesh;
-    }
-
-    // Scene Update
-    function updateScene() {
-      scene.children = scene.children.filter(child => !child.isMesh && !child.isLineSegments || child === plane || child === shadowPlane || child === gridHelper);
-      let hoveredBrick = null;
-
-      if (state.deleteMode || state.moveMode || state.rotateMode) {
-        raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(scene.children.filter(child => child.isMesh && child !== plane && child !== shadowPlane));
-        if (intersects.length > 0) {
-          hoveredBrick = intersects[0].object;
-        }
-      }
-
-      state.layers.flat().forEach(([x, y, z, type, rotY], index) => {
-        const isHovered = (state.deleteMode || state.moveMode || state.rotateMode) && hoveredBrick &&
-          Math.abs(hoveredBrick.position.x - x) < 0.001 && Math.abs(hoveredBrick.position.y - y) < 0.001 && Math.abs(hoveredBrick.position.z - z) < 0.001;
-        const brick = createBrick([x, y, z], BRICK_SIZES[type], type, false, isHovered, [0, rotY || 0, 0]);
-        brick.userData.index = index;
-        brick.userData.layerIndex = state.layers.findIndex(layer => layer.some(b => b[0] === x && b[1] === y && b[2] === z));
-        scene.add(brick);
-        if (brick.userData.edges) scene.add(brick.userData.edges);
-      });
-
-      if (state.hoverPoint && !state.deleteMode && !state.moveMode && !state.rotateMode) {
-        const { snapX, snapZ, isJointAligned } = snapToGrid(state.hoverPoint, state.selectedSize);
-        const y = getBrickY(BRICK_SIZES[state.selectedSize]);
-        const hoverBrick = createBrick([snapX, y, snapZ], BRICK_SIZES[state.selectedSize], state.selectedSize, true, false, [0, state.rotationY, 0], isJointAligned);
-        scene.add(hoverBrick);
-      }
-
-      if (state.moveMode && state.selectedBrick && state.hoverPoint) {
-        const { snapX, snapZ, isJointAligned } = snapToGrid(state.hoverPoint, state.selectedBrick[3]);
-        const y = state.selectedBrick[1];
-        state.ghostBrick = createBrick([snapX, y, snapZ], BRICK_SIZES[state.selectedBrick[3]], state.selectedBrick[3], true, false, [0, state.selectedBrick[4] || 0, 0], isJointAligned);
-        scene.add(state.ghostBrick);
-      }
-
-      if (state.rotateMode && state.selectedBrick) {
-        const [x, y, z, type, , , ] = state.selectedBrick;
-        const rotation = [(document.getElementById('rotate-slider').value * Math.PI) / 180];
-        state.ghostBrick = createBrick([x, y, z], BRICK_SIZES[type], type, true, false, [0, rotation, 0]);
-        scene.add(state.ghostBrick);
-      }
-
-      updateBrickCount();
-      renderer.shadowMap.needsUpdate = true;
-      updateInstructions();
-    }
-
-    // Snap to Grid
-    function snapToGrid(point, sizeType, excludeBrick = null) {
-      let snapX = Math.round(point.x * 100) / 100;
-      let snapZ = Math.round(point.z * 100) / 100;
-      const threshold = state.jointThickness + 0.001;
-      const allPositions = state.layers.flat().filter(b => !excludeBrick || !(Math.abs(b[0] - excludeBrick[0]) < 0.001 && Math.abs(b[1] - excludeBrick[1]) < 0.001 && Math.abs(b[2] - excludeBrick[2]) < 0.001));
-
-      for (const [x, , z] of allPositions) {
-        if (Math.abs(snapX - x) <= threshold) snapX = x;
-        if (Math.abs(snapZ - z) <= threshold) snapZ = z;
-      }
-
-      const size = BRICK_SIZES[sizeType];
-      const rotationY = state.rotationY;
-      let offsetX = 0, offsetZ = 0;
-
-      if (!state.deleteMode && !state.moveMode && !state.rotateMode) {
-        const cosRY = Math.cos(rotationY);
-        const sinRY = Math.sin(rotationY);
-        const halfWidth = size[0] / 2;
-        const halfDepth = size[2] / 2;
-
-        offsetX = halfWidth * cosRY + halfDepth * sinRY;
-        offsetZ = halfWidth * sinRY - halfDepth * cosRY;
-
-        snapX += offsetX;
-        snapZ += offsetZ;
-      }
-
-      const y = excludeBrick ? excludeBrick[1] : getBrickY(size);
-
-      const isJointAligned = state.layers[state.currentLayer].some(([x, y2, z]) => {
-        if (y !== y2) return false;
-        const dx = Math.abs(snapX - offsetX - x);
-        const dz = Math.abs(snapZ - offsetZ - z);
-        return (
-          (Math.abs(dx - state.jointThickness) < 0.001 && dz < 0.001) ||
-          (Math.abs(dz - state.jointThickness) < 0.001 && dx < 0.001)
-        );
-      });
-
-      return { snapX, snapZ, isJointAligned };
-    }
-
-    // Instructions Update
-    function updateInstructions() {
-      const instructionBar = document.getElementById('instruction-bar');
-      if (state.deleteMode) {
-        instructionBar.textContent = 'Cliquez sur une brique pour la supprimer';
-      } else if (state.moveMode) {
-        instructionBar.textContent = state.selectedBrick ? 'Déplacez la brique et cliquez pour confirmer la position' : 'Sélectionnez une brique à déplacer';
-      } else if (state.rotateMode) {
-        instructionBar.textContent = state.selectedBrick ? 'Ajustez la rotation et confirmez' : 'Sélectionnez une brique à tourner';
-      } else {
-        instructionBar.textContent = 'Double-cliquez pour placer une brique';
-      }
-    }
-
-    // Brick Count Update
-    function updateBrickCount() {
-      const counts = BRICK_TYPES.reduce((acc, type) => {
-        acc[type] = {
-          entire: state.layers.flat().filter(b => b[3] === `${type}_entire`).length,
-          three_quarter: state.layers.flat().filter(b => b[3] === `${type}_three_quarter`).length,
-          half: state.layers.flat().filter(b => b[3] === `${type}_half`).length,
-          quarter: state.layers.flat().filter(b => b[3] === `${type}_quarter`).length,
-        };
-        return acc;
-      }, {});
-
-      let html = '<table class="border-collapse border border-gray-400 w-full text-sm">';
-      html += '<thead><tr class="bg-gray-200">';
-      html += '<th class="border border-gray-400 p-2">Type</th>';
-      html += '<th class="border border-gray-400 p-2">Entière</th>';
-      html += '<th class="border border-gray-400 p-2">Trois quarts</th>';
-      html += '<th class="border border-gray-400 p-2">Demi</th>';
-      html += '<th class="border border-gray-400 p-2">Quart</th>';
-      html += '</tr></thead><tbody>';
-
-      let hasNonZero = false;
-      BRICK_TYPES.forEach(type => {
-        const typeCounts = counts[type];
-        if (Object.values(typeCounts).some(count => count > 0)) {
-          hasNonZero = true;
-          html += `<tr><td class="border border-gray-400 p-2">${type}</td>`;
-          html += `<td class="border border-gray-400 p-2">${typeCounts.entire}</td>`;
-          html += `<td class="border border-gray-400 p-2">${typeCounts.three_quarter}</td>`;
-          html += `<td class="border border-gray-400 p-2">${typeCounts.half}</td>`;
-          html += `<td class="border border-gray-400 p-2">${typeCounts.quarter}</td></tr>`;
-        }
-      });
-
-      html += '</tbody></table>';
-      document.getElementById('brick-type-counts').innerHTML = hasNonZero ? html : 'Aucun élément placé';
-    }
-
-    // Utility Functions
-    function getBrickY(size) {
-      return size[1] / 2 + state.jointThickness + state.currentLayer * (size[1] + state.jointThickness);
-    }
-
-    function saveState() {
-      state.history = state.history.slice(0, state.historyIndex + 1);
-      state.history.push({ layers: JSON.parse(JSON.stringify(state.layers)), projectTitle: state.projectTitle });
-      state.historyIndex++;
-    }
-
-    // Camera View Functions
-    function getSceneCenter() {
-      const bounds = state.layers.flat().reduce((acc, [x, y, z, type]) => {
-        const size = BRICK_SIZES[type];
-        return {
-          minX: Math.min(acc.minX, x - size[0] / 2),
-          maxX: Math.max(acc.maxX, x + size[0] / 2),
-          minZ: Math.min(acc.minZ, z - size[2] / 2),
-          maxZ: Math.max(acc.maxZ, z + size[2] / 2),
-          maxY: Math.max(acc.maxY, y + size[1] / 2),
-        };
-      }, { minX: 0, maxX: 0, minZ: 0, maxZ: 0, maxY: 0 });
-      return {
-        x: (bounds.minX + bounds.maxX) / 2,
-        y: bounds.maxY / 2,
-        z: (bounds.minZ + bounds.maxZ) / 2,
-      };
-    }
-
-    function setFrontView() {
-      const center = getSceneCenter();
-      camera.position.set(center.x, center.y, center.z + 1);
-      controls.target.set(center.x, center.y, center.z);
-      controls.update();
-      renderer.render(scene, camera);
-    }
-
-    function setLeftView() {
-      const center = getSceneCenter();
-      camera.position.set(center.x - 1, center.y, center.z);
-      controls.target.set(center.x, center.y, center.z);
-      controls.update();
-      renderer.render(scene, camera);
-    }
-
-    function setRightView() {
-      const center = getSceneCenter();
-      camera.position.set(center.x + 1, center.y, center.z);
-      controls.target.set(center.x, center.y, center.z);
-      controls.update();
-      renderer.render(scene, camera);
-    }
-
-    function setObliqueView() {
-      const center = getSceneCenter();
-      camera.position.set(center.x + 0.5, center.y + 0.5, center.z + 0.5);
-      controls.target.set(center.x, center.y, center.z);
-      controls.update();
-      renderer.render(scene, camera);
-    }
-
-    // Brick Operations
-    function addBrick(point) {
-      if (!point || point.x === undefined || point.z === undefined) return;
-      const { snapX, snapZ } = snapToGrid(point, state.selectedSize);
-      const y = getBrickY(BRICK_SIZES[state.selectedSize]);
-      saveState();
-      state.layers[state.currentLayer].push([snapX, y, snapZ, state.selectedSize, state.rotationY]);
-      updateScene();
-    }
-
-    function deleteBrick() {
-      const intersects = raycaster.intersectObjects(scene.children.filter(child => child.isMesh && child !== plane && child !== shadowPlane));
-      if (intersects.length > 0) {
-        const clickedMesh = intersects[0].object;
-        const position = clickedMesh.position;
-        saveState();
-        state.layers = state.layers.map(layer => layer.filter(([x, y, z]) => 
-          !(Math.abs(x - position.x) < 0.001 && Math.abs(y - position.y) < 0.001 && Math.abs(z - position.z) < 0.001)
-        ));
-        state.deleteMode = false;
-        document.querySelectorAll('#delete-mode').forEach(btn => btn.classList.remove('delete-active'));
-        updateScene();
-      }
-    }
-
-    function selectBrickForMove() {
-      const intersects = raycaster.intersectObjects(scene.children.filter(child => child.isMesh && child !== plane && child !== shadowPlane));
-      if (intersects.length > 0) {
-        const clickedMesh = intersects[0].object;
-        const layerIndex = clickedMesh.userData.layerIndex;
-        const brickIndex = state.layers[layerIndex].findIndex(([x, y, z]) => 
-          Math.abs(x - clickedMesh.position.x) < 0.001 && Math.abs(y - clickedMesh.position.y) < 0.001 && Math.abs(z - clickedMesh.position.z) < 0.001
-        );
-        state.selectedBrick = [...state.layers[layerIndex][brickIndex], layerIndex, brickIndex];
-        updateScene();
-      }
-    }
-
-    function confirmMove(point) {
-      if (!point || point.x === undefined || point.z === undefined || !state.selectedBrick) return;
-      const { snapX, snapZ } = snapToGrid(point, state.selectedBrick[3]);
-      saveState();
-      state.layers[state.selectedBrick[5]][state.selectedBrick[6]] = [snapX, state.selectedBrick[1], snapZ, state.selectedBrick[3], state.selectedBrick[4]];
-      state.selectedBrick = null;
-      state.moveMode = false;
-      document.querySelectorAll('#move-mode').forEach(btn => btn.classList.remove('move-active'));
-      updateScene();
-    }
-
-    function selectBrickForRotate() {
-      const intersects = raycaster.intersectObjects(scene.children.filter(child => child.isMesh && child !== plane && child !== shadowPlane));
-      if (intersects.length > 0) {
-        const clickedMesh = intersects[0].object;
-        const layerIndex = clickedMesh.userData.layerIndex;
-        const brickIndex = state.layers[layerIndex].findIndex(([x, y, z]) => 
-          Math.abs(x - clickedMesh.position.x) < 0.001 && Math.abs(y - clickedMesh.position.y) < 0.001 && Math.abs(z - clickedMesh.position.z) < 0.001
-        );
-        state.selectedBrick = [...state.layers[layerIndex][brickIndex], layerIndex, brickIndex];
-        const overlay = document.getElementById('rotate-overlay');
-        overlay.style.display = 'block';
-        document.getElementById('rotate-slider').value = (state.selectedBrick[4] || 0) * 180 / Math.PI;
-        document.getElementById('rotate-value').textContent = `${Math.round((state.selectedBrick[4] || 0) * 180 / Math.PI)}°`;
-        updateScene();
-      }
-    }
-
-    function confirmRotation() {
-      const newRotation = (document.getElementById('rotate-slider').value * Math.PI) / 180;
-      saveState();
-      state.layers[state.selectedBrick[5]][state.selectedBrick[6]][4] = newRotation;
-      state.selectedBrick = null;
-      state.rotateMode = false;
-      document.querySelectorAll('#rotate-mode').forEach(btn => btn.classList.remove('rotate-active'));
-      document.getElementById('rotate-overlay').style.display = 'none';
-      updateScene();
-    }
-
-    // Layer Management
-    function addLayer() {
-      saveState();
-      state.layers.push([]);
-      state.currentLayer = state.layers.length - 1;
-      updateLayerSelect();
-      updateScene();
-    }
-
-    function updateLayerSelect() {
-      const select = document.getElementById('layer-select');
-      select.innerHTML = state.layers.map((_, i) => 
-        `<option value="${i}" ${i === state.currentLayer ? 'selected' : ''}>Assise ${i + 1}</option>`
-      ).join('');
-    }
-
-    // History Management
-    function undo() {
-      if (state.historyIndex <= 0) return;
-      state.historyIndex--;
-      state.layers = JSON.parse(JSON.stringify(state.history[state.historyIndex].layers));
-      state.projectTitle = state.history[state.historyIndex].projectTitle;
-      document.getElementById('project-title').value = state.projectTitle;
-      updateLayerSelect();
-      updateScene();
-    }
-
-    function redo() {
-      if (state.historyIndex >= state.history.length - 1) return;
-      state.historyIndex++;
-      state.layers = JSON.parse(JSON.stringify(state.history[state.historyIndex].layers));
-      state.projectTitle = state.history[state.historyIndex].projectTitle;
-      document.getElementById('project-title').value = state.projectTitle;
-      updateLayerSelect();
-      updateScene();
-    }
-
-    // Camera Control
-    function resetCamera() {
-      camera.position.set(0.5, 0.5, 1);
-      controls.target.set(0, 0, 0);
-      controls.update();
-      renderer.render(scene, camera);
-    }
-
-    // Export Functions
-    function exportPDF() {
-      const originalWidth = window.innerWidth;
-      const originalHeight = window.innerHeight;
-      const exportWidth = 1920;
-      const exportHeight = Math.round(exportWidth * (27.7 / 21));
-      const pdf = new jsPDF({ orientation: 'landscape', unit: 'cm', format: [29.7, 21] });
-      const width = pdf.internal.pageSize.getWidth();
-      const height = pdf.internal.pageSize.getHeight();
-      const appTitle = state.projectTitle || 'Mur Simulateur 3d';
-      let page = 1;
-
-      renderer.setSize(exportWidth, exportHeight);
-      renderer.setClearColor(0xffffff, 1);
-
-      const bounds = state.layers.flat().reduce((acc, [x, y, z, type]) => {
-        const size = BRICK_SIZES[type];
-        return {
-          minX: Math.min(acc.minX, x - size[0] / 2),
-          maxX: Math.max(acc.maxX, x + size[0] / 2),
-          minZ: Math.min(acc.minZ, z - size[2] / 2),
-          maxZ: Math.max(acc.maxZ, z + size[2] / 2),
-          maxY: Math.max(acc.maxY, y + size[1] / 2),
-        };
-      }, { minX: 0, maxX: 0, minZ: 0, maxZ: 0, maxY: 0 });
-
-      const centerX = (bounds.minX + bounds.maxX) / 2;
-      const centerZ = (bounds.minZ + bounds.maxZ) / 2;
-      const centerY = bounds.maxY / 2;
-
-      function addCommonElements(viewName, isFourthPage = false) {
-        pdf.setLineWidth(0.05);
-        pdf.line(1, height - 2, 1 + 1, height - 2);
-        pdf.setFontSize(8);
-        pdf.text('10 cm', 1, height - 1.5);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(16);
-        pdf.text(appTitle, width / 2, isFourthPage ? 3.5 : 0.5, { align: 'center' });
-        pdf.setFontSize(12);
-        pdf.text(viewName, width / 2, isFourthPage ? height - 3.5 : height - 1, { align: 'center' });
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(8);
-        pdf.text(appTitle, width - (isFourthPage ? 1.5 : 3), height - (isFourthPage ? 4.5 : 1.5), { align: 'right' });
-        pdf.text('Conçu par Julien BROHEZ', width - (isFourthPage ? 1.5 : 3), height - (isFourthPage ? 4 : 1), { align: 'right' });
-        pdf.text(VERSION, width - (isFourthPage ? 1.5 : 3), height - (isFourthPage ? 3.5 : 0.5), { align: 'right' });
-        pdf.text(`${page} sur 5`, 1.5, height - (isFourthPage ? 3.5 : 0.5));
-      }
-
-      function addMarginMarks() {
-        pdf.setLineWidth(0.02);
-        pdf.line(1, 10, 1, 11);
-        pdf.line(28.7, 10, 28.7, 11);
-        pdf.line(14.35, 1, 15.35, 1);
-        pdf.line(14.35, 20, 15.35, 20);
-      }
-
-      // Top View
-      renderer.shadowMap.enabled = false;
-      const originalPlaneVisible = plane.visible;
-      const originalShadowPlaneVisible = shadowPlane.visible;
-      plane.visible = false;
-      shadowPlane.visible = false;
-      scene.background = null;
-      const topCamera = new THREE.OrthographicCamera(-0.722, 0.722, 0.95, -0.95, 0.1, 100);
-      topCamera.position.set(centerX, 1, centerZ);
-      topCamera.lookAt(centerX, 0, centerZ);
-      renderer.render(scene, topCamera);
-      pdf.addImage(renderer.domElement.toDataURL('image/png'), 'PNG', 7.63, 1, 14.44, 19);
-      plane.visible = originalPlaneVisible;
-      shadowPlane.visible = originalShadowPlaneVisible;
-      addMarginMarks();
-      addCommonElements('Vue de dessus');
-      pdf.text('Échelle : 1/10', 1, height - 1);
-      page++;
-
-      // Front View
-      pdf.addPage();
-      const frontLine = new THREE.Line(
-        new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-0.722, 0, 0), new THREE.Vector3(0.722, 0, 0)]),
-        new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 5 })
-      );
-      scene.add(frontLine);
-      renderer.shadowMap.enabled = true;
-      const frontCamera = new THREE.OrthographicCamera(-0.722, 0.722, 0.95, -0.95, 0.1, 100);
-      frontCamera.position.set(centerX, centerY, 0.722);
-      frontCamera.lookAt(centerX, centerY, 0);
-      renderer.render(scene, frontCamera);
-      pdf.addImage(renderer.domElement.toDataURL('image/png'), 'PNG', 7.63, 1, 14.44, 19);
-      addMarginMarks();
-      addCommonElements('Vue de face');
-      pdf.text('Échelle : 1/10', 1, height - 1);
-      scene.remove(frontLine);
-      page++;
-
-      // Side View
-      pdf.addPage();
-      const sideLine = new THREE.Line(
-        new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, -0.95), new THREE.Vector3(0, 0, 0.95)]),
-        new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 5 })
-      );
-      scene.add(sideLine);
-      const sideCamera = new THREE.OrthographicCamera(-0.722, 0.722, 0.95, -0.95, 0.1, 100);
-      sideCamera.position.set(0.722, centerY, centerZ);
-      sideCamera.lookAt(0, centerY, centerZ);
-      renderer.render(scene, sideCamera);
-      pdf.addImage(renderer.domElement.toDataURL('image/png'), 'PNG', 7.63, 1, 14.44, 19);
-      addMarginMarks();
-      addCommonElements('Vue de côté');
-      pdf.text('Échelle : 1/10', 1, height - 1);
-      scene.remove(sideLine);
-      page++;
-
-      // 3D View
-      pdf.addPage();
-      renderer.shadowMap.enabled = true;
-      scene.background = createSkyTexture();
-      camera.aspect = exportWidth / exportHeight;
-      camera.updateProjectionMatrix();
-      camera.lookAt(controls.target);
-      renderer.render(scene, camera);
-      pdf.addImage(renderer.domElement.toDataURL('image/png'), 'PNG', 7.63, 1, 14.44, 19);
-      addMarginMarks();
-      addCommonElements('Vue 3D', true);
-      page++;
-
-      // Inventory Page
-      pdf.addPage();
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(16);
-      pdf.text(appTitle, width / 2, 0.5, { align: 'center' });
-      pdf.setFontSize(12);
-      pdf.text('Inventaire des éléments', width / 2, 1, { align: 'center' });
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(10);
-      let y = 2;
-      BRICK_TYPES.forEach(type => {
-        SIZE_VARIANTS.forEach(variant => {
-          const count = state.layers.flat().filter(b => b[3] === `${type}_${variant}`).length;
-          if (count > 0) {
-            pdf.text(`${type} (${variant}): ${count} éléments`, 1, y);
-            y += 1;
-          }
-        });
-      });
-      pdf.setFontSize(8);
-      pdf.text(appTitle, width - 3, height - 1.5, { align: 'right' });
-      pdf.text('Conçu par Julien BROHEZ', width - 3, height - 1, { align: 'right' });
-      pdf.text(VERSION, width - 3, height - 0.5, { align: 'right' });
-      pdf.text(`${page} sur 5`, 1, height - 0.5);
-
-      renderer.setSize(originalWidth, originalHeight);
-      camera.aspect = originalWidth / originalHeight;
-      camera.updateProjectionMatrix();
-      renderer.shadowMap.enabled = true;
-      scene.background = createSkyTexture();
-      renderer.setClearColor(0x000000, 0);
-
-      pdf.save('vue-elements.pdf');
-    }
-
-    function exportPNG() {
-      renderer.render(scene, camera);
-      const canvas = state.projectTitle ? createTitledCanvas() : renderer.domElement;
-      const link = document.createElement('a');
-      link.download = 'vue-elements.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    }
-
-    function createTitledCanvas() {
-      const canvas = document.createElement('canvas');
-      canvas.width = renderer.domElement.width;
-      canvas.height = renderer.domElement.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(renderer.domElement, 0, 0);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, 50);
-      ctx.fillStyle = '#000000';
-      ctx.font = 'bold 30px Helvetica';
-      ctx.textAlign = 'center';
-      ctx.fillText(state.projectTitle, canvas.width / 2, 40);
-      return canvas;
-    }
-
-    // File Operations
-    function saveFile() {
-      const data = JSON.stringify({ layers: state.layers, projectTitle: state.projectTitle });
-      const blob = new Blob([data], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'wall-design.json';
-      link.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function openFile() {
-      document.getElementById('file-input').click();
-    }
-
-    function validateLayers(data) {
-      if (!data || typeof data !== 'object') return false;
-      const { layers, projectTitle } = data;
-      return (
-        Array.isArray(layers) &&
-        layers.every(layer => Array.isArray(layer) && layer.every(([x, y, z, type, rotY]) => 
-          typeof x === 'number' && typeof y === 'number' && typeof z === 'number' && 
-          BRICK_SIZES[type] && (rotY === undefined || typeof rotY === 'number')
-        )) &&
-        (typeof projectTitle === 'string' || projectTitle === undefined)
-      );
-    }
-
-    function handleFileInput(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = event => {
-        try {
-          const data = JSON.parse(event.target.result);
-          if (validateLayers(data)) {
-            state.layers = data.layers;
-            state.projectTitle = data.projectTitle || '';
-            document.getElementById('project-title').value = state.projectTitle;
-            state.currentLayer = Math.min(state.currentLayer, state.layers.length - 1);
-            state.history = [{ layers: JSON.parse(JSON.stringify(state.layers)), projectTitle: state.projectTitle }];
-            state.historyIndex = 0;
-            updateLayerSelect();
-            updateScene();
-          } else {
-            showNotification('Erreur : Format de fichier invalide', { x: window.innerWidth / 2, y: window.innerHeight / 2 });
-          }
-        } catch (err) {
-          showNotification(`Erreur : ${err.message}`, { x: window.innerWidth / 2, y: window.innerHeight / 2 });
-        }
-      };
-      reader.readAsText(file);
-      e.target.value = '';
-    }
-
-    // Notification
-    function showNotification(message, point) {
-      const notification = document.getElementById('notification');
-      notification.textContent = message;
-      notification.style.left = point.x === window.innerWidth / 2 
-        ? `${point.x}px` 
-        : `${Math.min(window.innerWidth - 200, Math.max(0, mouse.x * window.innerWidth / 2 + window.innerWidth / 2 + 10))}px`;
-      notification.style.top = point.y === window.innerHeight / 2 
-        ? `${point.y}px` 
-        : `${-mouse.y * window.innerHeight / 2 + window.innerHeight / 2 + 10}px`;
-      notification.style.display = 'block';
-      setTimeout(() => notification.style.display = 'none', 2000);
-    }
-
-    // Draggable Elements
-    function makeDraggable(element, pos) {
-      let isDragging = false;
-      let startX, startY;
-
-      element.addEventListener('mousedown', e => {
-        if (e.target.tagName === 'LABEL' || e.target.tagName === 'INPUT') return;
-        isDragging = true;
-        startX = e.clientX - pos.x;
-        startY = e.clientY - pos.y;
-      });
-
-      document.addEventListener('mousemove', e => {
-        if (!isDragging) return;
-        let x = e.clientX - startX;
-        let y = e.clientY - startY;
-
-        if (element.id === 'layerbox') {
-          y = Math.max(360, Math.min(y, 410));
-          x = Math.max(0, Math.min(x, window.innerWidth - element.offsetWidth));
-        } else if (element.id === 'title-input') {
-          y = Math.max(50, Math.min(y, 100));
-          x = Math.max(0, Math.min(x, window.innerWidth - element.offsetWidth));
-        }
-
-        pos.x = x;
-        pos.y = y;
-        element.style.left = `${x}px`;
-        element.style.top = `${y}px`;
-      });
-
-      document.addEventListener('mouseup', () => {
-        isDragging = false;
-      });
-    }
-
-    // Mode Toggling
-    function toggleMode(mode, activeClass) {
-      state[mode] = !state[mode];
-      state.deleteMode = mode === 'deleteMode' ? state.deleteMode : false;
-      state.moveMode = mode === 'moveMode' ? state.moveMode : false;
-      state.rotateMode = mode === 'rotateMode' ? state.rotateMode : false;
-      state.selectedBrick = null;
-      document.querySelectorAll('#delete-mode').forEach(btn => btn.classList.toggle('delete-active', state.deleteMode));
-      document.querySelectorAll('#move-mode').forEach(btn => btn.classList.toggle('move-active', state.moveMode));
-      document.querySelectorAll('#rotate-mode').forEach(btn => btn.classList.toggle('rotate-active', state.rotateMode));
-      document.getElementById('rotate-overlay').style.display = 'none';
-      updateScene();
-    }
-
-    // Event Listeners
-    const eventListeners = {
-      element: [
-        ['project-title', 'input', e => {
-          state.projectTitle = e.target.value.slice(0, 100);
-          saveState();
-        }],
-        ['brick-type', 'change', e => {
-          state.selectedSize = `${e.target.value}_${document.getElementById('brick-size').value}`;
-          updateScene();
-        }],
-        ['brick-size', 'change', e => {
-          state.selectedSize = `${document.getElementById('brick-type').value}_${e.target.value}`;
-          updateScene();
-        }],
-        ['rotation-y', 'input', e => {
-          state.rotationY = (e.target.value * Math.PI) / 180;
-          document.getElementById('rotation-value').textContent = `${e.target.value}°`;
-          updateScene();
-        }],
-        ['joint-thickness', 'input', e => {
-          state.jointThickness = parseFloat(e.target.value) / 100;
-          updateScene();
-        }],
-        ['layer-select', 'change', e => {
-          state.currentLayer = parseInt(e.target.value);
-          updateScene();
-        }],
-        ['add-layer-btn', 'click', addLayer],
-        ['delete-mode', 'click', () => toggleMode('deleteMode', 'delete-active')],
-        ['move-mode', 'click', () => toggleMode('moveMode', 'move-active')],
-        ['rotate-mode', 'click', () => toggleMode('rotateMode', 'rotate-active')],
-        ['rotate-slider', 'input', e => {
-          document.getElementById('rotate-value').textContent = `${e.target.value}°`;
-          updateScene();
-        }],
-        ['confirm-rotation', 'click', confirmRotation],
-        ['save-file', 'click', saveFile],
-        ['open-file', 'click', openFile],
-        ['file-input', 'change', handleFileInput],
-        ['export-pdf', 'click', exportPDF],
-        ['export-png', 'click', exportPNG],
-        ['toggle-white-bricks', 'click', () => {
-          state.whiteBricks = !state.whiteBricks;
-          updateScene();
-        }],
-        ['toggle-grid', 'click', () => {
-          gridHelper.visible = !gridHelper.visible;
-          renderer.render(scene, camera);
-        }],
-        ['reset-camera', 'click', resetCamera],
-        ['undo', 'click', undo],
-        ['redo', 'click', redo],
-        ['view-front', 'click', setFrontView],
-        ['view-left', 'click', setLeftView],
-        ['view-right', 'click', setRightView],
-        ['view-oblique', 'click', setObliqueView],
-      ],
-      global: [
-        ['mousemove', e => {
-          mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-          mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-          raycaster.setFromCamera(mouse, camera);
-          const intersects = raycaster.intersectObject(plane);
-          state.hoverPoint = intersects.length > 0 && !state.deleteMode && !state.rotateMode ? intersects[0].point : null;
-          updateScene();
-        }],
-        ['click', () => {
-          if (state.deleteMode) deleteBrick();
-          else if (state.moveMode) {
-            if (state.selectedBrick) confirmMove(state.hoverPoint);
-            else selectBrickForMove();
-          }
-          else if (state.rotateMode && !state.selectedBrick) selectBrickForRotate();
-        }],
-        ['dblclick', () => {
-          if (!state.deleteMode && !state.moveMode && !state.rotateMode && state.hoverPoint) addBrick(state.hoverPoint);
-        }],
-        ['resize', () => {
-          camera.aspect = window.innerWidth / window.innerHeight;
-          camera.updateProjectionMatrix();
-          renderer.setSize(window.innerWidth, window.innerHeight);
-          state.titleInputPos.x = window.innerWidth / 2 - document.getElementById('title-input').offsetWidth / 2;
-          document.getElementById('title-input').style.left = `${state.titleInputPos.x}px`;
-        }],
-      ],
-    };
-
-    function setupEventListeners() {
-      eventListeners.element.forEach(([id, event, handler]) => {
-        const elements = id.includes('mode') || id === 'add-layer-btn' || id.includes('view-') ? document.querySelectorAll(`#${id}`) : [document.getElementById(id)];
-        elements.forEach(el => el.addEventListener(event, handler));
-      });
-
-      eventListeners.global.forEach(([event, handler]) => {
-        document.addEventListener(event, handler);
-      });
-
-      makeDraggable(document.getElementById('title-input'), state.titleInputPos);
-    }
-
-    // Animation Loop
-    function animate() {
-      requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
-    }
-
-    // Start Application
-    document.getElementById('start-button').addEventListener('click', () => {
-      document.getElementById('homepage').style.display = 'none';
-      document.getElementById('app').style.display = 'block';
-      initThreeJS();
-      setupEventListeners();
-      updateLayerSelect();
-      animate();
-    });
-  </script>
-</body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="script.js"></script>
+  </body>
 </html>
