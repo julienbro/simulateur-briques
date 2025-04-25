@@ -456,6 +456,10 @@ function updateInstructions() {
 // Brick Count Update
 function updateBrickCount() {
   const counts = BRICK_TYPES.reduce((acc, type) => {
+    // Exclude ElementVide types from counting
+    if (type.startsWith("ElementVide")) {
+      return acc;
+    }
     acc[type] = {
       entire: state.layers.flat().filter((b) => b[3] === `${type}_entire`)
         .length,
@@ -481,8 +485,12 @@ function updateBrickCount() {
 
   let hasNonZero = false
   BRICK_TYPES.forEach((type) => {
+     // Also exclude ElementVide types from displaying in the table
+    if (type.startsWith("ElementVide")) {
+      return;
+    }
     const typeCounts = counts[type]
-    if (Object.values(typeCounts).some((count) => count > 0)) {
+    if (typeCounts && Object.values(typeCounts).some((count) => count > 0)) {
       hasNonZero = true
       html += `<tr><td class="border border-gray-400 p-2">${type}</td>`
       html += `<td class="border border-gray-400 p-2">${typeCounts.entire}</td>`
