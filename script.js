@@ -62,6 +62,36 @@ const BRICK_SIZES = {
   ElementVide5_three_quarter: [0.3, 0.19, 0.05],
   ElementVide5_half: [0.2, 0.19, 0.05],
   ElementVide5_quarter: [0.15, 0.19, 0.05],
+  Linteau120x19x14_entire: [1.20, 0.19, 0.14],
+  Linteau140x19x14_entire: [1.40, 0.19, 0.14],
+  Linteau160x19x14_entire: [1.60, 0.19, 0.14],
+  Linteau180x19x14_entire: [1.80, 0.19, 0.14],
+  Linteau200x19x14_entire: [2.00, 0.19, 0.14],
+  Linteau220x19x14_entire: [2.20, 0.19, 0.14],
+  Linteau240x19x14_entire: [2.40, 0.19, 0.14],
+  Linteau260x19x14_entire: [2.60, 0.19, 0.14],
+  Linteau280x19x14_entire: [2.80, 0.19, 0.14],
+  Linteau300x19x14_entire: [3.00, 0.19, 0.14],
+  Linteau100x19x9_entire: [1.00, 0.19, 0.09],
+  Linteau120x19x9_entire: [1.20, 0.19, 0.09],
+  Linteau160x19x9_entire: [1.60, 0.19, 0.09],
+  Linteau180x19x9_entire: [1.80, 0.19, 0.09],
+  Linteau200x19x9_entire: [2.00, 0.19, 0.09],
+  Linteau220x19x9_entire: [2.20, 0.19, 0.09],
+  Linteau240x19x9_entire: [2.40, 0.19, 0.09],
+  Linteau260x19x9_entire: [2.60, 0.19, 0.09],
+  Linteau280x19x9_entire: [2.80, 0.19, 0.09],
+  Linteau300x19x9_entire: [3.00, 0.19, 0.09],
+  Linteau100x19x19_entire: [1.00, 0.19, 0.19],
+  Linteau120x19x19_entire: [1.20, 0.19, 0.19],
+  Linteau160x19x19_entire: [1.60, 0.19, 0.19],
+  Linteau180x19x19_entire: [1.80, 0.19, 0.19],
+  Linteau200x19x19_entire: [2.00, 0.19, 0.19],
+  Linteau220x19x19_entire: [2.20, 0.19, 0.19],
+  Linteau240x19x19_entire: [2.40, 0.19, 0.19],
+  Linteau260x19x19_entire: [2.60, 0.19, 0.19],
+  Linteau280x19x19_entire: [2.80, 0.19, 0.19],
+  Linteau300x19x19_entire: [3.00, 0.19, 0.19],
 }
 
 const COLOR_MAP = {
@@ -71,15 +101,47 @@ const COLOR_MAP = {
   M90: "#2980b9",
   WF: "#27ae60",
   WFD: "#16a085",
-  Bloc9: "#d35400",
-  Bloc14: "#7f8c8d",
-  Bloc19: "#2c3e50",
-  Bloc29: "#f1c40f",
+  // Set Bloc colors to light grey
+  Bloc9: "#D3D3D3",
+  Bloc14: "#D3D3D3",
+  Bloc19: "#D3D3D3",
+  Bloc29: "#D3D3D3",
   ElementVide: "#ADD8E6",
   ElementVide1: "#ADD8E6",
   ElementVide2: "#ADD8E6",
   ElementVide4: "#ADD8E6",
   ElementVide5: "#ADD8E6",
+  // Set all Linteau colors to medium grey (concrete color)
+  Linteau120x19x14: "#989898",
+  Linteau140x19x14: "#989898",
+  Linteau160x19x14: "#989898",
+  Linteau180x19x14: "#989898",
+  Linteau200x19x14: "#989898",
+  Linteau220x19x14: "#989898",
+  Linteau240x19x14: "#989898",
+  Linteau260x19x14: "#989898",
+  Linteau280x19x14: "#989898",
+  Linteau300x19x14: "#989898",
+  Linteau100x19x9: "#989898",
+  Linteau120x19x9: "#989898",
+  Linteau160x19x9: "#989898",
+  Linteau180x19x9: "#989898",
+  Linteau200x19x9: "#989898",
+  Linteau220x19x9: "#989898",
+  Linteau240x19x9: "#989898",
+  Linteau260x19x9: "#989898",
+  Linteau280x19x9: "#989898",
+  Linteau300x19x9: "#989898",
+  Linteau100x19x19: "#989898",
+  Linteau120x19x19: "#989898",
+  Linteau160x19x19: "#989898",
+  Linteau180x19x19: "#989898",
+  Linteau200x19x19: "#989898",
+  Linteau220x19x19: "#989898",
+  Linteau240x19x19: "#989898",
+  Linteau260x19x19: "#989898",
+  Linteau280x19x19: "#989898",
+  Linteau300x19x19: "#989898",
 }
 
 const SIZE_COLOR_MAP = {
@@ -105,6 +167,36 @@ const BRICK_TYPES = [
   "ElementVide2",
   "ElementVide4",
   "ElementVide5",
+  "Linteau120x19x14",
+  "Linteau140x19x14",
+  "Linteau160x19x14",
+  "Linteau180x19x14",
+  "Linteau200x19x14",
+  "Linteau220x19x14",
+  "Linteau240x19x14",
+  "Linteau260x19x14",
+  "Linteau280x19x14",
+  "Linteau300x19x14",
+  "Linteau100x19x9",
+  "Linteau120x19x9",
+  "Linteau160x19x9",
+  "Linteau180x19x9",
+  "Linteau200x19x9",
+  "Linteau220x19x9",
+  "Linteau240x19x9",
+  "Linteau260x19x9",
+  "Linteau280x19x9",
+  "Linteau300x19x9",
+  "Linteau100x19x19",
+  "Linteau120x19x19",
+  "Linteau160x19x19",
+  "Linteau180x19x19",
+  "Linteau200x19x19",
+  "Linteau220x19x19",
+  "Linteau240x19x19",
+  "Linteau260x19x19",
+  "Linteau280x19x19",
+  "Linteau300x19x19",
 ]
 const SIZE_VARIANTS = ["entire", "three_quarter", "half", "quarter"]
 const VERSION = "1.0.0"
@@ -219,6 +311,7 @@ function initThreeJS() {
   document.getElementById("app").appendChild(renderer.domElement)
   scene.background = createSkyTexture()
   scene.add(ambientLight, directionalLight, plane, shadowPlane, gridHelper)
+  updateBrickSizeOptions(); // Call this to initialize size options
 }
 
 // Brick Creation
@@ -478,9 +571,9 @@ function updateBrickCount() {
   html += '<thead><tr class="bg-gray-200">'
   html += '<th class="border border-gray-400 p-2">Type</th>'
   html += '<th class="border border-gray-400 p-2">Entière</th>'
-  html += '<th class="border border-gray-400 p-2">Trois quarts</th>'
-  html += '<th class="border border-gray-400 p-2">Demi</th>'
-  html += '<th class="border border-gray-400 p-2">Quart</th>'
+  html += `<th class="border border-gray-400 p-2">Trois quarts</th>`
+  html += `<th class="border border-gray-400 p-2">Demi</th>`
+  html += `<th class="border border-gray-400 p-2">Quart</th>`
   html += "</tr></thead><tbody>"
 
   let hasNonZero = false
@@ -494,9 +587,16 @@ function updateBrickCount() {
       hasNonZero = true
       html += `<tr><td class="border border-gray-400 p-2">${type}</td>`
       html += `<td class="border border-gray-400 p-2">${typeCounts.entire}</td>`
-      html += `<td class="border border-gray-400 p-2">${typeCounts.three_quarter}</td>`
-      html += `<td class="border border-gray-400 p-2">${typeCounts.half}</td>`
-      html += `<td class="border border-gray-400 p-2">${typeCounts.quarter}</td></tr>`
+      // Only display columns for three_quarter, half, and quarter if they exist for the type
+      if (!type.startsWith("Linteau")) {
+         html += `<td class="border border-gray-400 p-2">${typeCounts.three_quarter}</td>`
+         html += `<td class="border border-gray-400 p-2">${typeCounts.half}</td>`
+         html += `<td class="border border-gray-400 p-2">${typeCounts.quarter}</td></tr>`
+      } else {
+         html += `<td class="border border-gray-400 p-2">0</td>`
+         html += `<td class="border border-gray-400 p-2">0</td>`
+         html += `<td class="border border-gray-400 p-2">0</td></tr>`
+      }
     }
   })
 
@@ -783,7 +883,7 @@ function exportPDF() {
   const appTitle = state.projectTitle || "Mur Simulateur 3d"
   let page = 1
 
-  // Define elements to hide
+  // Define elements to hide from inventory count in PDF
   const hiddenElementTypes = [
     "ElementVide",
     "ElementVide1",
@@ -942,8 +1042,8 @@ function exportPDF() {
   const sideLine = new THREE.Line(
     new THREE.BufferGeometry().setFromPoints([
       new THREE.Vector3(0, 0, -0.95),
-      new THREE.Vector3(0, 0, 0.95),
-    ]),
+      new THREE.Vector3(0, 0, 0.95)],
+    ),
     new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 5 }),
   )
   scene.add(sideLine)
@@ -1004,15 +1104,25 @@ function exportPDF() {
   let y = 2
   BRICK_TYPES.forEach((type) => {
     if (hiddenElementTypes.includes(type)) return // Skip hidden elements
-    SIZE_VARIANTS.forEach((variant) => {
-      const count = filteredLayers
-        .flat()
-        .filter((b) => b[3] === `${type}_${variant}`).length
+    // For lintels, only count the 'entire' size
+    if (type.startsWith("Linteau")) {
+      const count = filteredLayers.flat().filter((b) => b[3] === `${type}_entire`).length;
       if (count > 0) {
-        pdf.text(`${type} (${variant}): ${count} éléments`, 1, y)
-        y += 1
+        pdf.text(`${type} (Entière): ${count} éléments`, 1, y);
+        y += 1;
       }
-    })
+    } else {
+      // For other brick types, count all size variants
+      SIZE_VARIANTS.forEach((variant) => {
+        const count = filteredLayers
+          .flat()
+          .filter((b) => b[3] === `${type}_${variant}`).length
+        if (count > 0) {
+          pdf.text(`${type} (${variant}): ${count} éléments`, 1, y)
+          y += 1
+        }
+      })
+    }
   })
   pdf.setFontSize(8)
   pdf.text(appTitle, width - 3, height - 1.5, { align: "right" })
@@ -1108,6 +1218,40 @@ function showNotification(message) {
   }, 3000)
 }
 
+// Function to update brick size options based on type
+function updateBrickSizeOptions() {
+  const brickTypeSelect = document.getElementById("brick-type");
+  const brickSizeSelect = document.getElementById("brick-size");
+  const selectedBrickType = brickTypeSelect.value;
+
+  // Clear existing options
+  brickSizeSelect.innerHTML = "";
+
+  // Add size options based on selected brick type
+  if (selectedBrickType.startsWith("Linteau")) {
+    const option = document.createElement("option");
+    option.value = "entire";
+    option.textContent = "Entière";
+    brickSizeSelect.appendChild(option);
+  } else {
+    SIZE_VARIANTS.forEach(variant => {
+      const option = document.createElement("option");
+      option.value = variant;
+      option.textContent = {
+        entire: "Entière",
+        three_quarter: "Trois quarts",
+        half: "Demi",
+        quarter: "Quart"
+      }[variant];
+      brickSizeSelect.appendChild(option);
+    });
+  }
+   // Set the selected size based on the first available option
+   state.selectedSize = `${selectedBrickType}_${brickSizeSelect.value}`;
+   updateScene();
+}
+
+
 // Event Listeners
 const eventListeners = {
   global: () => {
@@ -1173,8 +1317,7 @@ const eventListeners = {
     })
 
     document.getElementById("brick-type").addEventListener("change", (e) => {
-      state.selectedSize = `${e.target.value}_${document.getElementById("brick-size").value}`
-      updateScene()
+      updateBrickSizeOptions(); // Call this to update size options
     })
 
     document.getElementById("brick-size").addEventListener("change", (e) => {
@@ -1464,7 +1607,6 @@ const eventListeners = {
         state.titleInputPos.x += xOffsetTitle
         state.titleInputPos.y += yOffsetTitle
         xOffsetTitle = 0
-        a
         yOffsetTitle = 0
         isDraggingTitle = false
         titleInput.style.cursor = "move"
