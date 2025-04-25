@@ -92,6 +92,56 @@ const BRICK_SIZES = {
   Linteau260x19x19_entire: [2.60, 0.19, 0.19],
   Linteau280x19x19_entire: [2.80, 0.19, 0.19],
   Linteau300x19x19_entire: [3.00, 0.19, 0.19],
+  BlocAssise60x20x9_entire: [0.60, 0.20, 0.09],
+  BlocAssise60x20x9_three_quarter: [0.45, 0.20, 0.09],
+  BlocAssise60x20x9_half: [0.30, 0.20, 0.09],
+  BlocAssise60x20x9_quarter: [0.15, 0.20, 0.09],
+  BlocAssise60x20x14_entire: [0.60, 0.20, 0.14],
+  BlocAssise60x20x14_three_quarter: [0.45, 0.20, 0.14],
+  BlocAssise60x20x14_half: [0.30, 0.20, 0.14],
+  BlocAssise60x20x14_quarter: [0.15, 0.20, 0.14],
+  BlocAssise60x20x19_entire: [0.60, 0.20, 0.19],
+  BlocAssise60x20x19_three_quarter: [0.45, 0.20, 0.19],
+  BlocAssise60x20x19_half: [0.30, 0.20, 0.19],
+  BlocAssise60x20x19_quarter: [0.15, 0.20, 0.19],
+  BlocCell60x25x10_entire: [0.60, 0.25, 0.10],
+  BlocCell60x25x10_three_quarter: [0.45, 0.25, 0.10],
+  BlocCell60x25x10_half: [0.30, 0.25, 0.10],
+  BlocCell60x25x10_quarter: [0.15, 0.25, 0.10],
+  BlocCell60x25x15_entire: [0.60, 0.25, 0.15],
+  BlocCell60x25x15_three_quarter: [0.45, 0.25, 0.15],
+  BlocCell60x25x15_half: [0.30, 0.25, 0.15],
+  BlocCell60x25x15_quarter: [0.15, 0.25, 0.15],
+  BlocCell60x25x20_entire: [0.60, 0.25, 0.20],
+  BlocCell60x25x20_three_quarter: [0.45, 0.25, 0.20],
+  BlocCell60x25x20_half: [0.30, 0.25, 0.20],
+  BlocCell60x25x20_quarter: [0.15, 0.25, 0.20],
+  BlocCell60x25x24_entire: [0.60, 0.25, 0.24],
+  BlocCell60x25x24_three_quarter: [0.45, 0.25, 0.24],
+  BlocCell60x25x24_half: [0.30, 0.25, 0.24],
+  BlocCell60x25x24_quarter: [0.15, 0.25, 0.24],
+  BlocCell60x25x30_entire: [0.60, 0.25, 0.30],
+  BlocCell60x25x30_three_quarter: [0.45, 0.25, 0.30],
+  BlocCell60x25x30_half: [0.30, 0.25, 0.30],
+  BlocCell60x25x30_quarter: [0.15, 0.25, 0.30],
+  BlocCell60x25x36_5_entire: [0.60, 0.25, 0.365],
+  BlocCell60x25x36_5_three_quarter: [0.45, 0.25, 0.365],
+  BlocCell60x25x36_5_half: [0.30, 0.25, 0.365],
+  BlocCell60x25x36_5_quarter: [0.15, 0.25, 0.365],
+  PanneauPUR120x60x5_entire: [1.20, 0.60, 0.050],
+  PanneauPUR120x60x6_entire: [1.20, 0.60, 0.060],
+  PanneauPUR120x60x7_entire: [1.20, 0.60, 0.070],
+  PanneauPUR120x60x8_entire: [1.20, 0.60, 0.080],
+  PanneauPUR120x60x9_entire: [1.20, 0.60, 0.090],
+  PanneauPUR120x60x10_entire: [1.20, 0.60, 0.100],
+  PanneauPUR120x60x11_entire: [1.20, 0.60, 0.110],
+  PanneauPUR120x60x12_entire: [1.20, 0.60, 0.120],
+  PanneauPUR120x60x13_entire: [1.20, 0.60, 0.130],
+  PanneauPUR120x60x14_entire: [1.20, 0.60, 0.140],
+  PanneauPUR120x60x15_entire: [1.20, 0.60, 0.150],
+  PanneauPUR120x60x16_entire: [1.20, 0.60, 0.160],
+  PanneauPUR120x60x18_entire: [1.20, 0.60, 0.180],
+  Profil6_5x250x6_5_entire: [0.065, 2.50, 0.065],
 }
 
 const COLOR_MAP = {
@@ -142,6 +192,29 @@ const COLOR_MAP = {
   Linteau260x19x19: "#989898",
   Linteau280x19x19: "#989898",
   Linteau300x19x19: "#989898",
+  BlocAssise60x20x9: "#A9A9A9",
+  BlocAssise60x20x14: "#A9A9A9",
+  BlocAssise60x20x19: "#A9A9A9",
+  BlocCell60x25x10: "#C0C0C0",
+  BlocCell60x25x15: "#C0C0C0",
+  BlocCell60x25x20: "#C0C0C0",
+  BlocCell60x25x24: "#C0C0C0",
+  BlocCell60x25x30: "#C0C0C0",
+  BlocCell60x25x36_5: "#C0C0C0",
+  PanneauPUR120x60x5: "#FFA500",
+  PanneauPUR120x60x6: "#FFA500",
+  PanneauPUR120x60x7: "#FFA500",
+  PanneauPUR120x60x8: "#FFA500",
+  PanneauPUR120x60x9: "#FFA500",
+  PanneauPUR120x60x10: "#FFA500",
+  PanneauPUR120x60x11: "#FFA500",
+  PanneauPUR120x60x12: "#FFA500",
+  PanneauPUR120x60x13: "#FFA500",
+  PanneauPUR120x60x14: "#FFA500",
+  PanneauPUR120x60x15: "#FFA500",
+  PanneauPUR120x60x16: "#FFA500",
+  PanneauPUR120x60x18: "#FFA500",
+  Profil6_5x250x6_5: "#000000",
 }
 
 const SIZE_COLOR_MAP = {
@@ -197,9 +270,32 @@ const BRICK_TYPES = [
   "Linteau260x19x19",
   "Linteau280x19x19",
   "Linteau300x19x19",
+   "BlocAssise60x20x9",
+  "BlocAssise60x20x14",
+  "BlocAssise60x20x19",
+  "BlocCell60x25x10",
+  "BlocCell60x25x15",
+  "BlocCell60x25x20",
+  "BlocCell60x25x24",
+  "BlocCell60x25x30",
+  "BlocCell60x25x36_5",
+  "PanneauPUR120x60x50",
+  "PanneauPUR120x60x60",
+  "PanneauPUR120x60x70",
+  "PanneauPUR120x60x80",
+  "PanneauPUR120x60x90",
+  "PanneauPUR120x60x100",
+  "PanneauPUR120x60x110",
+  "PanneauPUR120x60x120",
+  "PanneauPUR120x60x130",
+  "PanneauPUR120x60x140",
+  "PanneauPUR120x60x150",
+  "PanneauPUR120x60x160",
+  "PanneauPUR120x60x180",
+  "Profil6_5x250x6_5",
 ]
 const SIZE_VARIANTS = ["entire", "three_quarter", "half", "quarter"]
-const VERSION = "1.0.0"
+const VERSION = "1.0.5"
 
 // State
 let state = {
@@ -1228,7 +1324,9 @@ function updateBrickSizeOptions() {
   brickSizeSelect.innerHTML = "";
 
   // Add size options based on selected brick type
-  if (selectedBrickType.startsWith("Linteau")) {
+  if (selectedBrickType.startsWith("Linteau") || 
+      selectedBrickType.startsWith("PanneauPUR") || 
+      selectedBrickType.startsWith("Profil")) {
     const option = document.createElement("option");
     option.value = "entire";
     option.textContent = "Entière";
@@ -1246,9 +1344,9 @@ function updateBrickSizeOptions() {
       brickSizeSelect.appendChild(option);
     });
   }
-   // Set the selected size based on the first available option
-   state.selectedSize = `${selectedBrickType}_${brickSizeSelect.value}`;
-   updateScene();
+  // Set the selected size based on the first available option
+  state.selectedSize = `${selectedBrickType}_${brickSizeSelect.value}`;
+  updateScene();
 }
 
 
