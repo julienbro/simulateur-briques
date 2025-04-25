@@ -2,13 +2,6 @@ const { jsPDF } = window.jspdf
 
 // Constants
 const BRICK_SIZES = {
-  "M50_sur_champ_entire": [0.05, 0.19, 0.09],
-  "M57_sur_champ_entire": [0.057, 0.19, 0.09],
-  "M65_sur_champ_entire": [0.065, 0.19, 0.09],
-  "M90_sur_champ_entire": [0.09, 0.19, 0.09],
-  "WF_sur_champ_entire": [0.09, 0.21, 0.09],
-  "WFD_sur_champ_entire": [0.09, 0.21, 0.09],
-
   M50_entire: [0.19, 0.05, 0.09],
   M50_three_quarter: [0.14, 0.05, 0.09],
   M50_half: [0.09, 0.05, 0.09],
@@ -232,12 +225,6 @@ const SIZE_COLOR_MAP = {
 }
 
 const BRICK_TYPES = [
-  "M50_sur_champ",
-  "M57_sur_champ",
-  "M65_sur_champ",
-  "M90_sur_champ",
-  "WF_sur_champ",
-  "WFD_sur_champ",
   "M50",
   "M57",
   "M65",
