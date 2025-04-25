@@ -61,14 +61,23 @@ function setupEventListeners() {
   });
 
   document.getElementById("brick-type").addEventListener("change", (e) => {
-    state.selectedSize = `${e.target.value}_${document.getElementById("brick-size").value}`;
+    state.selectedSize = `${e.target.value}_${state.selectedSize.split('_')[1] || 'entire'}`;
     updateScene();
   });
 
-  document.getElementById("brick-size").addEventListener("change", (e) => {
-    state.selectedSize = `${document.getElementById("brick-type").value}_${e.target.value}`;
-    updateScene();
+  // Brick Size Buttons
+  document.querySelectorAll(".brick-size-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      const size = button.dataset.size;
+      state.selectedSize = `${document.getElementById("brick-type").value}_${size}`;
+      document.querySelectorAll(".brick-size-btn").forEach((btn) => btn.classList.remove("active"));
+      button.classList.add("active");
+      updateScene();
+    });
   });
+
+  // Set initial active button
+  document.querySelector(`.brick-size-btn[data-size="entire"]`).classList.add("active");
 
   document.getElementById("rotation-y").addEventListener("input", (e) => {
     state.rotationY = (e.target.value * Math.PI) / 180;
