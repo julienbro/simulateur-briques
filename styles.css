@@ -357,7 +357,7 @@ h2 {
     z-index: 10;
     right: 10px;
     top: 110px;
-    width: 500px;
+    width: 400px;
     height: 200px;
     resize: both; /* Allow resizing */
     overflow: auto; /* Add scrollbars if needed */
