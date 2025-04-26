@@ -181,7 +181,7 @@
     <div id="instruction-bar" class="instruction-bar">
       Double-cliquez pour placer une brique
     </div>
-    <div id="title-input" class="title-input">
+    <div id="title-input" class="title-input" style="top: 70px;">
       <label for="project-title">Titre du projet</label>
       <input type="text" id="project-title" maxlength="100" placeholder="Entrez le titre du projet" />
     </div>
@@ -198,7 +198,7 @@
         <option value="M50_sur_champ">Brique M50 sur champ (5x19x9 cm)</option>
         <option value="M57_sur_champ">Brique M57 sur champ (5,7x19x9 cm)</option>
         <option value="M65_sur_champ">Brique M65 sur champ (6,5x19x9 cm)</option>
-        <option value="M90_sur_champ">Brique M90 sur champ (9x19x9 cm)</option>
+        <option value="M90_sur_champ">Brique M90 sur champ (9x21x9 cm)</option>
         <option value="WF_sur_champ">Brique WF sur champ (9x21x9 cm)</option>
         <option value="WFD_sur_champ">Brique WFD sur champ (9x21x9 cm)</option>
         <option value="Bloc9">Bloc de 9 (39x19x9 cm)</option>
@@ -291,6 +291,12 @@
     </div>
     <div id="version" class="version">Version 1.0.5 par Julien Brohez</div>
     <input type="file" id="file-input" accept=".json" style="display: none" />
+
+    <div id="notes-container" class="notes-container" style="display: block;">
+        <label for="student-notes">Mode opératoire</label>
+        <textarea id="student-notes" placeholder="Entrez vos notes ici..."></textarea>
+    </div>
+   
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
