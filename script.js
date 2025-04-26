@@ -152,75 +152,75 @@ const BRICK_SIZES = {
 }
 
 const COLOR_MAP = {
-  M50: "#e07b39",
-  M57: "#c0392b",
-  M65: "#8e44ad",
-  M90: "#2980b9",
-  WF: "#27ae60",
-  WFD: "#16a085",
-  // Set Bloc colors to light grey
-  Bloc9: "#D3D3D3",
-  Bloc14: "#D3D3D3",
-  Bloc19: "#D3D3D3",
-  Bloc29: "#D3D3D3",
+  M50: "#FF0000",
+  M57: "#FF0000",
+  M65: "#FF0000",
+  M90: "#FF0000",
+  WF: "#FF0000",
+  WFD: "#FF0000",
+  // Set Bloc colors to grey
+  Bloc9: "#808080",
+  Bloc14: "#808080",
+  Bloc19: "#808080",
+  Bloc29: "#808080",
   ElementVide: "#ADD8E6",
   ElementVide1: "#ADD8E6",
   ElementVide2: "#ADD8E6",
   ElementVide4: "#ADD8E6",
   ElementVide5: "#ADD8E6",
-  // Set all Linteau colors to medium grey (concrete color)
-  Linteau120x19x14: "#989898",
-  Linteau140x19x14: "#989898",
-  Linteau160x19x14: "#989898",
-  Linteau180x19x14: "#989898",
-  Linteau200x19x14: "#989898",
-  Linteau220x19x14: "#989898",
-  Linteau240x19x14: "#989898",
-  Linteau260x19x14: "#989898",
-  Linteau280x19x14: "#989898",
-  Linteau300x19x14: "#989898",
-  Linteau100x19x9: "#989898",
-  Linteau120x19x9: "#989898",
-  Linteau160x19x9: "#989898",
-  Linteau180x19x9: "#989898",
-  Linteau200x19x9: "#989898",
-  Linteau220x19x9: "#989898",
-  Linteau240x19x9: "#989898",
-  Linteau260x19x9: "#989898",
-  Linteau280x19x9: "#989898",
-  Linteau300x19x9: "#989898",
-  Linteau100x19x19: "#989898",
-  Linteau120x19x19: "#989898",
-  Linteau160x19x19: "#989898",
-  Linteau180x19x19: "#989898",
-  Linteau200x19x19: "#989898",
-  Linteau220x19x19: "#989898",
-  Linteau240x19x19: "#989898",
-  Linteau260x19x19: "#989898",
-  Linteau280x19x19: "#989898",
-  Linteau300x19x19: "#989898",
-  BlocAssise60x20x9: "#A9A9A9",
-  BlocAssise60x20x14: "#A9A9A9",
-  BlocAssise60x20x19: "#A9A9A9",
-  BlocCell60x25x10: "#C0C0C0",
-  BlocCell60x25x15: "#C0C0C0",
-  BlocCell60x25x20: "#C0C0C0",
-  BlocCell60x25x24: "#C0C0C0",
-  BlocCell60x25x30: "#C0C0C0",
-  BlocCell60x25x36_5: "#C0C0C0",
-  PanneauPUR120x60x5: "#FFA500",
-  PanneauPUR120x60x6: "#FFA500",
-  PanneauPUR120x60x7: "#FFA500",
-  PanneauPUR120x60x8: "#FFA500",
-  PanneauPUR120x60x9: "#FFA500",
-  PanneauPUR120x60x10: "#FFA500",
-  PanneauPUR120x60x11: "#FFA500",
-  PanneauPUR120x60x12: "#FFA500",
-  PanneauPUR120x60x13: "#FFA500",
-  PanneauPUR120x60x14: "#FFA500",
-  PanneauPUR120x60x15: "#FFA500",
-  PanneauPUR120x60x16: "#FFA500",
-  PanneauPUR120x60x18: "#FFA500",
+  // Set all Linteau colors to grey
+  Linteau120x19x14: "#808080",
+  Linteau140x19x14: "#808080",
+  Linteau160x19x14: "#808080",
+  Linteau180x19x14: "#808080",
+  Linteau200x19x14: "#808080",
+  Linteau220x19x14: "#808080",
+  Linteau240x19x14: "#808080",
+  Linteau260x19x14: "#808080",
+  Linteau280x19x14: "#808080",
+  Linteau300x19x14: "#808080",
+  Linteau100x19x9: "#808080",
+  Linteau120x19x9: "#808080",
+  Linteau160x19x9: "#808080",
+  Linteau180x19x9: "#808080",
+  Linteau200x19x9: "#808080",
+  Linteau220x19x9: "#808080",
+  Linteau240x19x9: "#808080",
+  Linteau260x19x9: "#808080",
+  Linteau280x19x9: "#808080",
+  Linteau300x19x9: "#808080",
+  Linteau100x19x19: "#808080",
+  Linteau120x19x19: "#808080",
+  Linteau160x19x19: "#808080",
+  Linteau180x19x19: "#808080",
+  Linteau200x19x19: "#808080",
+  Linteau220x19x19: "#808080",
+  Linteau240x19x19: "#808080",
+  Linteau260x19x19: "#808080",
+  Linteau280x19x19: "#808080",
+  Linteau300x19x19: "#808080",
+  BlocAssise60x20x9: "##FFFFFF",
+  BlocAssise60x20x14: "##FFFFFF",
+  BlocAssise60x20x19: "##FFFFFF",
+  BlocCell60x25x10: "#FFFFFF",  // BlocCell to white
+  BlocCell60x25x15: "#FFFFFF",
+  BlocCell60x25x20: "#FFFFFF",
+  BlocCell60x25x24: "#FFFFFF",
+  BlocCell60x25x30: "#FFFFFF",
+  BlocCell60x25x36_5: "#FFFFFF",
+  PanneauPUR120x60x5: "#ccc096", // PanneauPUR to ccc096
+  PanneauPUR120x60x6: "#ccc096",
+  PanneauPUR120x60x7: "#ccc096",
+  PanneauPUR120x60x8: "#ccc096",
+  PanneauPUR120x60x9: "#ccc096",
+  PanneauPUR120x60x10: "#ccc096",
+  PanneauPUR120x60x11: "#ccc096",
+  PanneauPUR120x60x12: "#ccc096",
+  PanneauPUR120x60x13: "#ccc096",
+  PanneauPUR120x60x14: "#ccc096",
+  PanneauPUR120x60x15: "#ccc096",
+  PanneauPUR120x60x16: "#ccc096",
+  PanneauPUR120x60x18: "#ccc096",
   Profil6_5x250x6_5: "#000000",
 }
 
@@ -434,46 +434,43 @@ function createBrick(
   rotation = [0, 0, 0],
   isJointAligned = false,
 ) {
-  const geometry = new THREE.BoxGeometry(...size)
-  const brickType = type.split("_")[0]
-  const brickSize = type.split("_")[1]
-  const isElementVide = brickType.startsWith("ElementVide")
-  const color = transparent
-    ? isJointAligned
-      ? "#0000ff"
-      : "#00ff00": state.whiteBricks
-      ? "#ffffff"
-      : highlight
-        ? "#00ffff"
-        : SIZE_COLOR_MAP[brickSize] || COLOR_MAP[brickType] || "orange"
+  const geometry = new THREE.BoxGeometry(...size);
+  const brickType = type.split("_")[0];
+  const brickSize = type.split("_")[1];
+  const isElementVide = brickType.startsWith("ElementVide");
+  let color = COLOR_MAP[brickType] || "orange"; // Default to orange if not found in COLOR_MAP
+  if (state.whiteBricks) {
+    color = "#ffffff";
+  } else if (highlight) {
+    color = "#00ffff";
+  }
   const material = new THREE.MeshStandardMaterial({
     color,
     transparent: isElementVide || transparent,
     opacity: isElementVide ? 0.3 : transparent ? 0.3 : 1,
     wireframe: transparent && !isElementVide,
-  })
-  const mesh = new THREE.Mesh(geometry, material)
-  mesh.position.set(...position)
-  mesh.rotation.set(...rotation)
-  mesh.castShadow = !transparent && !isElementVide
-  mesh.receiveShadow = true
-  mesh.userData.type = type
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(...position);
+  mesh.rotation.set(...rotation);
+  mesh.castShadow = !transparent && !isElementVide;
+  mesh.receiveShadow = true;
+  mesh.userData.type = type;
 
   if (!transparent && !isElementVide) {
-    const edges = new THREE.EdgesGeometry(geometry)
+    const edges = new THREE.EdgesGeometry(geometry);
     const edgeMaterial = new THREE.LineBasicMaterial({
       color: 0x000000,
       linewidth: 1,
-    })
-    const edgeLines = new THREE.LineSegments(edges, edgeMaterial)
-    edgeLines.position.set(...position)
-    edgeLines.rotation.set(...rotation)
-    mesh.userData.edges = edgeLines
+    });
+    const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
+    edgeLines.position.set(...position);
+    edgeLines.rotation.set(...rotation);
+    mesh.userData.edges = edgeLines;
   }
 
-  return mesh
+  return mesh;
 }
-
 // Scene Update
 function updateScene() {
   scene.children = scene.children.filter(
