@@ -54,7 +54,7 @@ canvas {
 }
 
 .title-input {
-  top: 50px;
+  top: 110px;
   left: 50%;
   transform: translateX(-50%);
   width: 300px;
@@ -346,4 +346,36 @@ h2 {
 
 .brick-type-count table {
   width: 100%;
+}
+
+.notes-container {
+    position: absolute;
+    background: #e2e8f0;
+    padding: 8px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+    right: 10px;
+    top: 110px;
+    width: 500px;
+    height: 200px;
+    resize: both; /* Allow resizing */
+    overflow: auto; /* Add scrollbars if needed */
+}
+
+.notes-container label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: bold;
+}
+
+.notes-container textarea {
+    width: 100%;
+    height: 150px;
+    box-sizing: border-box; /* Include padding in width/height */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+    font-family: inherit; /* Use the body's font */
+    resize: none;
 }
