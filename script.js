@@ -189,16 +189,6 @@ const COLOR_MAP = {
   Linteau260x19x9: "#808080",
   Linteau280x19x9: "#808080",
   Linteau300x19x9: "#808080",
-  Linteau100x19x19: "#808080",
-  Linteau120x19x19: "#808080",
-  Linteau160x19x19: "#808080",
-  Linteau180x19x19: "#808080",
-  Linteau200x19x19: "#808080",
-  Linteau220x19x19: "#808080",
-  Linteau240x19x19: "#808080",
-  Linteau260x19x19: "#808080",
-  Linteau280x19x19: "#808080",
-  Linteau300x19x19: "#808080",
   BlocAssise60x20x9: "##FFFFFF",
   BlocAssise60x20x14: "##FFFFFF",
   BlocAssise60x20x19: "##FFFFFF",
@@ -328,7 +318,7 @@ let state = {
   rotateMode: false,
   projectTitle: "",
   layerboxPos: { x: 60, y: 360 },
-  titleInputPos: { x: window.innerWidth / 2 - 150, y: 50 },
+  titleInputPos: { x: window.innerWidth / 2 - 150, y: 110 }, // Changed from 50 to 110
   history: [
     {
       layers: [
@@ -342,7 +332,9 @@ let state = {
   historyIndex: 0,
   selectedBrick: null,
   ghostBrick: null,
-  contextMenu: null, // Ajout de l'état pour le menu contextuel
+  contextMenu: null,
+  notesContainerPos: { x:  window.innerWidth - 510, y: 110 },
+  isNotesOpen: true, // Add isNotesOpen to the state
 }
 
 // Three.js Setup
@@ -438,11 +430,11 @@ function createBrick(
   const brickType = type.split("_")[0];
   const brickSize = type.split("_")[1];
   const isElementVide = brickType.startsWith("ElementVide");
-  let color = COLOR_MAP[brickType] || "orange"; // Default to orange if not found in COLOR_MAP
+  let color = COLOR_MAP[brickType] || "orange"; // Default to orange if not foundin COLOR_MAP
   if (state.whiteBricks) {
     color = "#ffffff";
   } else if (highlight) {
-    color = "#00ffff";
+color ="#00ffff";
   }
   const material = new THREE.MeshStandardMaterial({
     color,
@@ -1751,88 +1743,33 @@ const eventListeners = {
       showNotification("Mur Simulateur 3D v1.0.0 par Julien Brohez")
     })
 
-    // Draggable Layerbox
-    let isDraggingLayerbox = false
-    let currentXLayerbox,
-      currentYLayerbox,
-      xOffsetLayerbox = 0,
-      yOffsetLayerbox = 0
-    const layerbox = document.getElementById("layerbox")
+    //Notes container
+    const notesContainer = document.getElementById("notes-container");
+    const notesToggleButton = document.createElement("button");
+    notesToggleButton.textContent = "Montrer/Cacher le mode opératoire";
+    notesToggleButton.style.position = "absolute";
+    notesToggleButton.style.top = "70px"; 
+    notesToggleButton.style.right = "10px";
+    notesToggleButton.style.zIndex = "21";
+    document.getElementById("app").appendChild(notesToggleButton);  
 
-    layerbox.addEventListener("mousedown", (e) => {
-      isDraggingLayerbox = true
-      currentXLayerbox = e.clientX - xOffsetLayerbox
-      currentYLayerbox = e.clientY - yOffsetLayerbox
-      layerbox.style.cursor = "grabbing"
-    })
+    notesToggleButton.addEventListener("click", () => {
+      state.isNotesOpen = !state.isNotesOpen;
+      notesContainer.style.display = state.isNotesOpen ? "block" : "none";
+    });
 
-    document.addEventListener("mousemove", (e) => {
-      if (isDraggingLayerbox) {
-        xOffsetLayerbox = e.clientX - currentXLayerbox
-        yOffsetLayerbox = e.clientY - currentYLayerbox
-        layerbox.style.left = `${state.layerboxPos.x + xOffsetLayerbox}px`
-        layerbox.style.top = `${state.layerboxPos.y + yOffsetLayerbox}px`
-      }
-    })
-
-    document.addEventListener("mouseup", () => {
-      if (isDraggingLayerbox) {
-        state.layerboxPos.x += xOffsetLayerbox
-        state.layerboxPos.y += yOffsetLayerbox
-        xOffsetLayerbox = 0
-        yOffsetLayerbox = 0
-        isDraggingLayerbox = false
-        layerbox.style.cursor = "move"
-      }
-    })
-
-    // Draggable Title Input
-    let isDraggingTitle = false
-    let currentXTitle,
-      currentYTitle,
-      xOffsetTitle = 0,
-      yOffsetTitle = 0
-    const titleInput = document.getElementById("title-input")
-
-    titleInput.addEventListener("mousedown", (e) => {
-      isDraggingTitle = true
-      currentXTitle = e.clientX - xOffsetTitle
-      currentYTitle = e.clientY - yOffsetTitle
-      titleInput.style.cursor = "grabbing"
-    })
-
-    document.addEventListener("mousemove", (e) => {
-      if (isDraggingTitle) {
-        xOffsetTitle = e.clientX - currentXTitle
-        yOffsetTitle = e.clientY - currentYTitle
-        titleInput.style.left = `${state.titleInputPos.x + xOffsetTitle}px`
-        titleInput.style.top = `${state.titleInputPos.y + yOffsetTitle}px`
-        titleInput.style.transform = "none"
-      }
-    })
-
-    document.addEventListener("mouseup", () => {
-      if (isDraggingTitle) {
-        state.titleInputPos.x += xOffsetTitle
-        state.titleInputPos.y += yOffsetTitle
-        xOffsetTitle = 0
-        yOffsetTitle = 0
-        isDraggingTitle = false
-        titleInput.style.cursor = "move"
-      }
-    })
   },
 }
 
 // Animation Loop
-function animate() {
-  requestAnimationFrame(animate)
-  controls.update()
-  renderer.render(scene, camera)
+function animate() { // Added parentheses here
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
 }
 
 // Initialize
-eventListeners.global()
-eventListeners.ui()
-animate()
+eventListeners.global();
+eventListeners.ui();
+animate();
 
