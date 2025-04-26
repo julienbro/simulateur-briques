@@ -282,19 +282,19 @@ const BRICK_TYPES = [
   "BlocCell60x25x24",
   "BlocCell60x25x30",
   "BlocCell60x25x36_5",
-  "PanneauPUR120x60x50",
-  "PanneauPUR120x60x60",
-  "PanneauPUR120x60x70",
-  "PanneauPUR120x60x80",
-  "PanneauPUR120x60x90",
-  "PanneauPUR120x60x100",
-  "PanneauPUR120x60x110",
-  "PanneauPUR120x60x120",
-  "PanneauPUR120x60x130",
-  "PanneauPUR120x60x140",
-  "PanneauPUR120x60x150",
-  "PanneauPUR120x60x160",
-  "PanneauPUR120x60x180",
+  "PanneauPUR120x60x5",
+  "PanneauPUR120x60x6",
+  "PanneauPUR120x60x7",
+  "PanneauPUR120x60x8",
+  "PanneauPUR120x60x9",
+  "PanneauPUR120x60x10",
+  "PanneauPUR120x60x11",
+  "PanneauPUR120x60x12",
+  "PanneauPUR120x60x13",
+  "PanneauPUR120x60x14",
+  "PanneauPUR120x60x15",
+  "PanneauPUR120x60x16",
+  "PanneauPUR120x60x18",
   "Profil6_5x250x6_5",
 ]
 const SIZE_VARIANTS = ["entire", "three_quarter", "half", "quarter"]
@@ -455,8 +455,7 @@ color ="#00ffff";
       color: 0x000000,
       linewidth: 1,
     });
-    const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
-    edgeLines.position.set(...position);
+    const edgeLines = new THREE.LineSegments(edges, edgeMaterial);edgeLines.position.set(...position);
     edgeLines.rotation.set(...rotation);
     mesh.userData.edges = edgeLines;
   }
@@ -679,24 +678,25 @@ function updateBrickCount() {
 
   let hasNonZero = false
   BRICK_TYPES.forEach((type) => {
-     // Also exclude ElementVide types from displaying in the table
+    // Also exclude ElementVide types from displaying in the table
     if (type.startsWith("ElementVide")) {
       return;
     }
     const typeCounts = counts[type]
+    // Check if typeCounts exists and if any count is greater than 0
     if (typeCounts && Object.values(typeCounts).some((count) => count > 0)) {
       hasNonZero = true
       html += `<tr><td class="border border-gray-400 p-2">${type}</td>`
       html += `<td class="border border-gray-400 p-2">${typeCounts.entire}</td>`
       // Only display columns for three_quarter, half, and quarter if they exist for the type
-      if (!type.startsWith("Linteau")) {
-         html += `<td class="border border-gray-400 p-2">${typeCounts.three_quarter}</td>`
-         html += `<td class="border border-gray-400 p-2">${typeCounts.half}</td>`
-         html += `<td class="border border-gray-400 p-2">${typeCounts.quarter}</td></tr>`
+      if (!type.startsWith("Linteau") && !type.startsWith("PanneauPUR") && !type.startsWith("Profil")) {
+        html += `<td class="border border-gray-400 p-2">${typeCounts.three_quarter}</td>`
+        html += `<td class="border border-gray-400 p-2">${typeCounts.half}</td>`
+        html += `<td class="border border-gray-400 p-2">${typeCounts.quarter}</td></tr>`
       } else {
-         html += `<td class="border border-gray-400 p-2">0</td>`
-         html += `<td class="border border-gray-400 p-2">0</td>`
-         html += `<td class="border border-gray-400 p-2">0</td></tr>`
+        html += `<td class="border border-gray-400 p-2">0</td>`
+        html += `<td class="border border-gray-400 p-2">0</td>`
+        html += `<td class="border border-gray-400 p-2">0</td></tr>`
       }
     }
   })
@@ -1238,6 +1238,31 @@ function exportPDF() {
   pdf.text(VERSION, width - 3, height - 0.5, { align: "right" })
   pdf.text(`${page} sur 5`, 1, height - 0.5)
 
+  // Add "Mode opératoire" page
+  pdf.addPage();
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(16);
+  pdf.text("Mode opératoire", width / 2, 1, { align: "center" });
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
+
+  const notes = document.getElementById("student-notes").value;
+  const splitNotes = pdf.splitTextToSize(notes, width - 2); // Split text to fit page width
+  let notesY = 3; // Starting Y position for the notes
+
+  splitNotes.forEach(line => {
+    pdf.text(line, 1, notesY);
+    notesY += 0.5; // Increment Y for each line
+  });
+
+  // Add footer to the "Mode opératoire" page
+  pdf.setFontSize(8);
+  pdf.text(appTitle, width - 3, height - 1.5, { align: "right" });
+  pdf.text("Conçu par Julien BROHEZ", width - 3, height - 1, { align: "right" });
+  pdf.text(VERSION, width - 3, height - 0.5, { align: "right" });
+  pdf.text(`${page} sur 6`, 1, height - 0.5); // Update total page count
+
+
   // Restore original layers and scene
   state.layers = originalLayers
   renderer.setSize(originalWidth, originalHeight)
@@ -1258,6 +1283,7 @@ function exportPNG() {
   link.download = "vue-elements.png"
   link.href = canvas.toDataURL("image/png")
   link.click()
+  URL.revokeObjectURL(url)
 }
 
 function createTitledCanvas() {
@@ -1513,8 +1539,8 @@ const eventListeners = {
       document.getElementById("homepage").style.display = "none"
       document.getElementById("app").style.display = "block"
       initThreeJS()
+      updateLayerSelect() // Call this to initialize layer select
       updateScene()
-      updateLayerSelect()
     })
 
     document.getElementById("brick-type").addEventListener("change", (e) => {
